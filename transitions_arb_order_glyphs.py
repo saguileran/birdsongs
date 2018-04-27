@@ -53,16 +53,15 @@ def normalizar(arr, minout=-1, maxout=1):
 
 # %%
 birdname = 'AmaVio'
-base_path = '/media/juan/New Volume/Experimentos vS/2018'
-#template_folder = '{}/Templates'.format(base_path)
-template_folder = '/home/juan/Documentos/Musculo/Codigo canarios/Files/Templates'
-folders = glob.glob(os.path.join
-                    ('{}/canto/{}/wavs/'.format(base_path, birdname), '*'))
-day = np.asarray([int(x.rsplit('-', 2)[1]) for x in folders])
+base_path = '/home/juan/Documentos/Musculo/Codigo canarios/Files'
+template_folder = '{}/Templates'.format(base_path)
+# folders = glob.glob(os.path.join
+#                    ('{}/canto/{}/wavs/'.format(base_path, birdname), '*'))
+# day = np.asarray([int(x.rsplit('-', 2)[1]) for x in folders])
 # ------------------#
-ordenes = [2]
+ordenes = [1]
 n_ordenes = len(ordenes)
-#order_hier = 'syllable'
+# order_hier = 'syllable'
 order_hier = 'phrase'
 # ------------------#
 # Ej. song = ABCDE a orden 2
@@ -71,7 +70,7 @@ order_hier = 'phrase'
 order_type = 'single'
 order_type = 'combined'
 # ------------------#
-files_path = folders[2]
+files_path = base_path
 log_file = glob.glob(os.path.join(files_path, '*song-log*'))[0]
 df_log = pd.read_csv(log_file, header=0, sep=',')
 all_wavs_wrep = list(df_log['File name'])
@@ -83,7 +82,7 @@ months = np.asarray([int(x[1]) for x in song_times])
 days = np.asarray([int(x[2][:2]) for x in song_times])
 hours = np.asarray([int(x[2][3:5]) for x in song_times])
 # ------------------#
-syl_types = list(set(''.join(list(df_log['song']))))
+syl_types = list(set(''.join(list(df_log['Song']))))
 
 # Creo figura de templates
 fig, ax = plt.subplots(2, len(syl_types), figsize=(30, 4))
@@ -131,33 +130,33 @@ p_tr_matrix_norep = np.zeros((num_files, n_ordenes, num_glyphs_from,
                               num_glyphs_to))
 #%%
 # De cada file me armo una matriz
+min_length = 3
 for i_order in range(n_ordenes):
     n_order = ordenes[i_order]
     for n_file in range(num_files):
         ff = all_wavs[n_file]
         print(ff)
-        for song_aux in df_log['song'][df_log['File name'] == ff]:
-            song_array = np.asarray([int(x) for x in song_aux])
+        for song_aux in df_log['Song'][df_log['File name'] == ff]:
+            song_array = np.asarray([x for x in song_aux])
             transitions_index = np.where([song_aux[n] != song_aux[n+1]
                                           for n in range(len(song_aux)-1)])[0]
             if order_hier == 'phrase':
-                song_aux2 = ''.join([song_aux[x] for x in transitions_index])
+                song = ''.join([song_aux[x] for x in transitions_index])
                 if len(transitions_index > 0):
-                    song_aux2 += song_aux[transitions_index[-1]+1]
+                    song += song_aux[transitions_index[-1]+1]
             elif order_hier == 'syllable':
-                song_aux2 = song_aux
-#            song = 's' + song_aux2 + 's'
-            # Asumo que en el file esta 0.....0
-            song = song_aux2
+                song = song_aux
             print(song)
             fin = len(song)
-            if fin > n_order:
+            if fin > n_order and fin > min_length:
                 inicio = 0
                 while inicio < fin-n_order:
                     row = glyphs_from.index(song[inicio:inicio + n_order])
                     column = glyphs_to.index(song[inicio + n_order])
                     n_tr_matrix[all_wavs.index(ff)][i_order][row][column] += 1
                     inicio += 1
+            else:
+                print('Descartada!\n')
         ocurring = np.where(n_tr_matrix[n_file][i_order] != 0)
         glyphs_from_oc = list(OrderedDict.fromkeys(ocurring[0]))
         num_glyphs_from_oc = len(glyphs_from_oc)
@@ -177,9 +176,10 @@ for i_order in range(n_ordenes):
         ax.set_yticklabels([glyphs_from[x] for x in glyphs_from_oc])
         ax.set_ylabel('From')
         ax.set_xlabel('To')
-        ax.set_title('Trans orden {}, tipo: {}'.format(n_order, order_hier))
+        ax.set_title('{}\n Orden {}, tipo: {}'.format(ff.split('.wav')[0],
+                     n_order, order_hier))
         fig.tight_layout()
-        if n_order == 1:
+        if n_order == 1 and order_hier == 'syllable':
             reps = np.diag(np.diag(n_tr_matrix[n_file][i_order]))
             n_tr_matrix_norep[n_file][i_order] = \
                 n_tr_matrix[n_file][i_order] - reps

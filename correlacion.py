@@ -244,14 +244,9 @@ dtime = 0.2
 ntime = int(dtime*fs)
 n_filas = len(v_envelope)//ntime
 U_matrix = np.diag(np.ones(n_filas))
-vecs = [v_envelope[(n)*ntime:(n+1)*ntime] for n in range(n_filas)]
-for row in range(1, n_filas):
-    for column in range(row):
-        U_matrix[row][column] = np.dot(vecs[row], vecs[column])
-        U_matrix[column][row] = U_matrix[row][column]
+vecs = np.asmatrix([v_envelope[(n)*ntime:(n+1)*ntime] for n in range(n_filas)])
+U_matrix = np.matmul(vecs, np.transpose(vecs))
 
 w, v = np.linalg.eig(U_matrix)
-base = np.zeros((len(w), ntime))
-for i in range(len(w)):
-    for j in range(len(vecs)):
-        base[i] += v[j][i]*vecs[j]
+base = np.matmul(v, vecs)
+base_vecs = [np.asarray(x)[0] for x in base]

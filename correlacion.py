@@ -240,13 +240,22 @@ fig.tight_layout()
 ax[1].plot(time, eenv, zorder=0)
 # %% SVD
 
-dtime = 0.2
+dtime = 0.4
+tstep = dtime/5
 ntime = int(dtime*fs)
-n_filas = len(v_envelope)//ntime
-U_matrix = np.diag(np.ones(n_filas))
-vecs = np.asmatrix([v_envelope[(n)*ntime:(n+1)*ntime] for n in range(n_filas)])
+nstep = int(tstep*fs)
+n_filas = (len(v_envelope)-ntime)//nstep
+vecs = np.asmatrix([normalizar(v_envelope[n*nstep:n*nstep+ntime], minout=0,
+                               maxout=1) for n in range(n_filas)])
 U_matrix = np.matmul(vecs, np.transpose(vecs))
-
-w, v = np.linalg.eig(U_matrix)
-base = np.matmul(v, vecs)
+eigval, eigvec = np.linalg.eig(U_matrix)
+base = np.matmul(eigvec, vecs)
 base_vecs = [np.asarray(x)[0] for x in base]
+plt.matshow(U_matrix)
+plt.colorbar()
+
+n = 5
+fig, ax = plt.subplots(n, figsize=(10, 20))
+for i in range(n):
+    ax[i].plot(np.arange(len(base_vecs[i]))/fs, base_vecs[i])
+fig.tight_layout()

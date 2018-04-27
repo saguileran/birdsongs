@@ -7,9 +7,11 @@ To do:
     - Multiples archivos para entrenar -> done
     - Mejorar espectrograma not?
     - Eliminar intervalos espureos -> done ? Aca o post-proc ?
-    - Generar output con secuencias de sílabas
-    - Guardar tiras de sílabas
+    - Generar output con secuencias de sílabas -> done
+    - Guardar tiras de sílabas -> done
     - Separar learning y prediction en py's distintos
+    - Preparar para mas de 10 tipos de silabas -> done
+    - Agregar signal method
 @author: gonza
 """
 
@@ -24,7 +26,6 @@ from sklearn.svm import LinearSVC
 import random
 import pandas as pd
 import glob
-# from scipy import signal
 
 
 def make_path(path):
@@ -63,15 +64,15 @@ n = 0
 for f_name in train_files:
     samp_rate, train_song[n] = wavfile.read('{}'.format(f_name))
     n += 1
-sign = np.concatenate((train_song[-1], train_song[-2]))
-times = np.arange(len(sign))/float(samp_rate)
-spectrogram, freqs, bins, im = plt.specgram(sign, NFFT=NFFT, Fs=samp_rate,
+signa = np.concatenate((train_song[-1], train_song[-2]))
+times = np.arange(len(signa))/float(samp_rate)
+spectrogram, freqs, bins, im = plt.specgram(signa, NFFT=NFFT, Fs=samp_rate,
                                             noverlap=int(NFFT*p_overlap),
                                             cmap='Greys')
 plt.ylim(0, 8000)
 # %%
 # ------------Generating the training set---------------
-
+method = 'spectrogram'
 # Size of the feature image
 dfreq = samp_rate/NFFT
 min_freq = 500
@@ -87,6 +88,12 @@ window_height = window_top - window_bot
 # Corto al rango de frecuencias relevante
 spec_relevant = spectrogram[window_bot:window_top]
 
+# ------------Generating the training set---------------
+
+# method = 'envelope'
+# dtime = np.diff(bins)[0]
+# s_envelope = envelope_cabeza(signa, method='percentile', perc=90,
+#                             intervalLength=int(0.1*dtime*samp_rate))
 # %%
 # Buffer matrix for computing the frames
 training_frame = np.zeros((window_height, window_width))
@@ -95,26 +102,30 @@ training_frame = np.zeros((window_height, window_width))
 frame_class = []
 
 # Create dictionary of syllable classes (for frame_class)
-syl_classes = {'S': 0, 'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F': 6, 'G': 7}
+# Va a haber problemas si hay mas de 10 silabas
+syl_names = ['S', 'A', 'B', 'C', 'D', 'E', 'F', 'G']
+syl_classes = {key: syl_names.index(key) for key in syl_names}
 # Create dictionary of syllable colors (for plots)
 syl_colors = {'S': 'r', 'A': 'g', 'B': 'b', 'C': 'k', 'D': 'c', 'E': 'm',
               'F': 'y', 'G': 'k'}
 # Create dictionary of syllable training sets
 syl_training_sets = {key: [] for key in syl_classes}
 # Create dictionary of syllable classes (for frame_class)
-syl_training_begs = {'S': [12.], 'A': [7.45, 15.42, 22.59],
+syl_training_begs = {'S': [12.],
+                     'A': [7.45, 15.42, 22.59],
                      'B': [0.92, 9.02, 17.16, 24.29],
                      'C': [14.51, 21.75],
                      'D': [7.2, 15.15],
                      'E': [93.11],
-                     'F': [18.68], 
+                     'F': [18.68],
                      'G': [16.32]}
-syl_training_ends = {'S': [14.], 'A': [8.55, 16.25, 23.4],
+syl_training_ends = {'S': [14.],
+                     'A': [8.55, 16.25, 23.4],
                      'B': [1.69, 10.99, 18.07, 25.21],
                      'C': [14.94, 22.20],
                      'D': [7.45, 15.37],
                      'E': [94.6],
-                     'F': [19.17], 
+                     'F': [19.17],
                      'G': [17.16]}
 
 fig, ax = plt.subplots(2, len(syl_classes), figsize=(30, 6))
@@ -129,7 +140,7 @@ for syl_type in syl_classes:
     syl_id = syl_classes[syl_type]
     for i in range(len(begs)):
         if i == rand_index:
-            cut_wav = sign[int(begs[i]*samp_rate):int(ends[i]*samp_rate)]
+            cut_wav = signa[int(begs[i]*samp_rate):int(ends[i]*samp_rate)]
             wavfile.write('{}/silaba_{}.wav'.format(templates_folder,
                                                     syl_type),
                           samp_rate, cut_wav)
@@ -149,11 +160,14 @@ for syl_type in syl_classes:
         time_end_coord = (np.abs(bins-ends[i])).argmin()
         for j in range(time_beg_coord, time_end_coord):
             # Taking the frame from the spectrogram
-            training_frame = np.asarray([10*np.log10
-                                         (np.asarray
-                                          (line[(j-half_window):
-                                                (j+1+half_window)]))
-                                        for line in spec_relevant])
+            if method == 'spectrogram':
+                training_frame = np.asarray([10*np.log10
+                                             (np.asarray
+                                              (line[(j-half_window):
+                                                    (j+1+half_window)]))
+                                            for line in spec_relevant])
+            elif method == 'envelope':
+                1
             training_set.append(training_frame)
             frame_class.append(syl_id)
     all_training_set += training_set
@@ -215,7 +229,7 @@ for j in range(half_window, len(bins)-half_window):
     confidence.append(clf.decision_function([predict_vector])[0])
 # %%
 fig, ax = plt.subplots(3, figsize=(12, 12), sharex=True)
-spectrogram, freqs, bins, im = ax[0].specgram(sign, NFFT=NFFT, Fs=samp_rate,
+spectrogram, freqs, bins, im = ax[0].specgram(signa, NFFT=NFFT, Fs=samp_rate,
                                               noverlap=int(NFFT*p_overlap),
                                               cmap='Greys')
 
@@ -231,7 +245,7 @@ syl_prediction = {key: [] for key in syl_classes}
 for syl in syl_classes:
     syl_prediction[syl] = np.asarray(prediction.copy()).astype(np.double)
     syl_prediction[syl][syl_prediction[syl] != syl_classes[syl]] = np.nan
-spectrogram, freqs, bins, im = ax[1].specgram(sign, NFFT=NFFT, Fs=samp_rate,
+spectrogram, freqs, bins, im = ax[1].specgram(signa, NFFT=NFFT, Fs=samp_rate,
                                               noverlap=int(NFFT/2),
                                               cmap='Greys')
 ax[1].set_ylim(0, 8000)
@@ -243,7 +257,7 @@ for syl in syl_classes:
 axt.legend()
 axt.set_ylim(-4.1, 0.1)
 
-ax[2].plot(times, sign)
+ax[2].plot(times, signa)
 axt = ax[2].twinx()
 for syl in syl_classes:
     syl_class = syl_classes[syl]
@@ -254,6 +268,7 @@ axt.set_ylabel('Confidence')
 axt.set_xlabel('Time [sec]')
 
 # %% Prediction new files
+df_file = '{}/song-log'.format(files_folder)
 df_song = pd.DataFrame(columns=['File name', 'Song', 'Start', 'End'])
 df_song = pd.DataFrame(columns=['File name', 'Song'])
 song_files = glob.glob(os.path.join(files_folder, '*.wav'))
@@ -304,11 +319,14 @@ for file in song_files:
     rel_pred = aux_pred[np.where(np.diff(aux_pred) != 0)]
     if aux_pred[-1] != aux_pred[-2]:
         rel_pred = np.append(rel_pred, aux_pred[-1])
-    file_string = ''.join([str(x) for x in rel_pred])
-    song_strings = file_string.split('0')
+    pred_letters = [list
+                    (syl_classes.keys())[list(syl_classes.values()).index(x)]
+                    for x in rel_pred]
+    file_string = ''.join([str(x) for x in pred_letters])
+    song_strings = file_string.split('S')
     for nn in song_strings:
         if nn != '':
-            df_song.loc[n_fila] = [os.path.basename(file), nn]
+            df_song.loc[n_fila] = [os.path.basename(file), 'S{}S'.format(nn)]
             n_fila += 1
     syl_prediction = {key: [] for key in syl_classes}
     for syl in syl_classes:
@@ -322,3 +340,4 @@ for file in song_files:
     axt.legend()
     axt.set_ylim(-4.1, 0.1)
     n += 1
+df_song.to_csv(df_file, index=False)

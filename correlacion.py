@@ -128,6 +128,12 @@ def loc_extrema(data, window=882):
     return(indmax[0], mmax, indmin[0], mmin)
 
 
+def nmoment(x, counts, n):
+    return np.sum(counts*(x-meanmoment(x, counts)**n)) / np.sum(counts)
+
+
+def meanmoment(x, counts):
+    return np.sum(x*counts) / np.sum(counts)
 # %%
 f_path = '/media/juan/New Volume/Experimentos vS/Datos gogui/wetransfer-f237e5'
 
@@ -205,17 +211,21 @@ tstart = [0.33, 4.55, 6.1, 7.5]
 nstart = [int(x*fs) for x in tstart]
 tend = [1.03, 5.38, 7., 8.3]
 nend = [int(x*fs) for x in tend]
-fig, ax = plt.subplots(len(nstart), 4, figsize=(15, 6), sharey=True)
+fig, ax = plt.subplots(len(nstart), 6, figsize=(20, 6), sharey=True)
 time_temp = []
 templates = []
 ttomax = []
 vmax = []
 skewness = []
+tmean = []
+tsk = []
 colors = ['r', 'g', 'b', 'm']
 for n in range(len(nstart)):
     auxtomax = []
     auxvmax = []
     auxsk = []
+    auxtmean = []
+    auxtsk = []
     time_temp.append(time[nstart[n]:nend[n]])
     templates.append(v_envelope[nstart[n]:nend[n]])
     ax[n][0].plot(time_temp[-1], templates[-1])
@@ -231,9 +241,17 @@ for n in range(len(nstart)):
         auxtomax.append(np.argmax(templates[-1][austart:ausend]))
         auxvmax.append(np.max(templates[-1][austart:ausend]))
         auxsk.append(auxtomax[-1]/(ausend-austart))
+        auxtmean.append(meanmoment(time_temp[-1][austart:ausend]-time_temp[-1][austart],
+                                   templates[-1][austart:ausend]))
+        auxtsk.append(nmoment(time_temp[-1][austart:ausend]-time_temp[-1][austart],
+                                   templates[-1][austart:ausend], 3))
+        
+    ax[n][1].set_xlim(0, 3000)
     ttomax.append(auxtomax)
     vmax.append(auxvmax)
     skewness.append(auxsk)
+    tmean.append(auxtmean)
+    tsk.append(auxtsk)
     ax[n][2].plot(ttomax[-1], vmax[-1], color=colors[n], marker='.', ls='None')
     ax[n][2].plot(np.mean(ttomax[-1]), np.mean(vmax[-1]), color=colors[n],
                   marker='x')
@@ -249,7 +267,49 @@ for n in range(len(nstart)):
                   ls='None')
     ax[n][3].plot(np.mean(skewness[-1]), np.mean(vmax[-1]), color=colors[n],
                   marker='x')
+    ell = Ellipse(xy=(np.mean(skewness[-1]), np.mean(vmax[-1])),
+                  width=np.std(skewness[-1]),
+                  height=np.std(vmax[-1]))
+    ell.set_facecolor('none')
+    ax[n][3].add_artist(ell)
+    ax[n][3].set_xlabel('Time to max/Duration')
+    ax[n][3].set_ylabel('Max value')
     ax[n][3].set_xlim(0., 1.)
+    ax[n][4].plot(tmean[-1], vmax[-1], color=colors[n], marker='.',
+                  ls='None')
+    ax[n][4].set_xlim(0., 0.04)
+    ax[n][4].set_xlabel('Time mean')
+    ax[n][5].plot(tsk[-1], vmax[-1], color=colors[n], marker='.',
+                  ls='None')
+    ax[n][5].set_xlim(0., 0.05)
+    ax[n][5].set_xlabel('Time skewness')
+# %%
+figall, axall = plt.subplots(1, 2, figsize=(9, 4), sharey=True)
+for n in range(len(colors)):
+    axall[0].plot(ttomax[n], vmax[n], color=colors[n], marker='.', ls='None')
+    axall[0].plot(np.mean(ttomax[n]), np.mean(vmax[n]), color=colors[n],
+                  marker='x')
+    ell = Ellipse(xy=(np.mean(ttomax[n]), np.mean(vmax[n])),
+                  width=np.std(ttomax[n]),
+                  height=np.std(vmax[n]))
+    ell.set_facecolor('none')
+    ell.set_edgecolor(colors[n])
+    axall[0].add_artist(ell)
+    axall[0].set_xlabel('Time to max')
+    axall[0].set_ylabel('Max value')
+    axall[1].plot(skewness[n], vmax[n], color=colors[n], marker='.',
+                  ls='None')
+    axall[1].plot(np.mean(skewness[n]), np.mean(vmax[n]), color=colors[n],
+                  marker='x')
+    ell = Ellipse(xy=(np.mean(skewness[n]), np.mean(vmax[n])),
+                  width=np.std(skewness[n]),
+                  height=np.std(vmax[n]))
+    ell.set_facecolor('none')
+    ell.set_edgecolor(colors[n])
+    axall[1].add_artist(ell)
+    axall[1].set_xlabel('Time to max/Duration')
+    axall[1].set_ylabel('Max value')
+
 # %% Warpeo
 template_starts = [4.83, 7.8]
 template_ends = [4.93, 7.9]

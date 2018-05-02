@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 from scipy.io import wavfile
 from scipy import signal
 from scipy.signal import butter
+from scipy.signal import argrelextrema
+from matplotlib.patches import Ellipse
 
 
 def envelope_cabeza(signal, method='percentile', logscale=False,
@@ -112,6 +114,20 @@ def get_spectrogram(data, sampling_rate, window=1024, overlap=1/1.1,
     return fu, tu, Sxx
 
 
+def loc_extrema(data, window=882):
+    """
+    Calcula maximos y minimos locales con una ventana de 2205 (50ms a 44100Hz)
+    Devuelve indices y valores (max y min)
+    """
+    indmax = argrelextrema(data, np.greater_equal, order=int(window/2))
+    mmax = np.zeros(len(data))
+    mmax[indmax[0]] = data[indmax[0]]
+    indmin = argrelextrema(data, np.less_equal, order=int(window/2))
+    mmin = np.zeros(len(data))
+    mmin[indmin[0]] = data[indmin[0]]
+    return(indmax[0], mmax, indmin[0], mmin)
+
+
 # %%
 f_path = '/media/juan/New Volume/Experimentos vS/Datos gogui/wetransfer-f237e5'
 
@@ -183,6 +199,57 @@ for f_start in template_starts:
     ax[2].plot(t_corr[np.where(correlacion > 0.6)],
                correlacion[np.where(correlacion > 0.6)], 'r.')
 
+# %% Simple measures (ACA ESTA LA PAPA)
+
+tstart = [0.33, 4.55, 6.1, 7.5]
+nstart = [int(x*fs) for x in tstart]
+tend = [1.03, 5.38, 7., 8.3]
+nend = [int(x*fs) for x in tend]
+fig, ax = plt.subplots(len(nstart), 4, figsize=(15, 6), sharey=True)
+time_temp = []
+templates = []
+ttomax = []
+vmax = []
+skewness = []
+colors = ['r', 'g', 'b', 'm']
+for n in range(len(nstart)):
+    auxtomax = []
+    auxvmax = []
+    auxsk = []
+    time_temp.append(time[nstart[n]:nend[n]])
+    templates.append(v_envelope[nstart[n]:nend[n]])
+    ax[n][0].plot(time_temp[-1], templates[-1])
+    indmax, valmax, indmin, valmin = loc_extrema(templates[-1],
+                                                 window=fs*0.025)
+    ax[n][0].plot(time_temp[-1][indmax], valmax[indmax], '.')
+    ax[n][0].plot(time_temp[-1][indmin], valmin[indmin], '.')
+    ind_breaks = indmin[np.where(np.diff(indmin) != 1)[0]]
+    for nn in range(len(ind_breaks)-1):
+        austart = ind_breaks[nn]
+        ausend = ind_breaks[nn+1]
+        ax[n][1].plot(templates[-1][austart:ausend], 'k', lw=2, alpha=0.3)
+        auxtomax.append(np.argmax(templates[-1][austart:ausend]))
+        auxvmax.append(np.max(templates[-1][austart:ausend]))
+        auxsk.append(auxtomax[-1]/(ausend-austart))
+    ttomax.append(auxtomax)
+    vmax.append(auxvmax)
+    skewness.append(auxsk)
+    ax[n][2].plot(ttomax[-1], vmax[-1], color=colors[n], marker='.', ls='None')
+    ax[n][2].plot(np.mean(ttomax[-1]), np.mean(vmax[-1]), color=colors[n],
+                  marker='x')
+    ell = Ellipse(xy=(np.mean(ttomax[-1]), np.mean(vmax[-1])),
+                  width=np.std(ttomax[-1]),
+                  height=np.std(vmax[-1]))
+    ell.set_facecolor('none')
+    ax[n][2].add_artist(ell)
+    ax[n][2].set_xlim(0, 2000)
+    ax[n][2].set_xlabel('Time to max')
+    ax[n][2].set_ylabel('Max value')
+    ax[n][3].plot(skewness[-1], vmax[-1], color=colors[n], marker='.',
+                  ls='None')
+    ax[n][3].plot(np.mean(skewness[-1]), np.mean(vmax[-1]), color=colors[n],
+                  marker='x')
+    ax[n][3].set_xlim(0., 1.)
 # %% Warpeo
 template_starts = [4.83, 7.8]
 template_ends = [4.93, 7.9]
@@ -240,13 +307,14 @@ fig.tight_layout()
 ax[1].plot(time, eenv, zorder=0)
 # %% SVD
 
-dtime = 0.4
+dtime = 0.2
 tstep = dtime/5
 ntime = int(dtime*fs)
 nstep = int(tstep*fs)
 n_filas = (len(v_envelope)-ntime)//nstep
-vecs = np.asmatrix([normalizar(v_envelope[n*nstep:n*nstep+ntime], minout=0,
-                               maxout=1) for n in range(n_filas)])
+#vecs = np.asmatrix([normalizar(v_envelope[n*nstep:n*nstep+ntime], minout=0,
+#                               maxout=1) for n in range(n_filas)])
+vecs = np.asmatrix([v_envelope[n*nstep:n*nstep+ntime]-np.mean(v_envelope[n*nstep:n*nstep+ntime]) for n in range(n_filas)])
 U_matrix = np.matmul(vecs, np.transpose(vecs))
 eigval, eigvec = np.linalg.eig(U_matrix)
 base = np.matmul(eigvec, vecs)

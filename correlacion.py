@@ -119,21 +119,28 @@ def loc_extrema(data, window=882):
     Calcula maximos y minimos locales con una ventana de 2205 (50ms a 44100Hz)
     Devuelve indices y valores (max y min)
     """
-    indmax = argrelextrema(data, np.greater_equal, order=int(window/2))
+    indmax = argrelextrema(data, np.greater_equal, order=int(window))
     mmax = np.zeros(len(data))
     mmax[indmax[0]] = data[indmax[0]]
-    indmin = argrelextrema(data, np.less_equal, order=int(window/2))
+    indmin = argrelextrema(data, np.less_equal, order=int(window))
     mmin = np.zeros(len(data))
     mmin[indmin[0]] = data[indmin[0]]
     return(indmax[0], mmax, indmin[0], mmin)
 
 
 def nmoment(x, counts, n):
-    return np.sum(counts*(x-meanmoment(x, counts)**n)) / np.sum(counts)
+    return np.sum(counts*(x-meanmoment(x, counts))**n)/np.sum(counts)
 
 
 def meanmoment(x, counts):
-    return np.sum(x*counts) / np.sum(counts)
+    return np.sum(x*counts)/np.sum(counts)
+
+
+def autocorr(x):
+    result = np.correlate(x, x, mode='full')
+    return result[int(result.size/2):]
+
+
 # %%
 f_path = '/media/juan/New Volume/Experimentos vS/Datos gogui/wetransfer-f237e5'
 
@@ -146,12 +153,14 @@ while i < len(s_files):
     indice = np.where([f_names[i] in x for x in v_files_aux])[0][0]
     v_files[i] = v_files_aux[indice]
     i += 1
-s_file = s_files[0]
-v_file = v_files[0]
+s_file = s_files[1]
+v_file = v_files[1]
 fs, s_raw = wavfile.read('{}'.format(s_file))
-s_raw = s_raw[:10*fs]
+s_raw = np.concatenate((s_raw[:int(3*fs)], s_raw[int(18*fs):int(21.5*fs)],
+                        s_raw[int(31.5*fs):]))
 fs, v_raw = wavfile.read('{}'.format(v_file))
-v_raw = v_raw[:10*fs]
+v_raw = np.concatenate((v_raw[:int(3*fs)], v_raw[int(18*fs):int(21.5*fs)],
+                        v_raw[int(31.5*fs):]))
 time = np.arange(len(v_raw))/fs
 # %%
 v_filt = butter_lowpass_filter(v_raw, fs, order=5)
@@ -159,6 +168,10 @@ v_filt = butter_highpass_filter(v_filt, fs, order=6)
 v_filt = butter_lowpass_filter(v_filt, fs, order=5)
 v_filt -= np.mean(v_filt)
 v_filt /= max(abs(v_filt))
+percentil = 90
+v_envelope = envelope_cabeza(v_filt, method='percentile', intervalLength=220,
+                             perc=percentil)
+v_envelope = normalizar(v_envelope, minout=0, maxout=1)
 # %%
 fig, ax = plt.subplots(3, figsize=(10, 8), sharex=True)
 
@@ -166,52 +179,76 @@ fu, tu, Sxx = get_spectrogram(s_raw, fs)
 ax[0].pcolormesh(tu, fu, np.log(Sxx), cmap=plt.get_cmap('Greys'),
                  rasterized=True)
 ax[0].set_ylim(0, 8000)
-ax[1].plot(time, v_filt, 'b')
-ax[1].set_xlim(0, 10)
-# %%
-percentil = 90
-v_envelope = envelope_cabeza(v_filt, method='percentile', intervalLength=110,
-                             perc=percentil)
-v_envelope = normalizar(v_envelope, minout=0, maxout=1)
-# %%
+# ax[1].plot(time, v_filt, 'b')
+ax[1].set_xlim(0, max(time))
 ax[1].plot(time, v_envelope, 'g')
 ax[1].plot(time, -v_envelope, 'g')
 
-# %%
-template_starts = [4.83]
-template_ends = [4.93]
-start = 0.
-end = 10.
-dt = int(0.1*fs)
-step = 5
-for f_start in template_starts:
-    n_start = int(f_start*fs)
-    f_end = template_ends[template_starts.index(f_start)]
-    n_end = int(f_end*fs)
+tstart = [0.2, 1., 1.5, 4., 5.1, 6., 7.1, 8.7, 9.5, 15.2, 17., 18.5,
+          20., 21.]
+cc = ['k', 'r', 'g', 'c', 'k', 'm', 'c', 'k', 'b', 'c', 'k', 'm', 'g', 'y']
+nstart = [int(x*fs) for x in tstart]
+tend = [x+0.2 for x in tstart]
+nend = [int(x*fs) for x in tend]
+correlacion = []
+end = max(time)
+dt = int(0.001*fs)
+for n in range(len(nstart)):
+    n_start = nstart[n]
+    n_end = nend[n]
     fragment = v_envelope[n_start:n_end]
     time_window = len(fragment)
-    ax[1].plot(time[n_start:n_end], fragment)
-    correlacion = []
+    ax[0].axvspan(xmin=time[n_start], xmax=time[n_end], color=cc[n], alpha=0.3)
+    corr_aux = []
     t_corr = []
-    left = int(start*fs)
+    left = 0
     while left + time_window < int(end*fs):
         right = left + time_window
         t_corr.append((left+time_window/2)/fs)
-        correlacion.append(np.corrcoef(fragment, v_envelope[left:right])[0][1])
-        left += step
-    correlacion = np.asarray(correlacion)
+        corr_aux.append(np.corrcoef(fragment, v_envelope[left:right])[0][1])
+        left += dt
+    corr_aux = np.asarray(corr_aux)
+    correlacion.append(corr_aux)
     t_corr = np.asarray(t_corr)
-    ax[2].plot(t_corr, correlacion)
-    ax[2].plot(t_corr[np.where(correlacion > 0.6)],
-               correlacion[np.where(correlacion > 0.6)], 'r.')
-
+    ax[2].plot(t_corr[np.where(corr_aux > 0.5)],
+               corr_aux[np.where(corr_aux > 0.5)], color=cc[n],
+               marker='.', ls='None')
+# %%
+distinct = [0, 1, 2, 3, 5, 8, 13]
+fig, ax = plt.subplots(len(distinct), len(distinct), figsize=(14, 14))
+for ncol in range(len(distinct)):
+    nc = distinct[ncol]
+    n_start = nstart[nc]
+    n_end = nend[nc]
+    fragment = v_envelope[n_start:n_end]
+    ax[-1][ncol].plot(fragment)
+    ax[-1][ncol].axes.get_xaxis().set_visible(False)
+    ax[-1][ncol].axes.get_yaxis().set_visible(False)
+    ax[-1][ncol].set_title('{}'.format(nc))
+    ax[ncol][0].plot(fragment)
+    ax[ncol][0].axes.get_xaxis().set_visible(False)
+    ax[ncol][0].axes.get_yaxis().set_visible(False)
+    ax[ncol][0].set_title('{}'.format(nc))
+    for nrow in range(ncol):
+        nr = distinct[nrow]
+        ax[nrow][ncol].plot(correlacion[nr], correlacion[nc])
+        ax[nrow][ncol].axvline(x=0.6, color='r')
+        ax[nrow][ncol].axhline(y=0.6, color='r')
+        ax[nrow][ncol].set_xlim(-1, 1)
+        ax[nrow][ncol].set_ylim(-1, 1)
+        ax[nrow][ncol].set_xlim(-1, 1)
+        ax[nrow][ncol].set_title('{}-{}'.format(nr, nc))
+        ax[nrow][ncol].axes.get_xaxis().set_visible(False)
+        ax[nrow][ncol].axes.get_yaxis().set_visible(False)
+fig.tight_layout()
 # %% Simple measures (ACA ESTA LA PAPA)
 
-tstart = [0.33, 4.55, 6.1, 7.5]
-nstart = [int(x*fs) for x in tstart]
-tend = [1.03, 5.38, 7., 8.3]
-nend = [int(x*fs) for x in tend]
-fig, ax = plt.subplots(len(nstart), 6, figsize=(20, 6), sharey=True)
+
+tempend = [0.7, 1.4, 2.8, 4.7, 5.7, 6.5, 7.5, 9.15, 10.2, 15.8, 18., 18.9,
+           20.4, 21.7]
+fig, ax = plt.subplots(len(distinct), 6, figsize=(20, 6), sharey=True,
+                       sharex='col')
+nend = [int(x*fs) for x in tempend]
 time_temp = []
 templates = []
 ttomax = []
@@ -219,34 +256,48 @@ vmax = []
 skewness = []
 tmean = []
 tsk = []
-colors = ['r', 'g', 'b', 'm']
-for n in range(len(nstart)):
+colors = [cc[x] for x in distinct]
+for n in range(len(distinct)):
     auxtomax = []
     auxvmax = []
     auxsk = []
     auxtmean = []
     auxtsk = []
-    time_temp.append(time[nstart[n]:nend[n]])
-    templates.append(v_envelope[nstart[n]:nend[n]])
-    ax[n][0].plot(time_temp[-1], templates[-1])
-    indmax, valmax, indmin, valmin = loc_extrema(templates[-1],
-                                                 window=fs*0.025)
-    ax[n][0].plot(time_temp[-1][indmax], valmax[indmax], '.')
-    ax[n][0].plot(time_temp[-1][indmin], valmin[indmin], '.')
-    ind_breaks = indmin[np.where(np.diff(indmin) != 1)[0]]
+    time_temp.append(time[nstart[distinct[n]]:nend[distinct[n]]])
+    templates.append(v_envelope[nstart[distinct[n]]:nend[distinct[n]]])
+    ax[n][0].plot(time_temp[-1]-time_temp[-1][0], templates[-1])
+    ix, vx, ii, vn = loc_extrema(templates[-1], window=fs*0.025)
+    ax[n][0].axes.get_xaxis().set_visible(False)
+    ax[n][0].set_ylabel('{}'.format(distinct[n]))
+    det = signal.detrend(autocorr(templates[-1]))
+    indmax, valmax, indmin, valmin = loc_extrema(det, window=fs*0.025)
+    ind_breaks_prop = np.arange(np.argmin(templates[-1][:indmax[1]]),
+                                          len(templates[-1]), indmax[1])
+    ind_breaks = [ind_breaks_prop[0]]
+    for nn in range(1, len(ind_breaks_prop)):
+        prop = ind_breaks_prop[nn]
+        real = ii[np.argmin(abs(ii-prop))]
+        ind_breaks.append(real)
     for nn in range(len(ind_breaks)-1):
+        ax[n][0].axvline(x=time_temp[-1][ind_breaks[nn]]-time_temp[-1][0],
+                         color='g')
+        ax[n][0].axvline(x=time_temp[-1][ind_breaks_prop[nn]]-time_temp[-1][0],
+                         color='r', ls='dashed')
         austart = ind_breaks[nn]
         ausend = ind_breaks[nn+1]
         ax[n][1].plot(templates[-1][austart:ausend], 'k', lw=2, alpha=0.3)
         auxtomax.append(np.argmax(templates[-1][austart:ausend]))
         auxvmax.append(np.max(templates[-1][austart:ausend]))
         auxsk.append(auxtomax[-1]/(ausend-austart))
-        auxtmean.append(meanmoment(time_temp[-1][austart:ausend]-time_temp[-1][austart],
+        auxtmean.append(meanmoment(time_temp[-1][austart:ausend] -
+                                   time_temp[-1][austart],
                                    templates[-1][austart:ausend]))
-        auxtsk.append(nmoment(time_temp[-1][austart:ausend]-time_temp[-1][austart],
-                                   templates[-1][austart:ausend], 3))
-        
+        auxtsk.append(nmoment(time_temp[-1][austart:ausend] -
+                              time_temp[-1][austart],
+                              templates[-1][austart:ausend], 3))
     ax[n][1].set_xlim(0, 3000)
+    ax[n][1].axes.get_xaxis().set_visible(False)
+    ax[n][1].axes.get_yaxis().set_visible(False)
     ttomax.append(auxtomax)
     vmax.append(auxvmax)
     skewness.append(auxsk)
@@ -263,6 +314,8 @@ for n in range(len(nstart)):
     ax[n][2].set_xlim(0, 2000)
     ax[n][2].set_xlabel('Time to max')
     ax[n][2].set_ylabel('Max value')
+#    ax[n][2].axes.get_xaxis().set_visible(False)
+    ax[n][2].axes.get_yaxis().set_visible(False)
     ax[n][3].plot(skewness[-1], vmax[-1], color=colors[n], marker='.',
                   ls='None')
     ax[n][3].plot(np.mean(skewness[-1]), np.mean(vmax[-1]), color=colors[n],
@@ -275,14 +328,23 @@ for n in range(len(nstart)):
     ax[n][3].set_xlabel('Time to max/Duration')
     ax[n][3].set_ylabel('Max value')
     ax[n][3].set_xlim(0., 1.)
+#    ax[n][3].axes.get_xaxis().set_visible(False)
+    ax[n][3].axes.get_yaxis().set_visible(False)
     ax[n][4].plot(tmean[-1], vmax[-1], color=colors[n], marker='.',
                   ls='None')
     ax[n][4].set_xlim(0., 0.04)
     ax[n][4].set_xlabel('Time mean')
+#    ax[n][4].axes.get_xaxis().set_visible(False)
+    ax[n][4].axes.get_yaxis().set_visible(False)
     ax[n][5].plot(tsk[-1], vmax[-1], color=colors[n], marker='.',
                   ls='None')
-    ax[n][5].set_xlim(0., 0.05)
+    if n == len(tempend)-1:
+        for nn in range(len(tempend)):
+            ax[nn][5].set_xlim(min([min(x) for x in tsk]),
+                               max([max(x) for x in tsk]))
     ax[n][5].set_xlabel('Time skewness')
+#    ax[n][5].axes.get_xaxis().set_visible(False)
+    ax[n][5].axes.get_yaxis().set_visible(False)
 # %%
 figall, axall = plt.subplots(1, 2, figsize=(9, 4), sharey=True)
 for n in range(len(colors)):
@@ -366,15 +428,14 @@ for f_start in template_starts:
 fig.tight_layout()
 ax[1].plot(time, eenv, zorder=0)
 # %% SVD
-
 dtime = 0.2
 tstep = dtime/5
 ntime = int(dtime*fs)
 nstep = int(tstep*fs)
 n_filas = (len(v_envelope)-ntime)//nstep
-#vecs = np.asmatrix([normalizar(v_envelope[n*nstep:n*nstep+ntime], minout=0,
-#                               maxout=1) for n in range(n_filas)])
-vecs = np.asmatrix([v_envelope[n*nstep:n*nstep+ntime]-np.mean(v_envelope[n*nstep:n*nstep+ntime]) for n in range(n_filas)])
+vecs = np.asmatrix([v_envelope[n*nstep:n*nstep+ntime] -
+                    np.mean(v_envelope[n*nstep:n*nstep+ntime])
+                    for n in range(n_filas)])
 U_matrix = np.matmul(vecs, np.transpose(vecs))
 eigval, eigvec = np.linalg.eig(U_matrix)
 base = np.matmul(eigvec, vecs)

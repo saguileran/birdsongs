@@ -247,8 +247,6 @@ for ncol in range(len(distinct)):
         ax[nrow][ncol].axes.get_yaxis().set_visible(False)
 fig.tight_layout()
 # %% Simple measures (ACA ESTA LA PAPA)
-
-
 tempend = [0.7, 1.4, 2.8, 4.7, 5.7, 6.5, 7.5, 9.15, 10.2, 15.8, 18., 18.9,
            20.4, 21.7]
 fig, ax = plt.subplots(len(distinct), 6, figsize=(15, 20), sharey=True,
@@ -350,7 +348,7 @@ for n in range(len(distinct)):
     ax[n][5].axes.get_yaxis().set_visible(False)
     ax[n][5].xaxis.set_major_formatter(FormatStrFormatter('%.e'))
 fig.tight_layout()
-# %%
+# %% Figuras juntas
 figall, axall = plt.subplots(1, 2, figsize=(9, 4), sharey=True)
 for n in range(len(colors)):
     axall[0].plot(ttomax[n], vmax[n], color=colors[n], marker='.', ls='None')
@@ -432,24 +430,43 @@ for f_start in template_starts:
         ax[2+i].legend()
 fig.tight_layout()
 ax[1].plot(time, eenv, zorder=0)
-# %% SVD
-dtime = 0.2
-tstep = dtime/5
-ntime = int(dtime*fs)
-nstep = int(tstep*fs)
-n_filas = (len(v_envelope)-ntime)//nstep
-vecs = np.asmatrix([v_envelope[n*nstep:n*nstep+ntime] -
-                    np.mean(v_envelope[n*nstep:n*nstep+ntime])
-                    for n in range(n_filas)])
-U_matrix = np.matmul(vecs, np.transpose(vecs))
-eigval, eigvec = np.linalg.eig(U_matrix)
-base = np.matmul(eigvec, vecs)
-base_vecs = [np.asarray(x)[0] for x in base]
-plt.matshow(U_matrix)
-plt.colorbar()
+# %% De noche ...
+n_file = 'cG01_NN_2017-01-18_22_10_48_vs_21_denoised.wav'
 
-n = 5
-fig, ax = plt.subplots(n, figsize=(10, 20))
-for i in range(n):
-    ax[i].plot(np.arange(len(base_vecs[i]))/fs, base_vecs[i])
-fig.tight_layout()
+fs, vn_raw = wavfile.read('{}/{}'.format(f_path, n_file))
+vn_raw = vn_raw[:int(3*fs)]
+ntime = np.arange(len(vn_raw))/fs
+percentil = 90
+vn_envelope = envelope_cabeza(vn_raw, method='percentile', intervalLength=220,
+                              perc=percentil)
+vn_envelope = normalizar(vn_envelope, minout=0, maxout=1)
+
+fig, ax = plt.subplots(1+len(distinct), 2,
+                       gridspec_kw={'width_ratios': [5, 1]},
+                       figsize=(10, 8), sharex='col', sharey='col')
+ax[0][0].set_xlim(0, max(ntime))
+ax[0][0].plot(ntime, vn_envelope, 'g')
+ax[0][0].plot(ntime, -vn_envelope, 'g')
+correlacion = []
+times_corr = []
+for n in range(len(distinct)):
+    temp = templates[n][:min((int(0.2*fs), len(templates[n])))]
+    ax[n+1][1].plot(list(temp)*3, color=cc[distinct[n]])
+    corr_aux = []
+    end = max(ntime)
+    dt = int(0.001*fs)
+    time_window = len(temp)
+    t_corr = []
+    left = 0
+    while left + time_window < int(end*fs):
+        right = left + time_window
+        t_corr.append((left+time_window/2)/fs)
+        corr_aux.append(np.corrcoef(temp, vn_envelope[left:right])[0][1])
+        left += dt
+    corr_aux = np.asarray(corr_aux)
+    correlacion.append(corr_aux)
+    t_corr = np.asarray(t_corr)
+    times_corr.append(t_corr)
+    ax[n+1][0].axhline(y=0.6, color=cc[distinct[n]])
+    ax[n+1][0].plot(t_corr, corr_aux, color=cc[distinct[n]])
+    ax[n+1][0].set_ylim(-1, 1)

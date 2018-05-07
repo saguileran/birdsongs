@@ -14,6 +14,7 @@ from scipy import signal
 from scipy.signal import butter
 from scipy.signal import argrelextrema
 from matplotlib.patches import Ellipse
+from matplotlib.ticker import FormatStrFormatter
 
 
 def envelope_cabeza(signal, method='percentile', logscale=False,
@@ -129,11 +130,15 @@ def loc_extrema(data, window=882):
 
 
 def nmoment(x, counts, n):
-    return np.sum(counts*(x-meanmoment(x, counts))**n)/np.sum(counts)
+    return np.sum(counts*((x-meanmoment(x, counts))/sigm(x, counts))**n)/np.sum(counts)
 
 
 def meanmoment(x, counts):
     return np.sum(x*counts)/np.sum(counts)
+
+
+def sigm(x, counts):
+    return np.sum(counts*(x-meanmoment(x, counts))**2/np.sum(counts))
 
 
 def autocorr(x):
@@ -246,7 +251,7 @@ fig.tight_layout()
 
 tempend = [0.7, 1.4, 2.8, 4.7, 5.7, 6.5, 7.5, 9.15, 10.2, 15.8, 18., 18.9,
            20.4, 21.7]
-fig, ax = plt.subplots(len(distinct), 6, figsize=(20, 6), sharey=True,
+fig, ax = plt.subplots(len(distinct), 6, figsize=(15, 20), sharey=True,
                        sharex='col')
 nend = [int(x*fs) for x in tempend]
 time_temp = []
@@ -272,7 +277,7 @@ for n in range(len(distinct)):
     det = signal.detrend(autocorr(templates[-1]))
     indmax, valmax, indmin, valmin = loc_extrema(det, window=fs*0.025)
     ind_breaks_prop = np.arange(np.argmin(templates[-1][:indmax[1]]),
-                                          len(templates[-1]), indmax[1])
+                                len(templates[-1]), indmax[1])
     ind_breaks = [ind_breaks_prop[0]]
     for nn in range(1, len(ind_breaks_prop)):
         prop = ind_breaks_prop[nn]
@@ -281,8 +286,6 @@ for n in range(len(distinct)):
     for nn in range(len(ind_breaks)-1):
         ax[n][0].axvline(x=time_temp[-1][ind_breaks[nn]]-time_temp[-1][0],
                          color='g')
-        ax[n][0].axvline(x=time_temp[-1][ind_breaks_prop[nn]]-time_temp[-1][0],
-                         color='r', ls='dashed')
         austart = ind_breaks[nn]
         ausend = ind_breaks[nn+1]
         ax[n][1].plot(templates[-1][austart:ausend], 'k', lw=2, alpha=0.3)
@@ -295,7 +298,8 @@ for n in range(len(distinct)):
         auxtsk.append(nmoment(time_temp[-1][austart:ausend] -
                               time_temp[-1][austart],
                               templates[-1][austart:ausend], 3))
-    ax[n][1].set_xlim(0, 3000)
+    if n == len(distinct)-1:
+        ax[n][0].set_xlim(0, np.min([len(x) for x in templates])/fs)
     ax[n][1].axes.get_xaxis().set_visible(False)
     ax[n][1].axes.get_yaxis().set_visible(False)
     ttomax.append(auxtomax)
@@ -311,10 +315,10 @@ for n in range(len(distinct)):
                   height=np.std(vmax[-1]))
     ell.set_facecolor('none')
     ax[n][2].add_artist(ell)
-    ax[n][2].set_xlim(0, 2000)
+    ax[n][2].set_xlim(0, 2500)
     ax[n][2].set_xlabel('Time to max')
     ax[n][2].set_ylabel('Max value')
-#    ax[n][2].axes.get_xaxis().set_visible(False)
+    ax[n][2].xaxis.set_major_locator(plt.MaxNLocator(3))
     ax[n][2].axes.get_yaxis().set_visible(False)
     ax[n][3].plot(skewness[-1], vmax[-1], color=colors[n], marker='.',
                   ls='None')
@@ -328,13 +332,12 @@ for n in range(len(distinct)):
     ax[n][3].set_xlabel('Time to max/Duration')
     ax[n][3].set_ylabel('Max value')
     ax[n][3].set_xlim(0., 1.)
-#    ax[n][3].axes.get_xaxis().set_visible(False)
+    ax[n][3].xaxis.set_major_locator(plt.MaxNLocator(3))
     ax[n][3].axes.get_yaxis().set_visible(False)
     ax[n][4].plot(tmean[-1], vmax[-1], color=colors[n], marker='.',
                   ls='None')
-    ax[n][4].set_xlim(0., 0.04)
     ax[n][4].set_xlabel('Time mean')
-#    ax[n][4].axes.get_xaxis().set_visible(False)
+    ax[n][4].xaxis.set_major_locator(plt.MaxNLocator(3))
     ax[n][4].axes.get_yaxis().set_visible(False)
     ax[n][5].plot(tsk[-1], vmax[-1], color=colors[n], marker='.',
                   ls='None')
@@ -343,8 +346,10 @@ for n in range(len(distinct)):
             ax[nn][5].set_xlim(min([min(x) for x in tsk]),
                                max([max(x) for x in tsk]))
     ax[n][5].set_xlabel('Time skewness')
-#    ax[n][5].axes.get_xaxis().set_visible(False)
+    ax[n][5].xaxis.set_major_locator(plt.MaxNLocator(3))
     ax[n][5].axes.get_yaxis().set_visible(False)
+    ax[n][5].xaxis.set_major_formatter(FormatStrFormatter('%.e'))
+fig.tight_layout()
 # %%
 figall, axall = plt.subplots(1, 2, figsize=(9, 4), sharey=True)
 for n in range(len(colors)):

@@ -117,7 +117,7 @@ def get_spectrogram(data, sampling_rate, window=1024, overlap=1/1.1,
 
 def loc_extrema(data, window=882):
     """
-    Calcula maximos y minimos locales con una ventana de 2205 (50ms a 44100Hz)
+    Calcula maximos y minimos locales
     Devuelve indices y valores (max y min)
     """
     indmax = argrelextrema(data, np.greater_equal, order=int(window))
@@ -130,7 +130,8 @@ def loc_extrema(data, window=882):
 
 
 def nmoment(x, counts, n):
-    return np.sum(counts*((x-meanmoment(x, counts))/sigm(x, counts))**n)/np.sum(counts)
+    return np.sum(counts*((x-meanmoment(x, counts))/sigm(x,
+                          counts))**n)/np.sum(counts)
 
 
 def meanmoment(x, counts):
@@ -184,7 +185,6 @@ fu, tu, Sxx = get_spectrogram(s_raw, fs)
 ax[0].pcolormesh(tu, fu, np.log(Sxx), cmap=plt.get_cmap('Greys'),
                  rasterized=True)
 ax[0].set_ylim(0, 8000)
-# ax[1].plot(time, v_filt, 'b')
 ax[1].set_xlim(0, max(time))
 ax[1].plot(time, v_envelope, 'g')
 ax[1].plot(time, -v_envelope, 'g')
@@ -443,7 +443,7 @@ vn_envelope = normalizar(vn_envelope, minout=0, maxout=1)
 
 fig, ax = plt.subplots(1+len(distinct), 2,
                        gridspec_kw={'width_ratios': [5, 1]},
-                       figsize=(10, 8), sharex='col', sharey='col')
+                       figsize=(10, 8), sharex='col')
 ax[0][0].set_xlim(0, max(ntime))
 ax[0][0].plot(ntime, vn_envelope, 'g')
 ax[0][0].plot(ntime, -vn_envelope, 'g')

@@ -321,13 +321,14 @@ alphas = np.linspace(-0.5, 0.5, grid_size)
 betas = np.linspace(-0.5, 0.5, grid_size)
 gammas = np.linspace(10000, 40000, n_gammas)
 
-ff = np.zeros(len(gammas)*len(alphas)*len(betas))
-alpha_out = np.zeros_like(ff)
-beta_out = np.zeros_like(ff)
-gamma_out = np.zeros_like(ff)
-SCI = np.zeros_like(ff)
-msf = np.zeros_like(ff)
-amp = np.zeros_like(ff)
+N_total = len(alphas)*len(betas)*len(gammas)
+#ff = np.zeros(len(gammas)*len(alphas)*len(betas))
+#alpha_out = np.zeros_like(ff)
+#beta_out = np.zeros_like(ff)
+#gamma_out = np.zeros_like(ff)
+#SCI = np.zeros_like(ff)
+#msf = np.zeros_like(ff)
+#amp = np.zeros_like(ff)
 
 # Sampleo
 sampling = 44150
@@ -337,7 +338,10 @@ dt_per_param = 0.02
 n_per_param = int(dt_per_param*sampling)
 
 # -- por parametro -- #
-for next_p in range(len(ff)):
+df = pd.DataFrame(index=range(N_total),
+                  columns=['alpha', 'beta', 'gamma', 'fundamental', 'msf',
+                  'SCI', 'amplitud'])
+for next_p in range(N_total):
     out_size = int(n_per_param)
     tmax = out_size*oversamp
 
@@ -384,9 +388,9 @@ for next_p in range(len(ff)):
     alfa1 = alphas[n_alpha]
     beta1 = betas[n_beta]
     gm = gammas[n_gamma]
-    alpha_out[next_p] = alfa1
-    beta_out[next_p] = beta1
-    gamma_out[next_p] = gm
+#    alpha_out[next_p] = alfa1
+#    beta_out[next_p] = beta1
+#    gamma_out[next_p] = gm
 
     s1overCH = (36*2.5*2/25.)*1e09
     s1overLB = 1.*1e-04
@@ -425,14 +429,15 @@ for next_p in range(len(ff)):
             A1 = amplitud + 0.5*noise
         t += 1
     # Revisar calculo de fundamental y sci
-    msf[next_p], ff[next_p], amp[next_p] = SpectralContent(out, sampling, method='synth')
-    SCI[next_p] = msf[next_p]/ff[next_p]
+    msf, ff, amp = SpectralContent(out, sampling, method='synth')
+    SCI = msf/ff
+    df.iloc[next_p] = [alfa1, beta1, gm, ff, msf, SCI, amp]
 
 # %% ff, SCI, Amplitud
-df = pd.DataFrame(np.transpose([alpha_out, beta_out, gamma_out, ff, msf, SCI,
-                                amp]),
-                  columns=['alpha', 'beta', 'gamma', 'fundamental', 'msf',
-                  'SCI', 'amplitud'])
+#df = pd.DataFrame(np.transpose([alpha_out, beta_out, gamma_out, ff, msf, SCI,
+#                                amp]),
+#                  columns=['alpha', 'beta', 'gamma', 'fundamental', 'msf',
+#                  'SCI', 'amplitud'])
 fig, ax = plt.subplots(6, figsize=(12, 18), sharex=True)
 ax[0].plot(df['alpha'], '.')
 

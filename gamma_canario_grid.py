@@ -19,6 +19,7 @@ from scipy import signal
 from scipy.signal import argrelextrema
 from scipy.signal import butter
 import pandas as pd
+import peakutils
 
 
 def envelope_cabeza(signal, method='percentile', intervalLength=210, perc=90):
@@ -176,16 +177,18 @@ def get_spectrogram(data, sampling_rate, window=1024, overlap=1/1.1,
     return fu, tu, Sxx
 
 
-def SpectralContent(segment, fs, method='song'):
-    dn_seg = len(segment)//2
-    fourier = np.abs(np.fft.rfft(segment))[:dn_seg]
-    freqs = np.fft.rfftfreq(len(segment), d=1/fs)[:dn_seg]
-    lim_left = np.argmin(np.abs(freqs-300))
-    fourier = np.abs(np.fft.rfft(segment))[lim_left:]
-    freqs = np.fft.rfftfreq(len(segment), d=1/fs)[lim_left:]
-    limite = np.argmin(np.abs(freqs-10000))
-    f_msf = np.sum(freqs[:limite]*fourier[:limite])/np.sum(fourier[:limite])
+def SpectralContent(data, fs, method='song', fmin=300, fmax=10000,
+                    dt_transit=0.002):
+    segment = data[int(dt_transit*fs):]
+    fourier = np.abs(np.fft.rfft(segment))
+    freqs = np.fft.rfftfreq(len(segment), d=1/fs)
+    min_bin = np.argmin(np.abs(freqs-fmin))
+    max_bin = np.argmin(np.abs(freqs-fmax))
+    fourier = np.abs(np.fft.rfft(segment))[min_bin:max_bin]
+    freqs = np.fft.rfftfreq(len(segment), d=1/fs)[min_bin:max_bin]
+    f_msf = np.sum(freqs*fourier)/np.sum(fourier)
     f_aff = 0
+    amp = max(segment)-min(segment)
     if method == 'song':
         f_aff = freqs[np.argmax(fourier*(freqs/(freqs+500)**2))]
     elif method == 'syllable':
@@ -198,10 +201,12 @@ def SpectralContent(segment, fs, method='song'):
             difs = np.diff(mm)
         f_aff = fs/np.mean(np.diff(mm))
     elif method == 'synth':
-        maximos = argrelextrema(fourier, np.greater, order=5)
-        if len(maximos[0]) > 0:
-            f_aff = freqs[maximos[0][0]]
-    return f_msf, f_aff
+        maximos = peakutils.indexes(fourier, thres=0.05, min_dist=5)
+        if amp < 500:
+            f_aff = 0
+        elif len(maximos) > 0:
+            f_aff = freqs[maximos[0]]
+    return f_msf, f_aff, amp
 
 # %%
 # Nombre del ave
@@ -263,7 +268,7 @@ ff = []
 t_sci = []
 while n_center < len(song)-dn_seg:
     segment = song[n_center-dn_seg:n_center+dn_seg]
-    msf, aff = SpectralContent(segment, fs)
+    msf, aff, amp = SpectralContent(segment, fs)
     SCI.append(msf/aff)
     ff.append(aff)
     t_sci.append(n_center/fs)
@@ -295,7 +300,7 @@ t_sci_av = t_center
 for n_s in range(len(silabas)):
     if len(silabas[n_s]) > 100:
         segment = song[silabas[n_s]]
-        msf, aff = SpectralContent(segment, fs, method='syllable')
+        msf, aff, amp = SpectralContent(segment, fs, method='syllable')
         SCI_av[n_s] = msf/aff
         ff_av[n_s] = aff
 color = [str(item/(max(t_sci_av))*255) for item in t_sci_av]
@@ -420,9 +425,8 @@ for next_p in range(len(ff)):
             A1 = amplitud + 0.5*noise
         t += 1
     # Revisar calculo de fundamental y sci
-    msf[next_p], ff[next_p] = SpectralContent(out, sampling, method='song')
+    msf[next_p], ff[next_p], amp[next_p] = SpectralContent(out, sampling, method='synth')
     SCI[next_p] = msf[next_p]/ff[next_p]
-    amp[next_p] = max(out)-min(out)
 
 # %% ff, SCI, Amplitud
 df = pd.DataFrame(np.transpose([alpha_out, beta_out, gamma_out, ff, msf, SCI,

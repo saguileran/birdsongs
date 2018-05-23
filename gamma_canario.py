@@ -19,6 +19,7 @@ from scipy import signal
 from scipy.signal import argrelextrema
 from scipy.signal import butter
 import pandas as pd
+import peakutils
 
 
 def envelope_cabeza(signal, method='percentile', intervalLength=210, perc=90):
@@ -176,16 +177,18 @@ def get_spectrogram(data, sampling_rate, window=1024, overlap=1/1.1,
     return fu, tu, Sxx
 
 
-def SpectralContent(segment, fs, method='song'):
-    dn_seg = len(segment)//2
-    fourier = np.abs(np.fft.rfft(segment))[:dn_seg]
-    freqs = np.fft.rfftfreq(len(segment), d=1/fs)[:dn_seg]
-    lim_left = np.argmin(np.abs(freqs-300))
-    fourier = np.abs(np.fft.rfft(segment))[lim_left:]
-    freqs = np.fft.rfftfreq(len(segment), d=1/fs)[lim_left:]
-    limite = np.argmin(np.abs(freqs-10000))
-    f_msf = np.sum(freqs[:limite]*fourier[:limite])/np.sum(fourier[:limite])
+def SpectralContent(data, fs, method='song', fmin=300, fmax=10000,
+                    dt_transit=0.002):
+    segment = data[int(dt_transit*fs):]
+    fourier = np.abs(np.fft.rfft(segment))
+    freqs = np.fft.rfftfreq(len(segment), d=1/fs)
+    min_bin = np.argmin(np.abs(freqs-fmin))
+    max_bin = np.argmin(np.abs(freqs-fmax))
+    fourier = np.abs(np.fft.rfft(segment))[min_bin:max_bin]
+    freqs = np.fft.rfftfreq(len(segment), d=1/fs)[min_bin:max_bin]
+    f_msf = np.sum(freqs*fourier)/np.sum(fourier)
     f_aff = 0
+    amp = max(segment)-min(segment)
     if method == 'song':
         f_aff = freqs[np.argmax(fourier*(freqs/(freqs+500)**2))]
     elif method == 'syllable':
@@ -198,10 +201,12 @@ def SpectralContent(segment, fs, method='song'):
             difs = np.diff(mm)
         f_aff = fs/np.mean(np.diff(mm))
     elif method == 'synth':
-        maximos = argrelextrema(fourier, np.greater, order=5)
-        if len(maximos[0]) > 0:
-            f_aff = freqs[maximos[0][0]]
-    return f_msf, f_aff
+        maximos = peakutils.indexes(fourier, thres=0.05, min_dist=5)
+        if amp < 500:
+            f_aff = 0
+        elif len(maximos) > 0:
+            f_aff = freqs[maximos[0]]
+    return f_msf, f_aff, amp
 
 # %%
 # Nombre del ave
@@ -310,8 +315,8 @@ plt.xlim(0, 5000)
 plt.ylim(0.5, 2.)
 
 # %% Sintetizo en un rango grande y me armo una base de datos
-grid_size = 10
-n_gammas = 10
+grid_size = 30
+n_gammas = 2
 alphas = np.linspace(-0.3, 0, grid_size)
 betas = np.linspace(-0.4, 0.05, grid_size)
 gammas = np.linspace(10000, 40000, n_gammas)
@@ -466,8 +471,7 @@ for n_param in range(len(df)):
     n_center = n_start+int(n_per_param/2)
     segment = out[n_start:n_start+n_per_param]
     # revisar metodo
-    msf, ff = SpectralContent(segment, sampling, method='song')
-    amp = max(segment)-min(segment)
+    msf, ff, amp = SpectralContent(segment, sampling, method='synth')
     SCI = msf/ff
     df.iloc[n_param] = [alpha_out[n_center], beta_out[n_center],
                         gamma_out[n_center], ff, msf, SCI, amp, time[n_center]]
@@ -479,7 +483,7 @@ ax[1].pcolormesh(tu, fu, np.log(Sxx), cmap=plt.get_cmap('Greys'),
                  rasterized=True)
 ax[1].set_xlim(min(time), max(time))
 ax[1].set_ylim(0, 8000)
-ax[1].plot(df['time'], df['fundamental'], '.')
+ax[1].plot(df['time'], df['fundamental'], 'o')
 
 ax[2].plot(df['time'], df['fundamental'], '.')
 ax[2].set_ylabel('ff')
@@ -492,7 +496,7 @@ ax[4].plot(df['time'], df['amplitud'])
 ax[4].set_ylabel('Amplitud')
 
 # %%
-nn = 5
+nn = 1
 df_aux = df[df['gamma'] == gammas[nn]]
 ff = df_aux['fundamental']
 SCI = df_aux['SCI']

@@ -10,11 +10,8 @@ Objetivo: Crear cantos sintéticos de canarios
 
 # %%
 from random import uniform
-import os
-import glob
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.io import wavfile
 from scipy import signal
 from scipy.signal import argrelextrema
 from scipy.signal import butter
@@ -208,127 +205,17 @@ def SpectralContent(data, fs, method='song', fmin=300, fmax=10000,
             f_aff = freqs[maximos[0]]
     return f_msf, f_aff, amp
 
-# %%
-# Nombre del ave
-birdname = 'AmaVio'
-
-# Carpeta donde estan guardados los wavs
-files_path = '/home/juan/Documentos/Musculo/Codigo canarios/Files'
-
-# Carpeta donde se van a guardar los resultados
-analisis_path = '{}analysis/'.format(files_path)
-if not os.path.exists(analisis_path):
-    os.makedirs(analisis_path)
-
-# %% Cargo datos de sonido y vs
-print('Cargando datos...')
-# Busca todos los archivos del pajaro.
-sound_files = glob.glob(os.path.join(files_path,
-                                     '*'+birdname+'*_s*wav'))
-# Elijo el primero de estos archivos
-num_file = 0
-fs, song = wavfile.read(sound_files[num_file])
-
-f_name_long = sound_files[num_file]
-f_name = f_name_long.rsplit('/', 1)[1].split('_s_', 1)[0]
-
-# Recorto el file
-t_i = 38.9
-t_f = 45.
-song = song[int(t_i*fs):int(t_f*fs)]
-time = np.linspace(0, len(song)/fs, len(song))
-envelope = normalizar(envelope_cabeza(song, intervalLength=0.01*fs), minout=0)
-umbral = 0.05
-plt.plot(normalizar(song))
-plt.plot(envelope)
-plt.axhline(y=umbral)
-supra = np.where(envelope > umbral)[0]
-silabas = consecutive(supra)
-NN = 1024
-overlap = 1/1.1
-sigma = NN/10
-fu, tu, Sxx = get_spectrogram(song, fs, window=NN, overlap=overlap,
-                              sigma=sigma)
-fig, ax = plt.subplots(2, sharex=True, figsize=(12, 6))
-ax[0].pcolormesh(tu, fu, np.log(Sxx), cmap=plt.get_cmap('Greys'),
-                 rasterized=True)
-ax[0].set_ylim(0, 8000)
-ax[0].set_xlim(min(time), max(time))
-for ss in silabas:
-    ax[0].plot([time[ss[0]], time[ss[-1]]], [0, 0], 'k', lw=5)
-print('Datos ok')
-# ff/SCI en intervalos de longitud predeterminada y moviendo ventanita
-dt_seg = 0.01
-dn_seg = int(dt_seg*fs)
-dn_step = dn_seg//3
-t_center = dt_seg
-n_center = int(t_center*fs)
-SCI = []
-ff = []
-t_sci = []
-while n_center < len(song)-dn_seg:
-    segment = song[n_center-dn_seg:n_center+dn_seg]
-    msf, aff, amp = SpectralContent(segment, fs)
-    SCI.append(msf/aff)
-    ff.append(aff)
-    t_sci.append(n_center/fs)
-    n_center += dn_step
-ff = np.asarray(ff)
-t_sci = np.asarray(t_sci)
-SCI = np.asarray(SCI)
-color = [str(item/(max(t_sci))) for item in t_sci[ff > 500]]
-ax[0].scatter(t_sci[ff > 500], ff[ff > 500], c=color)
-ax[1].scatter(t_sci[ff > 500], SCI[ff > 500], c=color)
-ax[1].set_ylabel('SCI')
-plt.figure()
-plt.scatter(ff[ff > 500], SCI[ff > 500], c=color)
-plt.xlabel('fundamental')
-plt.ylabel('SCI')
-# %%ff/SCI por silaba (~promedio)
-fig, ax = plt.subplots(2, sharex=True, figsize=(12, 6))
-ax[0].pcolormesh(tu, fu, np.log(Sxx), cmap=plt.get_cmap('Greys'),
-                 rasterized=True)
-ax[0].set_ylim(0, 8000)
-ax[0].set_xlim(min(time), max(time))
-dn_seg = np.asarray([len(x) for x in silabas])
-dt_seg = dn_seg/fs
-t_center = np.asarray([time[silabas[n][0]]+dt_seg[n]/2
-                       for n in range(len(silabas))])
-SCI_av = np.zeros_like(t_center)
-ff_av = np.zeros_like(t_center)
-t_sci_av = t_center
-for n_s in range(len(silabas)):
-    if len(silabas[n_s]) > 100:
-        segment = song[silabas[n_s]]
-        msf, aff, amp = SpectralContent(segment, fs, method='syllable')
-        SCI_av[n_s] = msf/aff
-        ff_av[n_s] = aff
-color = [str(item/(max(t_sci_av))*255) for item in t_sci_av]
-ax[0].scatter(t_sci_av, ff_av, c=color)
-ax[1].scatter(t_sci_av, SCI_av, c=color)
-ax[1].set_ylabel('SCI_av')
-plt.figure()
-plt.scatter(ff_av, SCI_av, c=color)
-plt.axvline(x=0)
-plt.axhline(y=1.)
-plt.xlim(0, 5000)
-plt.ylim(0.5, 2.)
 
 # %% Sintetizo en un rango grande y me armo una base de datos
-grid_size = 100
-n_gammas = 10
+grid_size = 5
+n_gammas = 1
 alphas = np.linspace(-0.5, 0.5, grid_size)
 betas = np.linspace(-0.5, 0.5, grid_size)
+agrid, bgrid = np.meshgrid(alphas, betas)
+ab_grid = np.c_[np.ravel(agrid), np.ravel(bgrid)]
 gammas = np.linspace(10000, 40000, n_gammas)
 
 N_total = len(alphas)*len(betas)*len(gammas)
-#ff = np.zeros(len(gammas)*len(alphas)*len(betas))
-#alpha_out = np.zeros_like(ff)
-#beta_out = np.zeros_like(ff)
-#gamma_out = np.zeros_like(ff)
-#SCI = np.zeros_like(ff)
-#msf = np.zeros_like(ff)
-#amp = np.zeros_like(ff)
 
 # Sampleo
 sampling = 44150
@@ -341,103 +228,87 @@ n_per_param = int(dt_per_param*sampling)
 df = pd.DataFrame(index=range(N_total),
                   columns=['alpha', 'beta', 'gamma', 'fundamental', 'msf',
                   'SCI', 'amplitud'])
-for next_p in range(N_total):
-    out_size = int(n_per_param)
-    tmax = out_size*oversamp
+n_param = 0
+for gm in gammas:
+    for alfa1, beta1 in ab_grid:
+        out_size = int(n_per_param)
+        tmax = out_size*oversamp
 
-    v = np.zeros(5)
-    v[0] = 0.000000000005
-    v[1] = 0.00000000001
-    v[2] = 0.000000000001
-    v[3] = 0.00000000001
-    v[4] = 0.000000000001
+        v = np.zeros(5)
+        v[0] = 0.000000000005
+        v[1] = 0.00000000001
+        v[2] = 0.000000000001
+        v[3] = 0.00000000001
+        v[4] = 0.000000000001
 
-    forcing1 = 0.
-    forcing2 = 0.
-    tiempot = 0.
-    tcount = 0
-    noise = 0
-    tnoise = 0
-    r = 0.4
-    rdis = 7000
-    gamma2 = 1.
-    gamma3 = 1.
-    atenua = 1
-    c = 35000.
-
-    a = np.zeros(tmax)
-    db = np.zeros(tmax)
-    df = np.zeros(tmax)
-
-    ancho = 0.2
-    largo = 3.5
-
-    tau = int(largo/(c*dt + 0.0))
-
-    t = tau
-    taux = 0
-    amplitud = 1
-
-    n_out = 0
-
-    n_gamma = next_p // (len(alphas)*len(betas))
-    n_alpha = next_p % (len(alphas)*len(betas)) % len(alphas)
-    n_beta = next_p % (len(alphas)*len(betas)) // len(betas)
-    if n_alpha == 0 and n_beta == 0:
-        print('{}%'.format(int(n_gamma*100/len(gammas))))
-    alfa1 = alphas[n_alpha]
-    beta1 = betas[n_beta]
-    gm = gammas[n_gamma]
-#    alpha_out[next_p] = alfa1
-#    beta_out[next_p] = beta1
-#    gamma_out[next_p] = gm
-
-    s1overCH = (36*2.5*2/25.)*1e09
-    s1overLB = 1.*1e-04
-    s1overLG = (50*1e-03)/.5
-    RB = 1*1e07
-    A1 = 0
-
-    out = np.zeros(out_size)
-    while t < tmax and v[1] > -5000000:
-        dbold = db[t]
-        a[t] = (.50)*(1.01*A1*v[1]) + db[t-tau]
-        db[t] = -r*a[t-tau]
-        ddb = (db[t]-dbold)/dt  # Derivada
-        forcing1 = db[t]
-        forcing2 = ddb
-        PRESSURE = a[t]
-        tiempot += dt
-        rk4(dxdt_synth, v, 5, t + 0.0, dt)
+        forcing1 = 0.
+        forcing2 = 0.
+        tiempot = 0.
+        tcount = 0
         noise = 0
-        preout = RB*v[4]
-        if taux == oversamp:
-            out[n_out] = preout*10
-            n_out += 1
-            taux = 0
-        taux += 1
-        if tiempot > 0.0:
-            # alfa1 = -0.15-0.00*amplitud
-            r = 0.1
-            noise = 0.21*(uniform(0, 1) - 0.5)
-            beta1 = beta1 + 0.0*noise
-            s1overCH = (360/0.8)*1e08
-            s1overLB = 1.*1e-04
-            s1overLG = (1/82.)
-            RB = (.5)*1e07
-            rdis = (300./5.)*(10000.)
-            A1 = amplitud + 0.5*noise
-        t += 1
-    # Revisar calculo de fundamental y sci
-    msf, ff, amp = SpectralContent(out, sampling, method='synth')
-    SCI = msf/ff
-    df.iloc[next_p] = [alfa1, beta1, gm, ff, msf, SCI, amp]
+        tnoise = 0
+        r = 0.4
+        rdis = 7000
+        gamma2 = 1.
+        gamma3 = 1.
+        atenua = 1
+        c = 35000.
 
+        a = np.zeros(tmax)
+        db = np.zeros(tmax)
+
+        ancho = 0.2
+        largo = 3.5
+        tau = int(largo/(c*dt + 0.0))
+        t = tau
+        taux = 0
+        amplitud = 1
+
+        n_out = 0
+
+        s1overCH = (36*2.5*2/25.)*1e09
+        s1overLB = 1.*1e-04
+        s1overLG = (50*1e-03)/.5
+        RB = 1*1e07
+        A1 = 0
+
+        out = np.zeros(out_size)
+        while t < tmax and v[1] > -5000000:
+            dbold = db[t]
+            a[t] = (.50)*(1.01*A1*v[1]) + db[t-tau]
+            db[t] = -r*a[t-tau]
+            ddb = (db[t]-dbold)/dt  # Derivada
+            forcing1 = db[t]
+            forcing2 = ddb
+            PRESSURE = a[t]
+            tiempot += dt
+            rk4(dxdt_synth, v, 5, t + 0.0, dt)
+            noise = 0
+            preout = RB*v[4]
+            if taux == oversamp:
+                out[n_out] = preout*10
+                n_out += 1
+                taux = 0
+            taux += 1
+            if tiempot > 0.0:
+                # alfa1 = -0.15-0.00*amplitud
+                r = 0.1
+                noise = 0.21*(uniform(0, 1) - 0.5)
+                beta1 = beta1 + 0.0*noise
+                s1overCH = (360/0.8)*1e08
+                s1overLB = 1.*1e-04
+                s1overLG = (1/82.)
+                RB = (.5)*1e07
+                rdis = (300./5.)*(10000.)
+                A1 = amplitud + 0.5*noise
+            t += 1
+        # Revisar calculo de fundamental y sci
+        msf, ff, amp = SpectralContent(out, sampling, method='synth')
+        SCI = msf/ff
+        df.iloc[n_param] = [alfa1, beta1, gm, ff, msf, SCI, amp]
+        n_param += 1
+df.to_csv('prueba.dat')
 # %% ff, SCI, Amplitud
-#df = pd.DataFrame(np.transpose([alpha_out, beta_out, gamma_out, ff, msf, SCI,
-#                                amp]),
-#                  columns=['alpha', 'beta', 'gamma', 'fundamental', 'msf',
-#                  'SCI', 'amplitud'])
 fig, ax = plt.subplots(6, figsize=(12, 18), sharex=True)
 ax[0].plot(df['alpha'], '.')
 
@@ -455,7 +326,7 @@ ax[5].plot(df['amplitud'])
 ax[5].set_ylabel('Amplitud')
 
 # %%
-nn = 5
+nn = 0
 df_aux = df[df['gamma'] == gammas[nn]]
 ff = df_aux['fundamental']
 SCI = df_aux['SCI']

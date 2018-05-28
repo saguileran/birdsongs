@@ -208,6 +208,7 @@ def SpectralContent(data, fs, method='song', fmin=300, fmax=10000,
             f_aff = freqs[maximos[0]]
     return f_msf, f_aff, amp
 
+
 # %%
 # Nombre del ave
 birdname = 'AmaVio'
@@ -314,153 +315,6 @@ plt.axhline(y=1.)
 plt.xlim(0, 5000)
 plt.ylim(0.5, 2.)
 
-# %% Sintetizo en un rango grande y me armo una base de datos
-grid_size = 30
-n_gammas = 2
-alphas = np.linspace(-0.3, 0, grid_size)
-betas = np.linspace(-0.4, 0.05, grid_size)
-gammas = np.linspace(10000, 40000, n_gammas)
-
-ff = np.zeros((len(gammas), len(alphas), len(betas)))
-SCI = np.zeros_like(ff)
-t_sci = np.zeros_like(ff)
-
-# Sampleo
-sampling = 44150
-oversamp = 20
-dt = 1./(oversamp*sampling)
-dt_per_param = 0.02
-n_per_param = int(dt_per_param*sampling)
-out_size = int(n_per_param*len(gammas)*len(alphas)*len(betas))
-time = np.arange(0, out_size/sampling, 1/sampling)
-tmax = out_size*oversamp
-
-v = np.zeros(5)
-v[0] = 0.000000000005
-v[1] = 0.00000000001
-v[2] = 0.000000000001
-v[3] = 0.00000000001
-v[4] = 0.000000000001
-
-forcing1 = 0.
-forcing2 = 0.
-tiempot = 0.
-tcount = 0
-noise = 0
-tnoise = 0
-r = 0.4
-rdis = 7000
-gamma2 = 1.
-gamma3 = 1.
-atenua = 1
-c = 35000.
-
-a = np.zeros(tmax)
-db = np.zeros(tmax)
-df = np.zeros(tmax)
-
-ancho = 0.2
-largo = 3.5
-
-tau = int(largo/(c*dt + 0.0))
-
-t = tau
-taux = 0
-amplitud = 1
-
-n_out = 0
-
-beta1 = betas[0]
-alfa1 = alphas[0]
-# ------ GAMMA ------#
-gm = gammas[0]
-# ------ ***** ------#
-
-s1overCH = (36*2.5*2/25.)*1e09
-s1overLB = 1.*1e-04
-s1overLG = (50*1e-03)/.5
-RB = 1*1e07
-A1 = 0
-
-# falta lo de abajo
-out = np.zeros(out_size)
-beta_out = np.zeros(out_size)
-alpha_out = np.zeros(out_size)
-gamma_out = np.zeros(out_size)
-dp = 5
-porcentaje = dp
-while t < tmax and v[1] > -5000000:
-    dbold = db[t]
-    a[t] = (.50)*(1.01*A1*v[1]) + db[t-tau]
-    db[t] = -r*a[t-tau]
-    ddb = (db[t]-dbold)/dt  # Derivada
-    forcing1 = db[t]
-    forcing2 = ddb
-    PRESSURE = a[t]
-    tiempot += dt
-    rk4(dxdt_synth, v, 5, t + 0.0, dt)
-    noise = 0
-    preout = RB*v[4]
-    if taux == oversamp:
-        # ----------- #
-        out[n_out] = preout*10
-        alpha_out[n_out] = alfa1
-        beta_out[n_out] = beta1
-        gamma_out[n_out] = gm
-        n_out += 1
-        next_p = n_out//n_per_param
-        n_gamma = next_p // (len(alphas)*len(betas))
-        n_alpha = next_p % (len(alphas)*len(betas)) % len(alphas)
-        n_beta = next_p % (len(alphas)*len(betas)) // len(betas)
-        alfa1 = alphas[n_alpha]
-        beta1 = betas[n_beta]
-        gm = gammas[n_gamma]
-        # ----------- #
-        taux = 0
-    taux += 1
-    if tiempot > 0.0:
-        # alfa1 = -0.15-0.00*amplitud
-        r = 0.1
-        noise = 0.21*(uniform(0, 1) - 0.5)
-        beta1 = beta1 + 0.0*noise
-        s1overCH = (360/0.8)*1e08
-        s1overLB = 1.*1e-04
-        s1overLG = (1/82.)
-        RB = (.5)*1e07
-        rdis = (300./5.)*(10000.)
-        A1 = amplitud + 0.5*noise
-    t += 1
-    completion = t/tmax*100
-    if completion > porcentaje:
-        print('{:.0f}% completado'.format(porcentaje))
-        porcentaje += dp
-
-# %%
-NN = 1024
-overlap = 1/1.1
-sigma = NN/10
-fu, tu, Sxx = get_spectrogram(out, sampling, window=NN, overlap=overlap,
-                              sigma=sigma)
-fig, ax = plt.subplots(5, figsize=(12, 18), sharex=True)
-ax[0].plot(time, out)
-ax[0].set_xlim(min(time), max(time))
-
-ax[1].pcolormesh(tu, fu, np.log(Sxx), cmap=plt.get_cmap('Greys'),
-                 rasterized=True)
-ax[1].set_xlim(min(time), max(time))
-
-ax[2].plot(time, alpha_out)
-ax[2].set_xlim(min(time), max(time))
-ax[2].set_ylabel('alpha')
-
-ax[3].plot(time, beta_out)
-ax[3].set_xlim(min(time), max(time))
-ax[3].set_ylabel('beta')
-
-ax[4].plot(time, gamma_out)
-ax[4].set_xlim(min(time), max(time))
-ax[4].set_ylabel('gamma')
-
 # %% ff, SCI, Amplitud
 df = pd.DataFrame(0, index=np.arange(len(alphas)*len(betas)*len(gammas)),
                   columns=['alpha', 'beta', 'gamma', 'fundamental', 'msf',
@@ -496,7 +350,7 @@ ax[4].plot(df['time'], df['amplitud'])
 ax[4].set_ylabel('Amplitud')
 
 # %%
-nn = 1
+nn = 0
 df_aux = df[df['gamma'] == gammas[nn]]
 ff = df_aux['fundamental']
 SCI = df_aux['SCI']

@@ -340,7 +340,7 @@ ax[5].set_ylabel('Amplitud')
 # %%
 gms = gammas
 for gg in gms:
-#    gama = gg[0]
+    gama = gg[0]
 #    df_aux = df_fit[df_fit['gamma'] == gama]
 #    alfa_f = df_aux['alfa']
 #    beta_f = df_aux['beta']

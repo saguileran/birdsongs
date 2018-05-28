@@ -265,7 +265,11 @@ for ngama in range(len(gammas)):
     for sil in range(len(df_song)):
         ff_obj = df_song['fundamental'][sil]
         SCI_obj = df_song['SCI'][sil]
-        aux2 = df_aux.loc[np.abs(df_aux['fundamental']-ff_obj) < 400]
+        paso = 1
+        aux2 = df_aux.loc[np.abs(df_aux['fundamental']-ff_obj) < 100*paso]
+        while len(aux2) < 5:
+            paso += 1
+            aux2 = df_aux.loc[np.abs(df_aux['fundamental']-ff_obj) < 100*paso]
         ff = aux2['fundamental'].astype(float)
         SCI = aux2['SCI'].astype(float)
         fit_ix = np.argmin(np.abs(SCI-SCI_obj))
@@ -301,7 +305,7 @@ for ngama in range(len(gammas)):
     ff = df_aux['fundamental'].astype(float)
     SCI = df_aux['SCI'].astype(float)
     ax[ngama].scatter(ff, SCI, s=10,
-                   label='gamma = {:.0f}'.format(gama))
+                      label='gamma = {:.0f}'.format(gama))
     ax[ngama].legend()
     ax[ngama].plot(df_fit[df_fit['gamma'] == gama]['fundamental'],
                    df_fit[df_fit['gamma'] == gama]['SCI'], 'mo',
@@ -310,7 +314,7 @@ for ngama in range(len(gammas)):
 fig.tight_layout()
 
 # %% Me quedo con el "mejor" gamma y veo las curvas de ff-SCI para alpha
-gama = gammas.iloc[2][0]
+gama = gammas.iloc[3][0]
 df_aux = df_grid[df_grid['gamma'] == gama]
 df_fit_aux = df_fit[df_fit['gamma'] == gama]
 ff = df_aux['fundamental'].astype(float)
@@ -323,11 +327,19 @@ cbar = plt.colorbar()
 cbar.set_label('alfa')
 plt.plot(df_song['fundamental'], df_song['SCI'], 'kx', label='song')
 alfa_bins = np.linspace(min(alfa), max(alfa), 11, endpoint=True)
-filas = 2
-columnas = 5
-fig, ax = plt.subplots(5, 2, figsize=(10, 10))
+filas = 5
+columnas = 2
+fig, ax = plt.subplots(filas, columnas, figsize=(10, 10), sharex=True,
+                       sharey=True)
 for nstart in range(len(alfa_bins[:-1])):
     start = alfa_bins[nstart]
     end = alfa_bins[nstart+1]
     df_bin = df_aux[(df_aux['alpha'] > start) & (df_aux['alpha'] < end)]
-    ax[nstart%5][nstart//5].plot(ff, SCI)
+    ax[nstart % filas][nstart//filas].plot(df_bin['fundamental'],
+                                           df_bin['SCI'], '.',
+                                           label='alfa: {:.2f} / {:.2f}'.format
+                                           (start, end))
+    ax[nstart % filas][nstart//filas].plot(df_song['fundamental'],
+                                           df_song['SCI'], 'kx', label='song')
+    ax[nstart % filas][nstart//filas].legend()
+fig.tight_layout()

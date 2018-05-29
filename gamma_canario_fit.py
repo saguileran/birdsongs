@@ -251,7 +251,7 @@ ax2.set_xlim(0, 5000)
 ax2.set_ylim(0.5, 2.)
 
 # %% Cargo las grillas de valores
-grid_file = 'ff_SCI-2018-05-24.13.53.26'
+grid_file = 'ff_SCI-all'
 df_grid = pd.read_csv(grid_file)
 df_fit = pd.DataFrame(columns=['fundamental', 'SCI', 'alfa', 'beta', 'gamma',
                                'ff song', 'SCI song'])
@@ -304,7 +304,7 @@ for ngama in range(len(gammas)):
     alfa = df_aux['alpha'].astype(float)
     ff = df_aux['fundamental'].astype(float)
     SCI = df_aux['SCI'].astype(float)
-    ax[ngama].scatter(ff, SCI, s=10,
+    ax[ngama].scatter(ff, SCI, s=10, alpha=0.5, c=alfa,
                       label='gamma = {:.0f}'.format(gama))
     ax[ngama].legend()
     ax[ngama].plot(df_fit[df_fit['gamma'] == gama]['fundamental'],

@@ -217,7 +217,7 @@ n_alphas = 100
 n_betas = 2*n_alphas
 n_gammas = 5
 alphas = np.linspace(-0.5, 0, n_alphas, endpoint=False)
-betas = np.linspace(-0.5, 0.5, n_betas, endpoint=False)
+betas = np.linspace(-1.5, -0.5, n_betas, endpoint=False)
 agrid, bgrid = np.meshgrid(alphas, betas)
 ab_grid = np.c_[np.ravel(agrid), np.ravel(bgrid)]
 gammas = np.linspace(10000, 40000, n_gammas)
@@ -320,7 +320,7 @@ for gm in gammas:
             print('{:.0f}%'.format(100*n_param/N_total))
             df.to_csv(outfile)
 # %% ff, SCI, Amplitud
-df = pd.read_csv('ff_SCI-2018-05-24.13.53.26')
+df = pd.read_csv('ff_SCI-all')
 fig, ax = plt.subplots(6, figsize=(12, 18), sharex=True)
 ax[0].plot(df['alpha'], '.')
 
@@ -341,9 +341,9 @@ ax[5].set_ylabel('Amplitud')
 gms = gammas
 for gg in gms:
     gama = gg[0]
-#    df_aux = df_fit[df_fit['gamma'] == gama]
-#    alfa_f = df_aux['alfa']
-#    beta_f = df_aux['beta']
+    df_aux = df_fit[df_fit['gamma'] == gama]
+    alfa_f = df_aux['alfa']
+    beta_f = df_aux['beta']
 
     df_aux = df[df['gamma'] == gama]
     df_aux = df_aux.fillna(0)
@@ -353,14 +353,14 @@ for gg in gms:
     alfa = df_aux['alpha'].astype(float)
     beta = df_aux['beta'].astype(float)
 
-    fig, ax = plt.subplots(1, 3, figsize=(12, 6))
+    fig, ax = plt.subplots(1, 3, figsize=(12, 9))
     fig.suptitle('gamma = {:.0f}'.format(gama))
 
     cax = ax[0].imshow(ff.values.reshape(len(set(beta)), -1), origin='lower',
                        extent=[min(alfa), max(alfa), min(beta), max(beta)],
                        interpolation='nearest', cmap='hot')
     fig.colorbar(cax, ax=ax[0], fraction=0.085, pad=0.04)
-#    ax[0].scatter(alfa_f, beta_f)
+    ax[0].scatter(alfa_f, beta_f)
     ax[0].set_xlabel('alpha')
     ax[0].set_ylabel('beta')
     ax[0].set_title('fundamental')
@@ -382,4 +382,4 @@ for gg in gms:
     ax[2].set_title('amplitud')
 
     fig.tight_layout()
-#    fig.savefig('espacio_parametros_gamma{}_fit.pdf'.format(gama), format='pdf')
+#    fig.savefig('espacio_parametros_gamma{}_fit_extendido.pdf'.format(gama), format='pdf')

@@ -175,10 +175,10 @@ def SpectralContent(data, fs, method='song', fmin=300, fmax=10000,
 birdname = 'AmaVio'
 
 # Carpeta donde estan guardados los wavs
-files_path = '/home/juan/Documentos/Musculo/Codigo canarios/Files'
-
+base_path = '/home/juan/Documentos/Musculo/Codigo canarios/'
+files_path = '{}Files'.format(base_path)
 # Carpeta donde se van a guardar los resultados
-analisis_path = '{}analysis/'.format(files_path)
+analisis_path = '{}analysis/'.format(base_path)
 if not os.path.exists(analisis_path):
     os.makedirs(analisis_path)
 
@@ -230,12 +230,12 @@ for ss in silabas:
 print('Datos ok')
 
 # %%ff/SCI por silaba (~promedio)
-df_song = pd.DataFrame(index=range(len(silabas)), columns=['fundamental',
-                       'msf', 'SCI', 'amplitud'])
+df_song_pre = pd.DataFrame(index=range(len(silabas)),
+                           columns=['fundamental', 'msf', 'SCI', 'amplitud'])
 fig = plt.figure(figsize=(20, 6))
 gs = gridspec.GridSpec(2, 2, width_ratios=[2, 1])
 ax0 = fig.add_subplot(gs[0, 0])
-ax1 = fig.add_subplot(gs[1, 0])
+ax1 = fig.add_subplot(gs[1, 0], sharex=ax0)
 ax2 = fig.add_subplot(gs[:, 1])
 ax0.pcolormesh(tu, fu, np.log(Sxx), cmap=plt.get_cmap('Greys'),
                rasterized=True)
@@ -252,21 +252,25 @@ for n_s in range(len(silabas)):
     segment = song[silabas[n_s]]
     msf, aff, amp = SpectralContent(segment, fs, dt_transit=0,
                                     method='syllable')
-    df_song.iloc[n_s] = [aff, msf, msf/aff, amp]
+    df_song_pre.iloc[n_s] = [aff, msf, msf/aff, amp]
     SCI_av[n_s] = msf/aff
     ff_av[n_s] = aff
+df_song = df_song_pre[(df_song_pre['fundamental'] < 6500) &
+                      (df_song_pre['SCI'] < 4)]
+df_song = df_song.reset_index(drop=True)
+df_song.to_csv('{}df_song'.format(analisis_path))
 color = [str(item/(max(t_sci_av))*255) for item in t_sci_av]
 ax0.scatter(t_sci_av, ff_av, c=color)
 ax1.scatter(t_sci_av, SCI_av, c=color)
 ax1.set_ylabel('SCI_av')
 ax2.scatter(ff_av, SCI_av, c=color)
 ax2.axhline(y=1.)
-ax2.set_xlim(0, 5000)
-ax2.set_ylim(0.5, 2.)
+ax2.set_xlim(0, 15000)
+ax2.set_ylim(0., 2.)
 
 # %% Cargo las grillas de valores
 grid_file = 'ff_SCI-all'
-df_grid = pd.read_csv(grid_file)
+df_grid = pd.read_csv('{}{}'.format(analisis_path, grid_file))
 df_fit = pd.DataFrame(columns=['fundamental', 'SCI', 'alfa', 'beta', 'gamma',
                                'ff song', 'SCI song'])
 gammas = df_grid.groupby('gamma')['gamma'].unique()  # unique values of gamma
@@ -294,6 +298,17 @@ for ngama in range(len(gammas)):
                               ff_obj, SCI_obj]
         DSCI[ngama] += (SCI.loc[fit_ix] - SCI_obj)**2
         n_fila += 1
+df_fit.to_csv('{}df_fit'.format(analisis_path))
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.plot(gammas, DSCI)
+ax.plot(gammas, DSCI, 'o')
+ax.set_ylabel('DSCI')
+ax.set_xlabel('gamma')
+title = [os.path.basename(x) for x in sound_files]
+title.append(len(df_song))
+ax.set_title('{}\n{}\n{}\n{}\n{}\n{} silabas total'.format(*title))
+fig.tight_layout()
 # %%
 colores = ['r', 'g', 'b', 'k', 'm']
 fig, ax = plt.subplots(1)
@@ -356,4 +371,5 @@ for nstart in range(len(alfa_bins[:-1])):
     ax[nstart % filas][nstart//filas].plot(df_song['fundamental'],
                                            df_song['SCI'], 'kx', label='song')
     ax[nstart % filas][nstart//filas].legend()
+fig.suptitle('gamma = {}'.format(gama))
 fig.tight_layout()

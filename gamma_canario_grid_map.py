@@ -19,6 +19,7 @@ import pandas as pd
 import peakutils
 import os
 from time import strftime
+from scipy import ndimage
 
 
 def envelope_cabeza(signal, method='percentile', intervalLength=210, perc=90):
@@ -341,9 +342,9 @@ ax[5].set_ylabel('Amplitud')
 gms = gammas
 for gg in gms:
     gama = gg[0]
-    df_aux = df_fit[df_fit['gamma'] == gama]
-    alfa_f = df_aux['alfa']
-    beta_f = df_aux['beta']
+#    df_aux = df_fit[df_fit['gamma'] == gama]
+#    alfa_f = df_aux['alfa']
+#    beta_f = df_aux['beta']
 
     df_aux = df[df['gamma'] == gama]
     df_aux = df_aux.fillna(0)
@@ -360,7 +361,7 @@ for gg in gms:
                        extent=[min(alfa), max(alfa), min(beta), max(beta)],
                        interpolation='nearest', cmap='hot')
     fig.colorbar(cax, ax=ax[0], fraction=0.085, pad=0.04)
-    ax[0].scatter(alfa_f, beta_f)
+#    ax[0].scatter(alfa_f, beta_f)
     ax[0].set_xlabel('alpha')
     ax[0].set_ylabel('beta')
     ax[0].set_title('fundamental')
@@ -382,4 +383,63 @@ for gg in gms:
     ax[2].set_title('amplitud')
 
     fig.tight_layout()
-#    fig.savefig('espacio_parametros_gamma{}_fit_extendido.pdf'.format(gama), format='pdf')
+#    fig.savefig('espacio_parametros_gamma{}_fit_extendido.pdf'.format(gama),
+#                format='pdf')
+# %% Gradientes (no suman mucho)
+gms = gammas
+for gg in gms:
+    gama = gg[0]
+
+    df_aux = df[df['gamma'] == gama]
+    df_aux = df_aux.fillna(0)
+    ff = df_aux['fundamental'].astype(float)
+    SCI = df_aux['SCI'].astype(float)
+    amp = df_aux['amplitud'].astype(float)
+    alfa = df_aux['alpha'].astype(float)
+    beta = df_aux['beta'].astype(float)
+
+    fig, ax = plt.subplots(1, 3, figsize=(12, 9))
+    fig.suptitle('gamma = {:.0f}'.format(gama))
+
+    img = ff.values.reshape(len(set(beta)), -1)
+    # Get x-gradient in "sx"
+    sx = ndimage.sobel(img, axis=0, mode='constant')
+    # Get y-gradient in "sy"
+    sy = ndimage.sobel(img, axis=1, mode='constant')
+    # Get square root of sum of squares
+    sobel = np.hypot(sx, sy)
+    cax = ax[0].imshow(sobel, origin='lower',
+                       interpolation='nearest', cmap='hot')
+    fig.colorbar(cax, ax=ax[0], fraction=0.085, pad=0.04)
+    ax[0].set_xlabel('alpha')
+    ax[0].set_ylabel('beta')
+    ax[0].set_title('fundamental')
+    img = SCI.values.reshape(len(set(beta)), -1)
+    # Get x-gradient in "sx"
+    sx = ndimage.sobel(img, axis=0, mode='constant')
+    # Get y-gradient in "sy"
+    sy = ndimage.sobel(img, axis=1, mode='constant')
+    # Get square root of sum of squares
+    sobel = np.hypot(sx, sy)
+    cax = ax[1].imshow(sobel, origin='lower',
+                       interpolation='nearest', cmap='hot')
+    fig.colorbar(cax, ax=ax[1], fraction=0.085, pad=0.04)
+    ax[1].set_xlabel('alpha')
+    ax[1].set_ylabel('beta')
+    ax[1].set_title('SCI')
+
+    img = amp.values.reshape(len(set(beta)), -1)
+    # Get x-gradient in "sx"
+    sx = ndimage.sobel(img, axis=0, mode='constant')
+    # Get y-gradient in "sy"
+    sy = ndimage.sobel(img, axis=1, mode='constant')
+    # Get square root of sum of squares
+    sobel = np.hypot(sx, sy)
+    cax = ax[2].imshow(sobel, origin='lower',
+                       interpolation='nearest', cmap='hot')
+    fig.colorbar(cax, ax=ax[2], fraction=0.085, pad=0.04)
+    ax[2].set_xlabel('alpha')
+    ax[2].set_ylabel('beta')
+    ax[2].set_title('amplitud')
+
+    fig.tight_layout()

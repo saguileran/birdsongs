@@ -226,22 +226,24 @@ def smooth_on_off(onoff, fs=44150, on_time=0.005):
     neg_dif = min(dif)
     window = int(fs*on_time)
     smooth = np.copy(onoff)
-    trans_on = np.where(dif == pos_dif)[0]
-    trans_off = np.where(dif == neg_dif)[0]
-    for onsets in range(len(trans_on)):
-        if trans_on[onsets] > window and \
-                    trans_on[onsets] < len(smooth) - window:
-            smooth[trans_on[onsets] - window:trans_on[onsets] + window] = \
-                sigmoid(np.arange(-window, window, 1), dt=on_time,
-                        maxout=max(smooth[trans_on[onsets] - window:trans_on[onsets] + window]), 
-                        minout=min(smooth[trans_on[onsets] - window:trans_on[onsets] + window]))
-    for offsets in range(len(trans_off)):
-        if trans_off[offsets] > window and \
-                    trans_off[offsets] < len(smooth) - window:
-            smooth[trans_off[offsets] - window:trans_off[offsets] + window] = \
-                sigmoid(-np.arange(-window, window, 1), dt=on_time,
-                        maxout=max(smooth[trans_off[offsets] - window:trans_off[offsets] + window]), 
-                        minout=min(smooth[trans_off[offsets] - window:trans_off[offsets] + window]))
+    trans_on = np.where(dif == neg_dif)[0]
+    trans_off = np.where(dif == pos_dif)[0]
+    for n_on in range(len(trans_on)):
+        start = trans_on[n_on] - window
+        end = trans_on[n_on] + window
+        if start > 0 and end < len(smooth):
+            smooth[start:end] = sigmoid(-np.arange(-window, window, 1),
+                                        dt=on_time,
+                                        maxout=max(smooth[start:end]),
+                                        minout=min(smooth[start:end]))
+    for n_off in range(len(trans_off)):
+        start = trans_off[n_off] - window
+        end = trans_off[n_off] + window
+        if start and end < len(smooth):
+            smooth[start:end] = sigmoid(np.arange(-window, window, 1),
+                                        dt=on_time/10,
+                                        maxout=max(smooth[start:end]),
+                                        minout=min(smooth[start:end]))
     return smooth
 
 
@@ -407,7 +409,7 @@ ax.set_xlim(min(time), max(time))
 for ss in silabas:
     ax.plot([time[ss[0]], time[ss[-1]]], [0, 0], 'k', lw=5)
 
-freq_file = '{}/fundamental'.format(files_path)
+freq_file = '{}/fundamental-1'.format(files_path)
 aux = 1
 if os.path.isfile(freq_file):
     var = input('Ya existe archivo de frecuencias,\
@@ -561,13 +563,12 @@ while t < tmax and v[1] > -5000000:
         n_out += 1
         beta1 = smooot_beta[n_out]
         alfa1 = smooth_alfa[n_out]
+        amplitud = env_amplitude[n_out]
         taux = 0
         if (n_out*100/N_total) % dp == 0:
             print('{:.0f}%'.format(100*n_out/N_total))
     taux += 1
     if tiempot > 0.0:
-        # Tomo alfa cte = -0.05
-#        alfa1 = -0.05-0.0*amplitud
         r = 0.1
         noise = 0.21*(uniform(0, 1) - 0.5)
         beta1 = beta1 + 0.0*noise

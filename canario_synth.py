@@ -212,9 +212,12 @@ def rk4(dv, v, n, t, dt):
     return v
 
 
-def sigmoid(x, dt=1, b=0, minout=0, maxout=1):
-    a = 5/(dt*44100)
-    return (1/(1+np.exp(-(a*x+b))))*(maxout-minout)+minout
+def sigmoid(x, dt=1, b=0, minout=0, maxout=1, fs=44150, rev=False):
+    a = 5/(dt*fs)
+    if not rev:
+        return (1/(1+np.exp(-(a*x+b))))*(maxout-minout)+minout
+    else:
+        return ((1/(1+np.exp(-(a*x+b))))*(maxout-minout)+minout)[::-1]
 
 
 def smooth_on_off(onoff, fs=44150, on_time=0.005):
@@ -233,7 +236,7 @@ def smooth_on_off(onoff, fs=44150, on_time=0.005):
         end = trans_on[n_on] + window
         if start > 0 and end < len(smooth):
             smooth[start:end] = sigmoid(-np.arange(-window, window, 1),
-                                        dt=on_time,
+                                        dt=on_time, fs=fs,
                                         maxout=max(smooth[start:end]),
                                         minout=min(smooth[start:end]))
     for n_off in range(len(trans_off)):
@@ -241,48 +244,55 @@ def smooth_on_off(onoff, fs=44150, on_time=0.005):
         end = trans_off[n_off] + window
         if start and end < len(smooth):
             smooth[start:end] = sigmoid(np.arange(-window, window, 1),
-                                        dt=on_time/10,
+                                        dt=on_time/10, fs=fs,
                                         maxout=max(smooth[start:end]),
                                         minout=min(smooth[start:end]))
     return smooth
 
 
-def smooth_trajectory(alfa, beta, fs=44150, on_time=0.005):
+def smooth_trajectory(alfa, beta, fs=44150, on_time=0.001, slow_factor=10):
     """
     Suaviza las trayectorias de alfa-beta
     """
     dif_alfa = np.diff(alfa)
     pos_dif = max(dif_alfa)
     neg_dif = min(dif_alfa)
-    window = int(fs*on_time)
+    window = int(fs*on_time*slow_factor)
     sm_alfa = np.copy(alfa)
     sm_beta = np.copy(beta)
-    trans_on = np.where(dif_alfa == neg_dif)[0]
-    trans_off = np.where(dif_alfa == pos_dif)[0]
+    trans_on = np.where(dif_alfa == neg_dif)[0] + 1
+    trans_off = np.where(dif_alfa == pos_dif)[0] + 1
     for n_on in range(len(trans_on)):
-        start = trans_on[n_on] - window
-        end = trans_on[n_on] + window
-        if start > 0 and end < len(sm_alfa):
-            sm_alfa[start:end] = sigmoid(-np.arange(-window, window, 1),
-                                         dt=on_time,
-                                         maxout=max(sm_alfa[start:end]),
-                                         minout=min(sm_alfa[start:end]))
-            sm_beta[start:end] = sigmoid(-np.arange(-window, window, 1),
-                                         dt=on_time/10,
-                                         maxout=max(sm_beta[start:end]),
-                                         minout=min(sm_beta[start:end]))
+        astart = trans_on[n_on] - window
+        aend = trans_on[n_on] + window
+        bstart = trans_on[n_on] - 2*window
+        bend = trans_on[n_on]
+        if astart > 0 and aend < len(sm_alfa):
+            sm_alfa[astart:aend] = sigmoid(np.arange(-window, window, 1),
+                                           dt=on_time*slow_factor, fs=fs,
+                                           rev=True,
+                                           maxout=max(sm_alfa[astart:aend]),
+                                           minout=min(sm_alfa[astart:aend]))
+            sm_beta[bstart:bend] = sigmoid(np.arange(-window, window, 1),
+                                           dt=on_time, fs=fs, rev=True,
+                                           maxout=max(sm_beta[astart:aend]),
+                                           minout=sm_beta[bend+1])
     for n_off in range(len(trans_off)):
-        start = trans_off[n_off] - window
-        end = trans_off[n_off] + window
-        if start and end < len(sm_alfa):
-            sm_alfa[start:end] = sigmoid(np.arange(-window, window, 1),
-                                         dt=on_time/10,
-                                         maxout=max(sm_alfa[start:end]),
-                                         minout=min(sm_alfa[start:end]))
-            sm_beta[start:end] = sigmoid(np.arange(-window, window, 1),
-                                         dt=on_time,
-                                         maxout=max(sm_beta[start:end]),
-                                         minout=min(sm_beta[start:end]))
+        astart = trans_off[n_off] - window
+        aend = trans_off[n_off] + window
+        bstart = trans_off[n_off] - window
+        bend = trans_off[n_off] + window
+        if astart > 0 and aend < len(sm_alfa):
+            sm_alfa[astart:aend] = sigmoid(np.arange(-window, window, 1),
+                                           dt=on_time, fs=fs,
+                                           rev=False,
+                                           maxout=max(sm_alfa[astart:aend]),
+                                           minout=min(sm_alfa[astart:aend]))
+            sm_beta[bstart:bend] = sigmoid(np.arange(-window, window, 1),
+                                           dt=on_time*slow_factor, fs=fs,
+                                           rev=False,
+                                           maxout=max(sm_beta[bstart:bend+1]),
+                                           minout=sm_beta[bstart])
     return sm_alfa, sm_beta
 
 
@@ -583,7 +593,7 @@ while t < tmax and v[1] > -5000000:
 synth_env = normalizar(envelope_cabeza(out, intervalLength=0.01*fs),
                        minout=0, method='extremos')
 out_amp = np.zeros_like(out)
-not_zero = np.where(synth_env > 0.01)
+not_zero = np.where(synth_env > 0.005)
 out_amp[not_zero] = out[not_zero]*envelope[not_zero]/synth_env[not_zero]
 s_amp_env = normalizar(envelope_cabeza(out_amp, intervalLength=0.01*fs),
                        minout=0, method='extremos')
@@ -614,3 +624,9 @@ ax[2][1].pcolormesh(tu_s, fu_s, np.log(Sxx_s_a), cmap=plt.get_cmap('Greys'),
 
 ax[2][1].set_ylim(0, 8000)
 ax[2][1].set_xlim(min(time), max(time))
+
+# %% Guardo wav
+wavfile.write('{}/synth2.wav'.format(files_path), fs,
+              np.asarray(normalizar(out_amp), dtype=np.float32))
+wavfile.write('{}/song.wav'.format(files_path), fs,
+              np.asarray(normalizar(song), dtype=np.float32))

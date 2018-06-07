@@ -274,14 +274,15 @@ def smooth_trajectory(alfa, beta, fs=44150, on_time=0.001, slow_factor=10):
                                            maxout=max(sm_alfa[astart:aend]),
                                            minout=min(sm_alfa[astart:aend]))
             sm_beta[bstart:bend] = sigmoid(np.arange(-window, window, 1),
-                                           dt=on_time, fs=fs, rev=True,
+                                           dt=on_time, fs=fs,
+                                           rev=True,
                                            maxout=max(sm_beta[astart:aend]),
                                            minout=sm_beta[bend+1])
     for n_off in range(len(trans_off)):
         astart = trans_off[n_off] - window
         aend = trans_off[n_off] + window
-        bstart = trans_off[n_off] - window
-        bend = trans_off[n_off] + window
+        bstart = trans_off[n_off]
+        bend = trans_off[n_off] + 2*window
         if astart > 0 and aend < len(sm_alfa):
             sm_alfa[astart:aend] = sigmoid(np.arange(-window, window, 1),
                                            dt=on_time, fs=fs,
@@ -291,8 +292,9 @@ def smooth_trajectory(alfa, beta, fs=44150, on_time=0.001, slow_factor=10):
             sm_beta[bstart:bend] = sigmoid(np.arange(-window, window, 1),
                                            dt=on_time*slow_factor, fs=fs,
                                            rev=False,
-                                           maxout=max(sm_beta[bstart:bend+1]),
-                                           minout=sm_beta[bstart])
+                                           maxout=max
+                                           (sm_beta[bstart-1:bend+1]),
+                                           minout=sm_beta[bstart-1])
     return sm_alfa, sm_beta
 
 
@@ -330,6 +332,7 @@ time = np.linspace(0, len(song)/fs, len(song))
 umbral = 0.05
 supra = np.where(envelope > umbral)[0]
 silabas = consecutive(supra, min_length=100)
+
 # %%
 times = []
 freqs = []
@@ -441,15 +444,18 @@ if os.path.isfile(freq_file):
         fig.canvas.callbacks.connect('key_press_event', press)
     elif var == 'e':
         freqs_sil = np.loadtxt(freq_file)
+        ax.plot(time, freqs_sil, '.', ms=1)
 
 # %% Cargo las grillas de valores
 print('Buscando beta...')
-# En el archivo ya esta alpha = -0.05
-grid_file = 'grid_005.dat'
+# En el archivo esta todo (para todo alpha, beta, gamma)
+grid_file = 'ff_SCI-all'
 opt_gamma = 25000
-df_all = pd.read_csv('{}{}'.format(base_path, grid_file))
-df_grid = df_all[df_all['gamma'] == opt_gamma]
+opt_alpha = -0.05
+df_all = pd.read_csv('{}{}'.format(base_path, grid_file)).fillna(0)
 
+df_grid = df_all[(df_all['gamma'] == opt_gamma) &
+                 (df_all['alpha'] == opt_alpha)]
 last = np.where(df_grid['fundamental'] == 0)[0][1]
 freq_table = df_grid['fundamental'][:last]
 freq_table = freq_table.drop(freq_table.index[[-2, -3, -4, -5]])
@@ -457,8 +463,10 @@ alpha_table = df_grid['alpha'][:last]
 beta_table = df_grid['beta'][:last]
 beta_table = beta_table.drop(beta_table.index[[-2, -3, -4, -5]])
 sci_table = df_grid['SCI'][:last]
+sci_table = sci_table.drop(beta_table.index[[-2, -3, -4, -5]])
 plt.figure()
-plt.plot(freq_table, beta_table, 'o')
+plt.scatter(freq_table, beta_table, c=np.asarray(sci_table))
+plt.colorbar()
 # %% Pre procesamiento beta-ff
 unique_ff = list(set(freq_table))
 ff = np.asarray(unique_ff)
@@ -469,14 +477,19 @@ for n_ff in range(len(unique_ff)):
     beta[n_ff] = np.mean(beta_table[freq_table == frecuencia])
 # Interpolo
 f_q = interp1d(ff, beta, kind='linear', fill_value='extrapolate')
-plt.plot(ff, beta, 'o')
+plt.figure()
+plt.plot(freq_table, beta_table, 'o', label='Tabla')
+plt.plot(ff, beta, 'o', label='Promedio')
 new_ff = np.linspace(0, max(ff), num=100)
-plt.plot(new_ff, f_q(new_ff), '--x')
+plt.plot(new_ff, f_q(new_ff), '--x', label='Interpolado')
+plt.legend()
+
 # %%
 freq = np.loadtxt(freq_file)
 env_amplitude = envelope
 
 beta_file = '{}beta_song.dat'.format(analisis_path)
+beta_file_b = '{}beta_song_b.dat'.format(analisis_path)
 
 ap_alfa = np.zeros_like(freq)   # beta
 ap_alfa += 0.05
@@ -489,17 +502,20 @@ for i in range(len(freq)):
         ap_beta[i] = f_q(freq[i])
         ap_alfa[i] = -0.05
     else:
-        ap_beta[i] = 0.15
+        ap_beta[i] = -0.15
         ap_freq[i] = 0.
 
 np.savetxt(beta_file, ap_beta, fmt='%.2f')
 # %%
-smooth_alfa, smooot_beta = smooth_trajectory(ap_alfa, ap_beta, on_time=0.01)
+smooth_alfa, smooot_beta = smooth_trajectory(ap_alfa, ap_beta, on_time=0.001,
+                                             slow_factor=10)
 plt.figure()
-plt.plot(ap_beta, 'b--')
-plt.plot(smooot_beta, 'b')
-plt.plot(ap_alfa, 'r--')
-plt.plot(smooth_alfa, 'r')
+plt.plot(time, ap_beta, 'b--', label=r'$\beta$')
+plt.plot(time, smooot_beta, 'b', label=r'$\beta_{smooth}$')
+plt.plot(time, ap_alfa, 'r--', label=r'$\alpha$')
+plt.plot(time, smooth_alfa, 'r', label=r'$\alpha_{smooth}$')
+plt.legend()
+plt.xlabel('Tiempo')
 print('Beta ok')
 # %% Integro
 N_total = len(song)
@@ -609,12 +625,15 @@ fu_s, tu_s, Sxx_s_a = get_spectrogram(out_amp, fs, window=NN, overlap=overlap,
                                       sigma=sigma)
 
 fig, ax = plt.subplots(3, 2, figsize=(18, 6), sharex=True, sharey='col')
-ax[0][0].plot(time, normalizar(song))
+ax[0][0].plot(time, normalizar(song), label='canto')
 ax[0][0].plot(time, envelope)
-ax[1][0].plot(time, normalizar(out))
+ax[0][0].legend()
+ax[1][0].plot(time, normalizar(out), label='output')
 ax[1][0].plot(time, synth_env)
-ax[2][0].plot(time, normalizar(out_amp))
+ax[1][0].legend()
+ax[2][0].plot(time, normalizar(out_amp), label='output normalizado amplitud')
 ax[2][0].plot(time, s_amp_env)
+ax[2][0].legend()
 ax[0][1].pcolormesh(tu, fu, np.log(Sxx), cmap=plt.get_cmap('Greys'),
                     rasterized=True)
 ax[1][1].pcolormesh(tu_s, fu_s, np.log(Sxx_s), cmap=plt.get_cmap('Greys'),
@@ -623,10 +642,13 @@ ax[2][1].pcolormesh(tu_s, fu_s, np.log(Sxx_s_a), cmap=plt.get_cmap('Greys'),
                     rasterized=True)
 
 ax[2][1].set_ylim(0, 8000)
-ax[2][1].set_xlim(min(time), max(time))
-
+# ax[2][1].set_xlim(min(time), max(time))
+ax[2][1].set_xlim(0, 6.5)
+fig.tight_layout()
 # %% Guardo wav
-wavfile.write('{}/synth2.wav'.format(files_path), fs,
+wavfile.write('{}/synth4_amp.wav'.format(files_path), fs,
               np.asarray(normalizar(out_amp), dtype=np.float32))
+wavfile.write('{}/synth4.wav'.format(files_path), fs,
+              np.asarray(normalizar(out), dtype=np.float32))
 wavfile.write('{}/song.wav'.format(files_path), fs,
               np.asarray(normalizar(song), dtype=np.float32))

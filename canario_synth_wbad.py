@@ -21,6 +21,7 @@ import pandas as pd
 import peakutils
 from random import uniform
 from scipy.interpolate import interp1d
+from scipy import stats
 
 
 def envelope_cabeza(signal, method='percentile', intervalLength=210, perc=90):
@@ -134,7 +135,7 @@ def get_spectrogram(data, sampling_rate, window=1024, overlap=1/1.1,
     return fu, tu, Sxx
 
 
-def SpectralContent(data, fs, method='song', fmin=300, fmax=10000,
+def SpectralContent(data, fs=44150, method='song', fmin=300, fmax=10000,
                     dt_transit=0.002):
     segment = data[int(dt_transit*fs):]
     fourier = np.abs(np.fft.rfft(segment))
@@ -214,10 +215,13 @@ def rk4(dv, v, n, t, dt):
 
 def sigmoid(x, dt=1, b=0, minout=0, maxout=1, fs=44150, rev=False):
     a = 5/(dt*fs)
+    sig = (1/(1+np.exp(-(a*x+b))))
+    sig_norm = sig-min(sig)
+    sig_norm /= max(sig_norm)
     if not rev:
-        return (1/(1+np.exp(-(a*x+b))))*(maxout-minout)+minout
+        return sig_norm*(maxout-minout)+minout
     else:
-        return ((1/(1+np.exp(-(a*x+b))))*(maxout-minout)+minout)[::-1]
+        return (sig_norm*(maxout-minout)+minout)[::-1]
 
 
 def smooth_on_off(onoff, fs=44150, on_time=0.005):
@@ -254,6 +258,8 @@ def smooth_trajectory(alfa, beta, fs=44150, on_time=0.001, slow_factor=10):
     """
     Suaviza las trayectorias de alfa-beta
     """
+    alfa_on = min(alfa)
+    alfa_off = max(alfa)
     dif_alfa = np.diff(alfa)
     pos_dif = max(dif_alfa)
     neg_dif = min(dif_alfa)
@@ -271,8 +277,8 @@ def smooth_trajectory(alfa, beta, fs=44150, on_time=0.001, slow_factor=10):
             sm_alfa[astart:aend] = sigmoid(np.arange(-window, window, 1),
                                            dt=on_time*slow_factor, fs=fs,
                                            rev=True,
-                                           maxout=max(sm_alfa[astart:aend]),
-                                           minout=min(sm_alfa[astart:aend]))
+                                           maxout=alfa_off,
+                                           minout=alfa_on)
             sm_beta[bstart:bend] = sigmoid(np.arange(-window, window, 1),
                                            dt=on_time, fs=fs,
                                            rev=True,
@@ -287,15 +293,20 @@ def smooth_trajectory(alfa, beta, fs=44150, on_time=0.001, slow_factor=10):
             sm_alfa[astart:aend] = sigmoid(np.arange(-window, window, 1),
                                            dt=on_time, fs=fs,
                                            rev=False,
-                                           maxout=max(sm_alfa[astart:aend]),
-                                           minout=min(sm_alfa[astart:aend]))
+                                           maxout=alfa_off,
+                                           minout=alfa_on)
             sm_beta[bstart:bend] = sigmoid(np.arange(-window, window, 1),
-                                           dt=on_time*slow_factor, fs=fs,
+                                           dt=on_time, fs=fs,
                                            rev=False,
                                            maxout=max
                                            (sm_beta[bstart-1:bend+1]),
                                            minout=sm_beta[bstart-1])
     return sm_alfa, sm_beta
+
+
+def running_mean(x, N):
+    cumsum = np.cumsum(np.insert(x, 0, 0))
+    return (cumsum[N:] - cumsum[:-N]) / float(N)
 
 
 # %%
@@ -363,7 +374,7 @@ def on_pick(event):
     ancho = 5
     f_event = df*(np.argmax(np.log(Sxx[:, tu_closest][aux-ancho:aux+ancho])) +
                   aux-ancho)
-    ax.plot(tu[tu_closest], f_event, 'b.')
+    ax[1].plot(tu[tu_closest], f_event, 'b.')
     plt.gcf().canvas.draw_idle()
     print('Guardar t = {:.3f} f = {:.0f}?'.format(time[time_closest], f_event))
 
@@ -377,14 +388,15 @@ def press(event):
     global f
     global ax
     global fs
+    global song
     if event.key == 'enter':
-        ax.plot(time[time_closest], f_event, 'r.')
+        ax[1].plot(time[time_closest], f_event, 'r.')
         plt.gcf().canvas.draw_idle()
         times.append(time_closest)
         freqs.append(f_event)
         print('Guardado en memoria')
     if event.key == '2':
-        ax.plot(time[time_closest], f_event/2, 'r.')
+        ax[1].plot(time[time_closest], f_event/2, 'r.')
         plt.gcf().canvas.draw_idle()
         times.append(time_closest)
         freqs.append(f_event/2)
@@ -397,7 +409,7 @@ def press(event):
         i2 = sorted_times[-1]
         t_interp = time[i1+1:i2-1]
         f_interp = f_q([x for x in range(i1+1, i2-1)])
-        ax.plot(t_interp, f_interp)
+        ax[1].plot(t_interp, f_interp)
         freqs_sil[i1+1:i2-1] = f_interp
         plt.gcf().canvas.draw_idle()
         times = []
@@ -405,6 +417,20 @@ def press(event):
         print('Nueva silaba')
     if event.key == 'escape':
         np.savetxt(freq_file, freqs_sil)
+    if event.key == 'f':
+        segment = song[time_closest-256:time_closest+256]
+        fourier = np.abs(np.fft.rfft(segment))
+        freqs = np.fft.rfftfreq(len(segment), d=1/fs)
+        min_bin = np.argmin(np.abs(freqs-300))
+        max_bin = np.argmin(np.abs(freqs-10000))
+        fourier = np.abs(np.fft.rfft(segment))[min_bin:max_bin]
+        freqs = np.fft.rfftfreq(len(segment), d=1/fs)[min_bin:max_bin]
+        norm_fou = fourier/np.sum(fourier)
+        entropy = -np.sum(norm_fou*np.log2(norm_fou))
+        plt.figure()
+        plt.plot(freqs, fourier, label='{}'.format(entropy))
+        plt.title('{:.2f}'.format(time[tu_closest]))
+        plt.legend()
 
 
 NN = 1024
@@ -413,38 +439,62 @@ sigma = NN/10
 fu, tu, Sxx = get_spectrogram(song, fs, window=NN, overlap=overlap,
                               sigma=sigma)
 df = np.diff(fu)[0]
-fig = plt.figure(figsize=(12, 6))
-ax = fig.add_subplot(111)
-ax.pcolormesh(tu, fu, np.log(Sxx), cmap=plt.get_cmap('Greys'),
-              rasterized=True)
-ax.set_ylim(0, 8000)
-ax.set_xlim(min(time), max(time))
-for ss in silabas:
-    ax.plot([time[ss[0]], time[ss[-1]]], [0, 0], 'k', lw=5)
+fig, ax = plt.subplots(2, figsize=(12, 6), sharex=True)
+ax[0].plot(time, song)
+ax[1].pcolormesh(tu, fu, np.log(Sxx), cmap=plt.get_cmap('Greys'),
+                 rasterized=True)
+ax[1].set_ylim(0, 8000)
+ax[1].set_xlim(min(time), max(time))
+#for ss in silabas:
+#    ax[1].axvline(time[ss[0]], ls='dashed')
+#    ax[1].axvline(time[ss[-1]], ls='dashed')
 
+#start = 0.
+#window = 1/50   # Resolucion 50Hz
+#end = start + window
+#ent_time = []
+#ent = []
+#while end < max(time):
+#    segment = song[int(start*fs):int(end*fs)]
+#    fourier = np.abs(np.fft.rfft(segment))
+#    freqs = np.fft.rfftfreq(len(segment), d=1/fs)
+#    min_bin = np.argmin(np.abs(freqs-300))
+#    max_bin = np.argmin(np.abs(freqs-10000))
+#    fourier = np.abs(np.fft.rfft(segment))[min_bin:max_bin]
+#    freqs = np.fft.rfftfreq(len(segment), d=1/fs)[min_bin:max_bin]
+#    norm_fou = fourier/np.sum(fourier)
+#    entropy = -np.sum(norm_fou*np.log2(norm_fou))
+#    ent_time.append((start+end)/2)
+#    ent.append(entropy)
+#    start += window/10
+#    end = start + window
+#ax2 = ax[1].twinx()
+#ax2.plot(ent_time, ent, '.')
 freq_file = '{}/fundamental-1'.format(files_path)
 aux = 1
 if os.path.isfile(freq_file):
-    var = input('Ya existe archivo de frecuencias,\
-                sobreescribir [s], nuevo file [n], exit [e]? [s/n/e] ')
+    var = input('Ya existe archivo {}, sobreescribir [s], nuevo file [n], \
+                exit [e]? [s/n/e] '.format(freq_file))
     if var == 's':
         print('click = elegir punto; n = nueva silaba')
-        print('enter = guardar; escape = guardar en file')
+        print('enter = guardar; escape = guardar en file, f = fourier')
         fig.tight_layout()
         fig.canvas.callbacks.connect('button_press_event', on_pick)
         fig.canvas.callbacks.connect('key_press_event', press)
     elif var == 'n':
         while os.path.isfile(freq_file):
-            freq_file = 'fundamental-{}'.format(aux)
+            freq_file = '{}/fundamental-{}'.format(files_path, aux)
             aux += 1
+        print(freq_file)
         print('click = elegir punto; n = nueva silaba')
-        print('enter = guardar; escape = guardar en file')
+        print('enter = guardar; escape = guardar en file, f = fourier')
         fig.tight_layout()
         fig.canvas.callbacks.connect('button_press_event', on_pick)
         fig.canvas.callbacks.connect('key_press_event', press)
     elif var == 'e':
+        print('Cargando {}'.format(freq_file))
         freqs_sil = np.loadtxt(freq_file)
-        ax.plot(time, freqs_sil, '.', ms=1)
+        ax[1].plot(time, freqs_sil, '.', ms=1)
 
 # %% Cargo las grillas de valores
 print('Buscando beta...')
@@ -462,6 +512,7 @@ freq_table = df_grid['fundamental'][:last]
 freq_table = freq_table.drop(freq_table.index[[-2, -3, -4, -5]])
 alpha_table = df_grid['alpha'][:last]
 beta_table = df_grid['beta'][:last]
+
 beta_table = beta_table.drop(beta_table.index[[-2, -3, -4, -5]])
 sci_table = df_grid['SCI'][:last]
 sci_table = sci_table.drop(beta_table.index[[-2, -3, -4, -5]])

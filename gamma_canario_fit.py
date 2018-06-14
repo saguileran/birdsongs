@@ -312,6 +312,19 @@ for ngama in range(len(gammas)):
                    fillstyle='none', label='fit')
     ax[ngama].plot(df_song['fundamental'], df_song['SCI'], 'kx', label='song')
 fig.tight_layout()
+# %% Grafico ff vs SCI para todo, color = gamma
+fig, ax = plt.subplots(1, figsize=(8, 8))
+colores = ['r', 'g', 'b', 'y', 'c']
+for ngama in range(len(gammas)):
+    gama = gammas.iloc[ngama][0]
+    df_aux = df_grid[df_grid['gamma'] == gama]
+    alfa = df_aux['alpha'].astype(float)
+    ff = df_aux['fundamental'].astype(float)
+    SCI = df_aux['SCI'].astype(float)
+    ax.scatter(ff, SCI, s=10, alpha=0.1, c=colores[ngama],
+               label='gamma = {:.0f}'.format(gama))
+ax.legend()
+fig.tight_layout()
 
 # %% Me quedo con el "mejor" gamma y veo las curvas de ff-SCI para alpha
 gama = gammas.iloc[3][0]

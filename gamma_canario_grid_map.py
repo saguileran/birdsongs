@@ -18,7 +18,7 @@ from scipy.signal import butter
 import pandas as pd
 import peakutils
 import os
-from time import strftime
+from time import strftime, clock
 from scipy import ndimage
 
 
@@ -216,13 +216,13 @@ outfile = 'ff_SCI-{}'.format(strftime("%Y-%m-%d.%H.%M.%S"))
 
 n_alphas = 100
 n_betas = 2*n_alphas
-n_gammas = 5
+n_gammas = 6
 alphas = np.linspace(-0.5, 0, n_alphas, endpoint=False)
-betas = np.linspace(-1.5, -0.5, n_betas, endpoint=False)
+betas = np.linspace(-0.5, 0.5, n_betas, endpoint=False)
 agrid, bgrid = np.meshgrid(alphas, betas)
 ab_grid = np.c_[np.ravel(agrid), np.ravel(bgrid)]
-gammas = np.linspace(10000, 40000, n_gammas)
-
+gammas = np.linspace(25000, 50000, n_gammas)
+gammas = np.asarray([27500., 30000., 35000., 37500., 42500., 45000., 50000.])
 N_total = len(alphas)*len(betas)*len(gammas)
 
 # Sampleo
@@ -280,7 +280,6 @@ for gm in gammas:
         s1overLG = (50*1e-03)/.5
         RB = 1*1e07
         A1 = 0
-
         out = np.zeros(out_size)
         while t < tmax and v[1] > -5000000:
             dbold = db[t]
@@ -339,6 +338,7 @@ ax[5].plot(df['amplitud'])
 ax[5].set_ylabel('Amplitud')
 
 # %%
+gammas = df.groupby('gamma')['gamma'].unique()  # unique values of gamma
 gms = gammas
 for gg in gms:
     gama = gg[0]
@@ -365,7 +365,6 @@ for gg in gms:
     ax[0].set_xlabel('alpha')
     ax[0].set_ylabel('beta')
     ax[0].set_title('fundamental')
-    
     cax = ax[1].imshow(SCI.values.reshape(len(set(beta)), -1), origin='lower',
                        extent=[min(alfa), max(alfa), min(beta), max(beta)],
                        interpolation='nearest', cmap='hot')
@@ -385,61 +384,3 @@ for gg in gms:
     fig.tight_layout()
 #    fig.savefig('espacio_parametros_gamma{}_fit_extendido.pdf'.format(gama),
 #                format='pdf')
-# %% Gradientes (no suman mucho)
-gms = gammas
-for gg in gms:
-    gama = gg[0]
-
-    df_aux = df[df['gamma'] == gama]
-    df_aux = df_aux.fillna(0)
-    ff = df_aux['fundamental'].astype(float)
-    SCI = df_aux['SCI'].astype(float)
-    amp = df_aux['amplitud'].astype(float)
-    alfa = df_aux['alpha'].astype(float)
-    beta = df_aux['beta'].astype(float)
-
-    fig, ax = plt.subplots(1, 3, figsize=(12, 9))
-    fig.suptitle('gamma = {:.0f}'.format(gama))
-
-    img = ff.values.reshape(len(set(beta)), -1)
-    # Get x-gradient in "sx"
-    sx = ndimage.sobel(img, axis=0, mode='constant')
-    # Get y-gradient in "sy"
-    sy = ndimage.sobel(img, axis=1, mode='constant')
-    # Get square root of sum of squares
-    sobel = np.hypot(sx, sy)
-    cax = ax[0].imshow(sobel, origin='lower',
-                       interpolation='nearest', cmap='hot')
-    fig.colorbar(cax, ax=ax[0], fraction=0.085, pad=0.04)
-    ax[0].set_xlabel('alpha')
-    ax[0].set_ylabel('beta')
-    ax[0].set_title('fundamental')
-    img = SCI.values.reshape(len(set(beta)), -1)
-    # Get x-gradient in "sx"
-    sx = ndimage.sobel(img, axis=0, mode='constant')
-    # Get y-gradient in "sy"
-    sy = ndimage.sobel(img, axis=1, mode='constant')
-    # Get square root of sum of squares
-    sobel = np.hypot(sx, sy)
-    cax = ax[1].imshow(sobel, origin='lower',
-                       interpolation='nearest', cmap='hot')
-    fig.colorbar(cax, ax=ax[1], fraction=0.085, pad=0.04)
-    ax[1].set_xlabel('alpha')
-    ax[1].set_ylabel('beta')
-    ax[1].set_title('SCI')
-
-    img = amp.values.reshape(len(set(beta)), -1)
-    # Get x-gradient in "sx"
-    sx = ndimage.sobel(img, axis=0, mode='constant')
-    # Get y-gradient in "sy"
-    sy = ndimage.sobel(img, axis=1, mode='constant')
-    # Get square root of sum of squares
-    sobel = np.hypot(sx, sy)
-    cax = ax[2].imshow(sobel, origin='lower',
-                       interpolation='nearest', cmap='hot')
-    fig.colorbar(cax, ax=ax[2], fraction=0.085, pad=0.04)
-    ax[2].set_xlabel('alpha')
-    ax[2].set_ylabel('beta')
-    ax[2].set_title('amplitud')
-
-    fig.tight_layout()

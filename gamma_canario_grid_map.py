@@ -177,10 +177,10 @@ def get_spectrogram(data, sampling_rate, window=1024, overlap=1/1.1,
     return fu, tu, Sxx
 
 
-def SpectralContent(data, fs, method='song', fmin=300, fmax=10000,
-                    dt_transit=0.002):
-    segment = data[int(dt_transit*fs):]
-    fourier = np.abs(np.fft.rfft(segment))
+def SpectralContent(filt_data, fs, method='song', fmin=300, fmax=10000,
+                    dt_transit=0.002, x_data=None):
+    segment = filt_data[int(dt_transit*fs):]
+    amp = max(segment)-min(segment)
     freqs = np.fft.rfftfreq(len(segment), d=1/fs)
     min_bin = np.argmin(np.abs(freqs-fmin))
     max_bin = np.argmin(np.abs(freqs-fmax))
@@ -188,7 +188,6 @@ def SpectralContent(data, fs, method='song', fmin=300, fmax=10000,
     freqs = np.fft.rfftfreq(len(segment), d=1/fs)[min_bin:max_bin]
     f_msf = np.sum(freqs*fourier)/np.sum(fourier)
     f_aff = 0
-    amp = max(segment)-min(segment)
     if method == 'song':
         f_aff = freqs[np.argmax(fourier*(freqs/(freqs+500)**2))]
     elif method == 'syllable':
@@ -200,7 +199,13 @@ def SpectralContent(data, fs, method='song', fmin=300, fmax=10000,
             mm = argrelextrema(segment, np.greater, order=orden)[0]
             difs = np.diff(mm)
         f_aff = fs/np.mean(np.diff(mm))
-    elif method == 'synth':
+    elif method == 'synth' and x_data is not None:
+        segment = x_data[int(dt_transit*fs):]
+        freqs = np.fft.rfftfreq(len(segment), d=1/fs)
+        min_bin = np.argmin(np.abs(freqs-fmin))
+        max_bin = np.argmin(np.abs(freqs-fmax))
+        fourier = np.abs(np.fft.rfft(segment))[min_bin:max_bin]
+        freqs = np.fft.rfftfreq(len(segment), d=1/fs)[min_bin:max_bin]
         maximos = peakutils.indexes(fourier, thres=0.05, min_dist=5)
         if amp < 500:
             f_aff = 0
@@ -222,7 +227,8 @@ betas = np.linspace(-0.5, 0.5, n_betas, endpoint=False)
 agrid, bgrid = np.meshgrid(alphas, betas)
 ab_grid = np.c_[np.ravel(agrid), np.ravel(bgrid)]
 gammas = np.linspace(25000, 50000, n_gammas)
-gammas = np.asarray([27500., 30000., 35000., 37500., 42500., 45000., 50000.])
+gammas = np.asarray([50000., 42500., 45000., 60000., 70000., 80000., 90000.,
+                     100000.])
 N_total = len(alphas)*len(betas)*len(gammas)
 
 # Sampleo
@@ -281,6 +287,7 @@ for gm in gammas:
         RB = 1*1e07
         A1 = 0
         out = np.zeros(out_size)
+        x_out = np.zeros(out_size)
         while t < tmax and v[1] > -5000000:
             dbold = db[t]
             a[t] = (.50)*(1.01*A1*v[1]) + db[t-tau]
@@ -295,6 +302,7 @@ for gm in gammas:
             preout = RB*v[4]
             if taux == oversamp:
                 out[n_out] = preout*10
+                x_out[n_out] = v[1]
                 n_out += 1
                 taux = 0
             taux += 1
@@ -310,7 +318,9 @@ for gm in gammas:
                 rdis = (300./5.)*(10000.)
                 A1 = amplitud + 0.5*noise
             t += 1
-        msf, ff, amp = SpectralContent(out, sampling, method='synth')
+        msf, ff, amp = SpectralContent(out, sampling, method='synth',
+                                       x_data=x_out)
+        break
         SCI = 0
         if ff != 0:
             SCI = msf/ff
@@ -320,7 +330,7 @@ for gm in gammas:
             print('{:.0f}%'.format(100*n_param/N_total))
             df.to_csv(outfile)
 # %% ff, SCI, Amplitud
-df = pd.read_csv('ff_SCI-all')
+df = pd.read_csv('ff_SCI-all_2')
 fig, ax = plt.subplots(6, figsize=(12, 18), sharex=True)
 ax[0].plot(df['alpha'], '.')
 
@@ -342,9 +352,9 @@ gammas = df.groupby('gamma')['gamma'].unique()  # unique values of gamma
 gms = gammas
 for gg in gms:
     gama = gg[0]
-#    df_aux = df_fit[df_fit['gamma'] == gama]
-#    alfa_f = df_aux['alfa']
-#    beta_f = df_aux['beta']
+    df_aux = df_fit[df_fit['gamma'] == gama]
+    alfa_f = df_aux['alfa']
+    beta_f = df_aux['beta']
 
     df_aux = df[df['gamma'] == gama]
     df_aux = df_aux.fillna(0)
@@ -361,7 +371,7 @@ for gg in gms:
                        extent=[min(alfa), max(alfa), min(beta), max(beta)],
                        interpolation='nearest', cmap='hot')
     fig.colorbar(cax, ax=ax[0], fraction=0.085, pad=0.04)
-#    ax[0].scatter(alfa_f, beta_f)
+    ax[0].scatter(alfa_f, beta_f)
     ax[0].set_xlabel('alpha')
     ax[0].set_ylabel('beta')
     ax[0].set_title('fundamental')

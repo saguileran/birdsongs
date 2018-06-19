@@ -21,7 +21,6 @@ import pandas as pd
 import peakutils
 from random import uniform
 from scipy.interpolate import interp1d
-from scipy import stats
 
 
 def envelope_cabeza(signal, method='percentile', intervalLength=210, perc=90):
@@ -254,53 +253,88 @@ def smooth_on_off(onoff, fs=44150, on_time=0.005):
     return smooth
 
 
-def smooth_trajectory(alfa, beta, fs=44150, on_time=0.001, slow_factor=10):
+def smooth_trajectory(alfa_real, beta, fs=44150, on_time=0.001, slow_factor=10,
+                      constant_alfa='False', beta_off=0.5):
     """
     Suaviza las trayectorias de alfa-beta
     """
-    alfa_on = min(alfa)
-    alfa_off = max(alfa)
-    dif_alfa = np.diff(alfa)
-    pos_dif = max(dif_alfa)
-    neg_dif = min(dif_alfa)
-    window = int(fs*on_time*slow_factor)
-    sm_alfa = np.copy(alfa)
-    sm_beta = np.copy(beta)
-    trans_on = np.where(dif_alfa == neg_dif)[0] + 1
-    trans_off = np.where(dif_alfa == pos_dif)[0] + 1
-    for n_on in range(len(trans_on)):
-        astart = trans_on[n_on] - window
-        aend = trans_on[n_on] + window
-        bstart = trans_on[n_on] - 2*window
-        bend = trans_on[n_on]
-        if astart > 0 and aend < len(sm_alfa):
-            sm_alfa[astart:aend] = sigmoid(np.arange(-window, window, 1),
-                                           dt=on_time*slow_factor, fs=fs,
-                                           rev=True,
-                                           maxout=alfa_off,
-                                           minout=alfa_on)
-            sm_beta[bstart:bend] = sigmoid(np.arange(-window, window, 1),
-                                           dt=on_time, fs=fs,
-                                           rev=True,
-                                           maxout=max(sm_beta[astart:aend]),
-                                           minout=sm_beta[bend+1])
-    for n_off in range(len(trans_off)):
-        astart = trans_off[n_off] - window
-        aend = trans_off[n_off] + window
-        bstart = trans_off[n_off]
-        bend = trans_off[n_off] + 2*window
-        if astart > 0 and aend < len(sm_alfa):
-            sm_alfa[astart:aend] = sigmoid(np.arange(-window, window, 1),
-                                           dt=on_time, fs=fs,
-                                           rev=False,
-                                           maxout=alfa_off,
-                                           minout=alfa_on)
-            sm_beta[bstart:bend] = sigmoid(np.arange(-window, window, 1),
-                                           dt=on_time, fs=fs,
-                                           rev=False,
-                                           maxout=max
-                                           (sm_beta[bstart-1:bend+1]),
-                                           minout=sm_beta[bstart-1])
+    alfa = np.copy(alfa_real)
+    if not constant_alfa:
+        alfa_on = min(alfa)
+        alfa_off = max(alfa)
+        dif_alfa = np.diff(alfa)
+        pos_dif = max(dif_alfa)
+        neg_dif = min(dif_alfa)
+        window = int(fs*on_time*slow_factor)
+        sm_alfa = np.copy(alfa)
+        sm_beta = np.copy(beta)
+        trans_on = np.where(dif_alfa == neg_dif)[0] + 1
+        trans_off = np.where(dif_alfa == pos_dif)[0] + 1
+        for n_on in range(len(trans_on)):
+            astart = trans_on[n_on] - window
+            aend = trans_on[n_on] + window
+            bstart = trans_on[n_on] - 2*window
+            bend = trans_on[n_on]
+            if astart > 0 and aend < len(sm_alfa):
+                sm_alfa[astart:aend] = sigmoid(np.arange(-window, window, 1),
+                                               dt=on_time*slow_factor, fs=fs,
+                                               rev=True,
+                                               maxout=alfa_off,
+                                               minout=alfa_on)
+                sm_beta[bstart:bend] = sigmoid(np.arange(-window, window, 1),
+                                               dt=on_time, fs=fs,
+                                               rev=True,
+                                               maxout=max(sm_beta[astart:aend]),
+                                               minout=sm_beta[bend+1])
+        for n_off in range(len(trans_off)):
+            astart = trans_off[n_off] - window
+            aend = trans_off[n_off] + window
+            bstart = trans_off[n_off]
+            bend = trans_off[n_off] + 2*window
+            if astart > 0 and aend < len(sm_alfa):
+                sm_alfa[astart:aend] = sigmoid(np.arange(-window, window, 1),
+                                               dt=on_time, fs=fs,
+                                               rev=False,
+                                               maxout=alfa_off,
+                                               minout=alfa_on)
+                sm_beta[bstart:bend] = sigmoid(np.arange(-window, window, 1),
+                                               dt=on_time, fs=fs,
+                                               rev=False,
+                                               maxout=max
+                                               (sm_beta[bstart-1:bend+1]),
+                                               minout=sm_beta[bstart-1])
+    else:
+        sm_alfa = np.copy(alfa)
+        alfa[np.where(beta == beta_off)] = min(alfa) + 1
+        alfa_on = min(alfa)
+        alfa_off = max(alfa)
+        dif_alfa = np.diff(alfa)
+        pos_dif = max(dif_alfa)
+        neg_dif = min(dif_alfa)
+        window = int(fs*on_time*slow_factor)
+        sm_beta = np.copy(beta)
+        trans_on = np.where(dif_alfa == neg_dif)[0] + 1
+        trans_off = np.where(dif_alfa == pos_dif)[0] + 1
+        for n_on in range(len(trans_on)):
+            bstart = trans_on[n_on] - window
+            bend = trans_on[n_on]
+            if bstart > 0 and bend < len(sm_beta):
+                sm_beta[bstart:bend] = sigmoid(np.arange(-window//2,
+                                                         window//2, 1),
+                                               dt=on_time, fs=fs,
+                                               rev=True,
+                                               maxout=beta_off,
+                                               minout=sm_beta[bend+1])
+        for n_off in range(len(trans_off)):
+            bstart = trans_off[n_off]
+            bend = trans_off[n_off] + window
+            if bstart > 0 and bend < len(sm_beta):
+                sm_beta[bstart:bend] = sigmoid(np.arange(-window//2,
+                                                         window//2, 1),
+                                               dt=on_time, fs=fs,
+                                               rev=False,
+                                               maxout=beta_off,
+                                               minout=sm_beta[bstart-1])
     return sm_alfa, sm_beta
 
 
@@ -329,6 +363,7 @@ envelope = np.empty(0)
 inicio = [28.4, 21., 7.5, 38.9, 28.]
 fin = [37.5, 31.5, 13.8, 45., 30.]
 num_file = 0
+file_id = sound_files[num_file].rsplit('/', 1)[1].split('_s_', 1)[0]
 fs, s = wavfile.read(sound_files[num_file])
 # Recorto el file
 t_i = inicio[num_file]
@@ -445,31 +480,7 @@ ax[1].pcolormesh(tu, fu, np.log(Sxx), cmap=plt.get_cmap('Greys'),
                  rasterized=True)
 ax[1].set_ylim(0, 8000)
 ax[1].set_xlim(min(time), max(time))
-#for ss in silabas:
-#    ax[1].axvline(time[ss[0]], ls='dashed')
-#    ax[1].axvline(time[ss[-1]], ls='dashed')
 
-#start = 0.
-#window = 1/50   # Resolucion 50Hz
-#end = start + window
-#ent_time = []
-#ent = []
-#while end < max(time):
-#    segment = song[int(start*fs):int(end*fs)]
-#    fourier = np.abs(np.fft.rfft(segment))
-#    freqs = np.fft.rfftfreq(len(segment), d=1/fs)
-#    min_bin = np.argmin(np.abs(freqs-300))
-#    max_bin = np.argmin(np.abs(freqs-10000))
-#    fourier = np.abs(np.fft.rfft(segment))[min_bin:max_bin]
-#    freqs = np.fft.rfftfreq(len(segment), d=1/fs)[min_bin:max_bin]
-#    norm_fou = fourier/np.sum(fourier)
-#    entropy = -np.sum(norm_fou*np.log2(norm_fou))
-#    ent_time.append((start+end)/2)
-#    ent.append(entropy)
-#    start += window/10
-#    end = start + window
-#ax2 = ax[1].twinx()
-#ax2.plot(ent_time, ent, '.')
 freq_file = '{}/fundamental-1'.format(files_path)
 aux = 1
 if os.path.isfile(freq_file):
@@ -497,14 +508,17 @@ if os.path.isfile(freq_file):
         ax[1].plot(time, freqs_sil, '.', ms=1)
 
 # %% Cargo las grillas de valores
-print('Buscando beta...')
 # En el archivo esta todo (para todo alpha, beta, gamma)
-grid_file = 'ff_SCI-all'
+grid_file = 'ff_SCI-all_2'
 opt_gamma = 25000
 opt_alpha = -0.05
-bad_alpha = -0.5
-df_all = pd.read_csv('{}{}'.format(base_path, grid_file)).fillna(0)
 
+bad_alpha = -0.5
+
+gamma_snilc = 50000     # Ver
+alpha_snilc = -0.5      # Ver
+
+df_all = pd.read_csv('{}{}'.format(base_path, grid_file)).fillna(0)
 df_grid = df_all[(df_all['gamma'] == opt_gamma) &
                  (df_all['alpha'] == opt_alpha)]
 last = np.where(df_grid['fundamental'] == 0)[0][1]
@@ -531,6 +545,17 @@ plt.figure()
 plt.scatter(freq_bad, beta_bad, c=np.asarray(sci_bad))
 plt.colorbar()
 plt.clim(1, 3)
+
+df_snilc = df_all[(df_all['gamma'] == gamma_snilc) &
+                  (df_all['alpha'] == alpha_snilc)]
+last_snilc = np.where(df_snilc['fundamental'] == 0)[0][1]
+freq_snilc = df_snilc['fundamental'][:last_snilc]
+beta_snilc = df_snilc['beta'][:last_snilc]
+sci_snilc = df_snilc['SCI'][:last_snilc]
+plt.figure()
+plt.scatter(freq_snilc, beta_snilc, c=np.asarray(sci_snilc))
+plt.colorbar()
+plt.clim(1, 3)
 # %% Pre procesamiento beta-ff
 unique_ff = list(set(freq_table))
 ff = np.asarray(unique_ff)
@@ -546,6 +571,7 @@ plt.plot(freq_table, beta_table, 'o', label='Tabla')
 plt.plot(ff, beta, 'o', label='Promedio')
 new_ff = np.linspace(0, max(ff), num=100)
 plt.plot(new_ff, f_q(new_ff), '--x', label='Interpolado')
+plt.title('gamma {}\nalfa {}'.format(opt_gamma, opt_alpha))
 plt.legend()
 
 unique_ff_bad = list(set(freq_bad))
@@ -560,8 +586,26 @@ f_q_b = interp1d(ff_b, beta_b, kind='linear', fill_value='extrapolate')
 plt.figure()
 plt.plot(freq_bad, beta_bad, 'o', label='Tabla')
 plt.plot(ff_b, beta_b, 'o', label='Promedio')
-new_ff = np.linspace(0, max(ff), num=100)
-plt.plot(new_ff, f_q_b(new_ff), '--x', label='Interpolado')
+new_ff_b = np.linspace(0, max(ff_b), num=100)
+plt.plot(new_ff_b, f_q_b(new_ff_b), '--x', label='Interpolado')
+plt.title('gamma {}\nalfa {}'.format(opt_gamma, bad_alpha))
+plt.legend()
+# %%
+unique_ff_snilc = list(set(freq_snilc))
+ff_s = np.asarray(unique_ff_snilc)
+beta_s = np.zeros_like(unique_ff_snilc)
+# Promedio en valores repetidos de frecuencia
+for n_ff in range(len(unique_ff_snilc)):
+    frecuencia_s = ff_s[n_ff]
+    beta_s[n_ff] = np.mean(beta_snilc[freq_snilc == frecuencia_s])
+# Interpolo
+f_q_snilc = interp1d(ff_s, beta_s, kind='linear', fill_value='extrapolate')
+plt.figure()
+plt.plot(freq_snilc, beta_snilc, 'o', label='Tabla')
+plt.plot(ff_s, beta_s, 'o', label='Promedio')
+new_ff_snilc = np.linspace(0, max(ff_s), num=100)
+plt.plot(new_ff_snilc, f_q_snilc(new_ff_snilc), '--x', label='Interpolado')
+plt.title('gamma {}\nalfa {}'.format(gamma_snilc, alpha_snilc))
 plt.legend()
 # %%
 freq = np.loadtxt(freq_file)
@@ -569,6 +613,7 @@ env_amplitude = envelope
 
 beta_file = '{}beta_song.dat'.format(analisis_path)
 beta_file_b = '{}beta_song_b.dat'.format(analisis_path)
+beta_file_snilc = '{}beta_song_snilc.dat'.format(analisis_path)
 
 ap_alfa = np.zeros_like(freq)   # beta
 ap_alfa += 0.05
@@ -579,6 +624,10 @@ ap_alfa_b = np.zeros_like(freq)   # beta
 ap_alfa_b += 0.05
 ap_beta_b = np.zeros_like(freq)   # beta
 
+ap_alfa_snilc = np.zeros_like(freq)   # beta
+ap_alfa_snilc += alpha_snilc
+ap_beta_snilc = np.zeros_like(freq)   # beta snilc
+off_snilc = 0.5
 for i in range(len(freq)):
     if freq[i] > 100:
         ap_freq[i] = freq[i]
@@ -586,13 +635,18 @@ for i in range(len(freq)):
         ap_alfa[i] = -0.05
         ap_beta_b[i] = f_q_b(freq[i])
         ap_alfa_b[i] = -0.5
+        ap_beta_snilc[i] = f_q_snilc(2*freq[i])     # 2* ya que estaba mal
+                                                    # calculada la ff en mapa
+                                                    # (arreglando)
     else:
         ap_beta[i] = -0.15
         ap_beta_b[i] = -0.15
+        ap_beta_snilc[i] = off_snilc
         ap_freq[i] = 0.
 
 np.savetxt(beta_file, ap_beta, fmt='%.2f')
 np.savetxt(beta_file_b, ap_beta_b, fmt='%.2f')
+np.savetxt(beta_file_snilc, ap_beta_snilc, fmt='%.2f')
 # %%
 smooth_alfa, smooth_beta = smooth_trajectory(ap_alfa, ap_beta, on_time=0.001,
                                              slow_factor=10)
@@ -601,6 +655,7 @@ plt.plot(time, ap_beta, 'b--', label=r'$\beta$')
 plt.plot(time, smooth_beta, 'b', label=r'$\beta_{smooth}$')
 plt.plot(time, ap_alfa, 'r--', label=r'$\alpha$')
 plt.plot(time, smooth_alfa, 'r', label=r'$\alpha_{smooth}$')
+plt.title('gamma {}\nalfa {}'.format(opt_gamma, opt_alpha))
 plt.legend()
 plt.xlabel('Tiempo')
 # %%
@@ -611,9 +666,23 @@ plt.plot(time, ap_beta_b, 'b--', label=r'$\beta$')
 plt.plot(time, smooth_beta_b, 'b', label=r'$\beta_{smooth}$')
 plt.plot(time, ap_alfa_b, 'r--', label=r'$\alpha$')
 plt.plot(time, smooth_alfa_b, 'r', label=r'$\alpha_{smooth}$')
+plt.title('gamma {}\nalfa {}'.format(opt_gamma, bad_alpha))
 plt.legend()
 plt.xlabel('Tiempo')
-
+# %%
+smooth_alfa_snilc, smooth_beta_snilc = smooth_trajectory(ap_alfa_snilc,
+                                                         ap_beta_snilc,
+                                                         on_time=0.001,
+                                                         constant_alfa=True,
+                                                         beta_off=off_snilc)
+plt.figure()
+plt.plot(time, ap_beta_snilc, 'b--', label=r'$\beta$')
+plt.plot(time, smooth_beta_snilc, 'b', label=r'$\beta_{smooth}$')
+plt.plot(time, ap_alfa_snilc, 'r--', label=r'$\alpha$')
+plt.plot(time, smooth_alfa_snilc, 'r', label=r'$\alpha_{smooth}$')
+plt.title('gamma {}\nalfa {}'.format(gamma_snilc, alpha_snilc))
+plt.legend()
+plt.xlabel('Tiempo')
 # %% Integro (bueno)
 N_total = len(song)
 # Sampleo
@@ -788,6 +857,93 @@ while t < tmax and v[1] > -5000000:
         rdis = (300./5.)*(10000.)
         A1 = amplitud + 0.0*noise
     t += 1
+# %% Integro (snilc)
+N_total = len(song)
+# Sampleo
+sampling = 44150
+oversamp = 20
+dt = 1./(oversamp*sampling)
+
+out_size = int(N_total)
+tmax = out_size*oversamp
+
+v = np.zeros(5)
+v[0] = 0.000000000005
+v[1] = 0.00000000001
+v[2] = 0.000000000001
+v[3] = 0.00000000001
+v[4] = 0.000000000001
+
+forcing1 = 0.
+forcing2 = 0.
+tiempot = 0.
+tcount = 0
+noise = 0
+tnoise = 0
+r = 0.4
+rdis = 7000
+gamma2 = 1.
+gamma3 = 1.
+atenua = 1
+c = 35000.
+
+a = np.zeros(tmax)
+db = np.zeros(tmax)
+
+ancho = 0.2
+largo = 3.5
+tau = int(largo/(c*dt + 0.0))
+t = tau
+taux = 0
+amplitud = env_amplitude[0]
+
+n_out = 0
+
+s1overCH = (36*2.5*2/25.)*1e09
+s1overLB = 1.*1e-04
+s1overLG = (50*1e-03)/.5
+RB = 1*1e07
+A1 = 0
+
+gm = opt_gamma
+alfa1 = smooth_alfa_snilc[0]
+beta1 = smooth_beta_snilc[0]
+out_snilc = np.zeros(out_size)
+dp = 5
+
+while t < tmax and v[1] > -5000000:
+    dbold = db[t]
+    a[t] = (.50)*(1.01*A1*v[1]) + db[t-tau]
+    db[t] = -r*a[t-tau]
+    ddb = (db[t]-dbold)/dt  # Derivada
+    forcing1 = db[t]
+    forcing2 = ddb
+    PRESSURE = a[t]
+    tiempot += dt
+    rk4(dxdt_synth, v, 5, t + 0.0, dt)
+    noise = 0
+    preout = RB*v[4]
+    if taux == oversamp:
+        out_snilc[n_out] = preout*10
+        n_out += 1
+        beta1 = smooth_beta_snilc[n_out]
+        alfa1 = smooth_alfa_snilc[n_out]
+        amplitud = env_amplitude[n_out]
+        taux = 0
+        if (n_out*100/N_total) % dp == 0:
+            print('{:.0f}%'.format(100*n_out/N_total))
+    taux += 1
+    if tiempot > 0.0:
+        r = 0.1
+        noise = 0.21*(uniform(0, 1) - 0.5)
+        beta1 = beta1 + 0.0*noise
+        s1overCH = (360/0.8)*1e08
+        s1overLB = 1.*1e-04
+        s1overLG = (1/82.)
+        RB = (.5)*1e07
+        rdis = (300./5.)*(10000.)
+        A1 = amplitud + 0.0*noise
+    t += 1
 # %%
 synth_env = normalizar(envelope_cabeza(out, intervalLength=0.01*fs),
                        minout=0, method='extremos')
@@ -796,8 +952,6 @@ not_zero = np.where(synth_env > 0.005)
 out_amp[not_zero] = out[not_zero]*envelope[not_zero]/synth_env[not_zero]
 s_amp_env = normalizar(envelope_cabeza(out_amp, intervalLength=0.01*fs),
                        minout=0, method='extremos')
-
-
 # %%
 synth_env_b = normalizar(envelope_cabeza(out_b, intervalLength=0.01*fs),
                          minout=0, method='extremos')
@@ -806,6 +960,17 @@ not_zero = np.where(synth_env_b > 0.005)
 out_amp_b[not_zero] = out_b[not_zero]*envelope[not_zero]/synth_env_b[not_zero]
 s_amp_env_b = normalizar(envelope_cabeza(out_amp_b, intervalLength=0.01*fs),
                          minout=0, method='extremos')
+# %%
+synth_env_snilc = normalizar(envelope_cabeza(out_snilc,
+                                             intervalLength=0.01*fs),
+                             minout=0, method='extremos')
+out_amp_snilc = np.zeros_like(out_snilc)
+not_zero = np.where(synth_env_snilc > 0.005)
+out_amp_snilc[not_zero] = out_snilc[not_zero] * \
+                          envelope[not_zero]/synth_env_snilc[not_zero]
+s_amp_env_snilc = normalizar(envelope_cabeza(out_amp_snilc,
+                                             intervalLength=0.01*fs),
+                             minout=0, method='extremos')
 # %%
 NN = 1024
 overlap = 1/1.1
@@ -816,8 +981,10 @@ fu_s, tu_s, Sxx_s = get_spectrogram(out, fs, window=NN, overlap=overlap,
                                     sigma=sigma)
 fu_s, tu_s, Sxx_s_b = get_spectrogram(out_b, fs, window=NN, overlap=overlap,
                                       sigma=sigma)
+fu_s, tu_s, Sxx_s_snilc = get_spectrogram(out_snilc, fs, window=NN,
+                                          overlap=overlap, sigma=sigma)
 
-fig, ax = plt.subplots(3, 2, figsize=(18, 6), sharex=True, sharey='col')
+fig, ax = plt.subplots(4, 3, figsize=(18, 6), sharex=True, sharey='col')
 ax[0][0].plot(time, normalizar(song), label='canto')
 ax[0][0].plot(time, envelope)
 ax[0][0].legend()
@@ -827,20 +994,31 @@ ax[1][0].legend()
 ax[2][0].plot(time, normalizar(out_b), label='output (malo)')
 ax[2][0].plot(time, s_amp_env_b)
 ax[2][0].legend()
+ax[3][0].plot(time, normalizar(out_snilc), label='output (snilc)')
+ax[3][0].plot(time, s_amp_env_snilc)
+ax[3][0].legend()
 ax[0][1].pcolormesh(tu, fu, np.log(Sxx), cmap=plt.get_cmap('Greys'),
                     rasterized=True)
 ax[1][1].pcolormesh(tu_s, fu_s, np.log(Sxx_s), cmap=plt.get_cmap('Greys'),
                     rasterized=True)
 ax[2][1].pcolormesh(tu_s, fu_s, np.log(Sxx_s_b), cmap=plt.get_cmap('Greys'),
                     rasterized=True)
-
-ax[2][1].set_ylim(0, 8000)
-ax[2][1].set_xlim(0, 6.5)
+ax[3][1].pcolormesh(tu_s, fu_s, np.log(Sxx_s_snilc),
+                    cmap=plt.get_cmap('Greys'),
+                    rasterized=True)
+ax[3][1].set_ylim(0, 8000)
+ax[3][1].set_xlim(0, 6.5)
 fig.tight_layout()
 # %% Guardo wav
-wavfile.write('{}/synth5.wav'.format(files_path), fs,
+out_name = '{}/{}-synth'.format(files_path, file_id)
+n = 1
+while os.path.isfile(out_name):
+    n += 1
+    out_name = '{}/{}-synth-{}'.format(files_path, file_id, n)
+wavfile.write('{}.wav'.format(out_name), fs,
               np.asarray(normalizar(out), dtype=np.float32))
-wavfile.write('{}/synth5b.wav'.format(files_path), fs,
+wavfile.write('{}b.wav'.format(out_name), fs,
               np.asarray(normalizar(out_b), dtype=np.float32))
-wavfile.write('{}/song.wav'.format(files_path), fs,
-              np.asarray(normalizar(song), dtype=np.float32))
+wavfile.write('{}snilc.wav'.format(out_name), fs,
+              np.asarray(normalizar(out_snilc), dtype=np.float32))
+wavfile.write('song.wav', fs, np.asarray(normalizar(song), dtype=np.float32))

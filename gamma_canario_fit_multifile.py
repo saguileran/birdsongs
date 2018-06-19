@@ -173,7 +173,6 @@ def SpectralContent(data, fs, method='song', fmin=300, fmax=10000,
 # %%
 # Nombre del ave
 birdname = 'AmaVio'
-
 # Carpeta donde estan guardados los wavs
 base_path = '/home/juan/Documentos/Musculo/Codigo canarios/'
 files_path = '{}Files'.format(base_path)
@@ -181,7 +180,7 @@ files_path = '{}Files'.format(base_path)
 analisis_path = '{}analysis/'.format(base_path)
 if not os.path.exists(analisis_path):
     os.makedirs(analisis_path)
-
+df_song_file = '{}df_song'.format(analisis_path)
 # %% Cargo datos de sonido y vs
 print('Cargando datos...')
 # Busca todos los archivos del pajaro.
@@ -258,7 +257,7 @@ for n_s in range(len(silabas)):
 df_song = df_song_pre[(df_song_pre['fundamental'] < 6500) &
                       (df_song_pre['SCI'] < 4)]
 df_song = df_song.reset_index(drop=True)
-df_song.to_csv('{}df_song'.format(analisis_path))
+df_song.to_csv(df_song_file)
 color = [str(item/(max(t_sci_av))*255) for item in t_sci_av]
 ax0.scatter(t_sci_av, ff_av, c=color)
 ax1.scatter(t_sci_av, SCI_av, c=color)
@@ -269,7 +268,9 @@ ax2.set_xlim(0, 15000)
 ax2.set_ylim(0., 2.)
 
 # %% Cargo las grillas de valores
-grid_file = 'ff_SCI-all'
+if 'df_song' not in locals():
+    df_song = pd.read_csv(df_song_file, index_col=0)
+grid_file = 'ff_SCI-all_2'
 df_grid = pd.read_csv('{}{}'.format(analisis_path, grid_file))
 df_fit = pd.DataFrame(columns=['fundamental', 'SCI', 'alfa', 'beta', 'gamma',
                                'ff song', 'SCI song'])
@@ -310,22 +311,21 @@ title.append(len(df_song))
 ax.set_title('{}\n{}\n{}\n{}\n{}\n{} silabas total'.format(*title))
 fig.tight_layout()
 # %%
-colores = ['r', 'g', 'b', 'k', 'm']
+colores = ['r', 'g', 'b', 'k', 'm', 'y', 'c']
 fig, ax = plt.subplots(1)
 for ngama in range(len(gammas)):
     gama = gammas.iloc[ngama][0]
     df_aux = df_fit[df_fit['gamma'] == gama]
     alfa = df_aux['alfa']
     beta = df_aux['beta']
-    ax.plot(alfa, beta, 'o', c=colores[ngama],
+    ax.plot(alfa, beta, 'o', c=colores[ngama % len(colores)],
             label='gamma = {:.0f}'.format(gama))
 ax.set_xlabel('alfa')
 ax.set_ylabel('beta')
 ax.legend()
 
 # %% Para cada gamma grafico ff vs sci (todo el espacio) y los puntos del canto
-fig, ax = plt.subplots(1, len(gammas), figsize=(20, 4), sharex=True,
-                       sharey=True)
+fig, ax = plt.subplots(3, 4, figsize=(15, 8), sharex=True, sharey=True)
 colores = ['r', 'g', 'b', 'y', 'c']
 for ngama in range(len(gammas)):
     gama = gammas.iloc[ngama][0]
@@ -333,17 +333,19 @@ for ngama in range(len(gammas)):
     alfa = df_aux['alpha'].astype(float)
     ff = df_aux['fundamental'].astype(float)
     SCI = df_aux['SCI'].astype(float)
-    ax[ngama].scatter(ff, SCI, s=10, alpha=0.5, c=alfa,
-                      label='gamma = {:.0f}'.format(gama))
-    ax[ngama].legend()
-    ax[ngama].plot(df_fit[df_fit['gamma'] == gama]['fundamental'],
-                   df_fit[df_fit['gamma'] == gama]['SCI'], 'mo',
-                   fillstyle='none', label='fit')
-    ax[ngama].plot(df_song['fundamental'], df_song['SCI'], 'kx', label='song')
+    ax[ngama//4][ngama % 4].scatter(ff, SCI, s=10, alpha=0.5, c=alfa,
+                                    label='gamma = {:.0f}'.format(gama))
+    ax[ngama//4][ngama % 4].legend()
+    ax[ngama//4][ngama % 4].plot(df_fit[df_fit['gamma'] == gama]
+                                       ['fundamental'],
+                                 df_fit[df_fit['gamma'] == gama]['SCI'], 'mo',
+                                 fillstyle='none', label='fit')
+    ax[ngama//4][ngama % 4].plot(df_song['fundamental'], df_song['SCI'],
+                                 'kx', label='song')
 fig.tight_layout()
 
-# %% Me quedo con el "mejor" gamma y veo las curvas de ff-SCI para alpha
-gama = gammas.iloc[3][0]
+# %% Me quedo con un gamma y veo las curvas de ff-SCI para alpha
+gama = gammas.iloc[-1][0]
 df_aux = df_grid[df_grid['gamma'] == gama]
 df_fit_aux = df_fit[df_fit['gamma'] == gama]
 ff = df_aux['fundamental'].astype(float)

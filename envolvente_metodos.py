@@ -169,11 +169,9 @@ while i < len(s_files):
 s_file = s_files[1]
 v_file = v_files[1]
 fs, s_raw = wavfile.read('{}'.format(s_file))
-s_raw = np.concatenate((s_raw[:int(3*fs)], s_raw[int(18*fs):int(21.5*fs)],
-                        s_raw[int(31.5*fs):]))
+s_raw = s_raw[int(31*fs):int(35.5*fs)]
 fs, v_raw = wavfile.read('{}'.format(v_file))
-v_raw = np.concatenate((v_raw[:int(3*fs)], v_raw[int(18*fs):int(21.5*fs)],
-                        v_raw[int(31.5*fs):]))
+v_raw = v_raw[int(31*fs):int(35.5*fs)]
 time = np.arange(len(v_raw))/fs
 # %%
 v_filt = butter_lowpass_filter(v_raw, fs, order=5)

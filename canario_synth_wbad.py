@@ -635,9 +635,9 @@ for i in range(len(freq)):
         ap_alfa[i] = -0.05
         ap_beta_b[i] = f_q_b(freq[i])
         ap_alfa_b[i] = -0.5
-        ap_beta_snilc[i] = f_q_snilc(2*freq[i])     # 2* ya que estaba mal
-                                                    # calculada la ff en mapa
-                                                    # (arreglando)
+        ap_beta_snilc[i] = f_q_snilc(freq[i])     # 2* ya que estaba mal
+                                                  # calculada la ff en mapa
+                                                  # (arreglando)
     else:
         ap_beta[i] = -0.15
         ap_beta_b[i] = -0.15
@@ -905,10 +905,11 @@ s1overLG = (50*1e-03)/.5
 RB = 1*1e07
 A1 = 0
 
-gm = opt_gamma
+gm = gamma_snilc
 alfa1 = smooth_alfa_snilc[0]
 beta1 = smooth_beta_snilc[0]
 out_snilc = np.zeros(out_size)
+x_snilc = np.zeros(out_size)
 dp = 5
 
 while t < tmax and v[1] > -5000000:
@@ -925,6 +926,7 @@ while t < tmax and v[1] > -5000000:
     preout = RB*v[4]
     if taux == oversamp:
         out_snilc[n_out] = preout*10
+        x_snilc[n_out] = v[1]
         n_out += 1
         beta1 = smooth_beta_snilc[n_out]
         alfa1 = smooth_alfa_snilc[n_out]

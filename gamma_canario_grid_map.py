@@ -177,7 +177,7 @@ def get_spectrogram(data, sampling_rate, window=1024, overlap=1/1.1,
     return fu, tu, Sxx
 
 
-def SpectralContent(filt_data, fs, method='song', fmin=300, fmax=10000,
+def SpectralContent(filt_data, fs=44150, method='song', fmin=300, fmax=10000,
                     dt_transit=0.002, x_data=None):
     segment = filt_data[int(dt_transit*fs):]
     amp = max(segment)-min(segment)
@@ -225,7 +225,7 @@ n_gammas = 6
 alphas = np.linspace(-0.5, 0, n_alphas, endpoint=False)
 betas = np.linspace(-0.5, 0.5, n_betas, endpoint=False)
 agrid, bgrid = np.meshgrid(alphas, betas)
-ab_grid = np.c_[np.ravel(agrid), np.ravel(bgrid)]
+ab_grid = np.c_[np.ravel(bgrid), np.ravel(agrid)]
 gammas = np.linspace(25000, 50000, n_gammas)
 gammas = np.asarray([50000., 42500., 45000., 60000., 70000., 80000., 90000.,
                      100000.])
@@ -245,7 +245,7 @@ df = pd.DataFrame(index=range(N_total),
 n_param = 0
 dp = 1
 for gm in gammas:
-    for alfa1, beta1 in ab_grid:
+    for beta1, alfa1 in ab_grid:
         out_size = int(n_per_param)
         tmax = out_size*oversamp
 
@@ -320,7 +320,6 @@ for gm in gammas:
             t += 1
         msf, ff, amp = SpectralContent(out, sampling, method='synth',
                                        x_data=x_out)
-        break
         SCI = 0
         if ff != 0:
             SCI = msf/ff

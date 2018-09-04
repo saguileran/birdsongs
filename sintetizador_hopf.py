@@ -196,18 +196,6 @@ fig, ax = plt.subplots(5, figsize=(10, 10), sharex=True)
 ax[0].plot(time, norm_song)
 ax[0].plot(time, envelope44k)
 ax[0].plot(time, -envelope44k)
-#ax[1].plot(time, norm_song)
-#ax[1].plot(time[::4], envelope11k[:-1])
-#ax[2].plot(time, norm_song)
-#ax[2].plot(time[::40], envelope1k[:-2])
-#ax[3].plot(time, norm_song)
-#ax[3].plot(time[::220], envelope200[:-2])
-#
-#ax[4].plot(time, envelope44k, label='44k')
-#ax[4].plot(time[::4], envelope11k[:-1], label='11k')
-#ax[4].plot(time[::40], envelope1k[:-2], label='1k')
-#ax[4].plot(time[::220], envelope200[:-2], label='200')
-#ax[4].legend()
 # %%
 times = []
 freqs = []

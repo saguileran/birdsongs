@@ -11,6 +11,7 @@ import numpy as np
 from scipy import signal
 from scipy.signal import butter
 from scipy.signal import argrelextrema
+import matplotlib.pyplot as plt
 
 
 def consecutive(data, stepsize=1, min_length=1):
@@ -72,7 +73,8 @@ def envelope_hilbert(data, samp_rate=44150, f_corte=100.):
     return hil_env
 
 
-def normalizar(arr, minout=-1, maxout=1, pmax=100, pmin=5, method='extremos'):
+def normalizar(arr, minout=-1, maxout=1, pmax=100, pmin=5, method='extremos',
+               zeromean=True):
     """
     Normaliza un array en el intervalo minout-maxout
     """
@@ -87,6 +89,8 @@ def normalizar(arr, minout=-1, maxout=1, pmax=100, pmin=5, method='extremos'):
         norm_array = norm_array/np.percentile(norm_array, pmax)
         norm_array *= maxout-minout
         norm_array += minout
+    if zeromean:
+        norm_array -= np.mean(norm_array)
     return norm_array
 
 
@@ -117,7 +121,7 @@ def butter_highpass_filter(data, fs, hcutoff=100.0, order=5):
 
 
 def get_spectrogram(data, sampling_rate, window=1024, overlap=1/1.1,
-                    sigma=102.4):
+                    sigma=102.4, plot=False, fmax=8000):
     """
     Computa el espectrograma de la señal usando ventana gaussiana.
 
@@ -143,6 +147,11 @@ def get_spectrogram(data, sampling_rate, window=1024, overlap=1/1.1,
                                      (('gaussian', sigma), window),
                                      scaling='spectrum')
     Sxx = np.clip(Sxx, a_min=np.amax(Sxx)*0.000001, a_max=np.amax(Sxx))
+    if plot:
+        plt.figure()
+        plt.pcolormesh(tu, fu, np.log(Sxx), cmap=plt.get_cmap('Greys'),
+                       rasterized=True)
+        plt.ylim(0, fmax)
     return fu, tu, Sxx
 
 

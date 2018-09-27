@@ -193,7 +193,7 @@ ax[0].plot(time, v_filt)
 ax[0].plot(time, v_envelope, 'g')
 ax[0].plot(time, -v_envelope, 'g')
 ax[1].plot(time, v_filt)
-for n in range(1, 6):
-    hil_filt = butter_lowpass_filter(hil_env, fs, order=5, lcutoff=100*n)
-    ax[1].plot(time, hil_filt, label='Filtro {}Hz'.format(100*n))
+hil_filt = butter_lowpass_filter(hil_env, fs, order=5, lcutoff=200)
+ax[1].plot(time, hil_filt, label='Filtro {}Hz'.format(100))
+
 ax[1].legend()

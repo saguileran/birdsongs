@@ -150,7 +150,7 @@ class dataFile:
         self.npoints = len(self.data)
         self.time = np.arange(self.npoints)/self.fs
         self.envelope = np.asarray([0])
-        self.subsamplingd = np.asarray([0])
+        self.subsampled = np.asarray([0])
         self.subsampling = 0
         self.subtime = np.asarray([0])
         self.subenv = np.asarray([0])
@@ -194,8 +194,8 @@ class dataFile:
     def autocorr(self, subsampling=100, mode='full', plot=False):
         if self.subsampling != subsampling:
             self.subsample(subsampling=subsampling)
-        result = np.correlate(self.subsampled, self.subampled, mode=mode)
-        autocorr = result[result.size/2:]
+        result = np.correlate(self.subsampled, self.subsampled, mode=mode)
+        autocorr = result[result.size//2:]
         if plot:
             plt.figure()
             plt.plot(self.subtime, autocorr)
@@ -223,8 +223,33 @@ class dataFile:
             plt.plot(self.subtime, self.subenv)
         return 0
 
-    def get_file_spectrogram(self, window=1024, overlap=1/1.1,
-                             sigma=102.4, plot=False, fmax=8000):
+    def envelope_spectrogram(self, tstep=0.01, sigma_factor=5,
+                             plot=False, fmin=0, fmax=50, freq_resolution=5):
+        time_win = 1/freq_resolution
+        window = int(self.fs*time_win)
+        overlap = 1-(tstep/time_win)
+        sigma = window/sigma_factor
+        if len(self.envelope) == 1:
+            self.envelope = self.calculate_envelope()
+        fu, tu, Sxx = signal.spectrogram(self.envelope, self.fs,
+                                         nperseg=window,
+                                         noverlap=window*overlap,
+                                         window=signal.get_window
+                                         (('gaussian', sigma), window),
+                                         scaling='spectrum')
+        Sxx = np.clip(Sxx, a_min=np.amax(Sxx)*0.0001, a_max=np.amax(Sxx))
+        if plot:
+            fig, ax = plt.subplots(2, figsize=(16,4), sharex=True)
+            ax[0].plot(self.time, self.data)
+            ax[0].plot(self.time, self.envelope)
+            ax[1].pcolormesh(tu, fu, np.log(Sxx), cmap=plt.get_cmap('Greys'),
+                           rasterized=True)
+            ax[1].set_ylim(fmin, fmax)
+            fig.tight_layout()
+        return fu, tu, Sxx
+
+    def get_file_spectrogram(self, window=1024, overlap=1/1.1, sigma=102.4,
+                             plot=False, fmin=0, fmax=8000):
         """
         Computa el espectrograma de la señal usando ventana gaussiana.
 
@@ -254,7 +279,7 @@ class dataFile:
             plt.figure()
             plt.pcolormesh(tu, fu, np.log(Sxx), cmap=plt.get_cmap('Greys'),
                            rasterized=True)
-            plt.ylim(0, fmax)
+            plt.ylim(fmin, fmax)
         return fu, tu, Sxx
 
 
@@ -528,5 +553,6 @@ if __name__ == "__main__":
     rnd_file = dataFile(data, fs)
     subsampling = 200
     rnd_file.plot(plotEnvelope=True, subsampling=subsampling)
-    rnd_file.autocorr(subsampling=subsampling, plot=True)
+#    rnd_file.autocorr(subsampling=subsampling, plot=True)
+#    rnd_file.envelope_spectrogram(plot=True, fmax=200,window=10240*2, sigma=1024*3)
 #    pb.plotProtocol([2608, 2708, '2808'], test=True, logenv=True)

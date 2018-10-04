@@ -9,22 +9,31 @@ Codigo para analizar experimentos de playback
 """
 # %% Importo librerias
 import numpy as np
-import os
+import os, fnmatch
 import glob
 import pandas as pd
 from scipy.io import wavfile
 from scipy import signal
-from scipy.signal import butter
-from analysis_functions import get_spectrogram, normalizar
-import sys
+from scipy.signal import butter, find_peaks
 import gc
 import matplotlib
 import random
-matplotlib.use('agg')
+#matplotlib.use('agg')
 import matplotlib.pyplot as plt
+#os.chdir('/home/juan/Documentos/Musculo/Codigo canarios/')
+from analysis_functions import get_spectrogram, normalizar, consecutive
 
 
 # %%
+def search_file(filename, search_path):
+    """ Given a search path, find file with requested name """
+    for root, dir, files in os.walk(search_path):
+        candidate = os.path.join(root, filename)
+        if os.path.exists(candidate):
+            return os.path.abspath(candidate)
+    return None
+
+
 class Experiment:
     """
     Todo lo que es folder-file-wise. Nada de manejo ni analisis de datos.
@@ -43,6 +52,34 @@ class Experiment:
         self.playback_folders = glob.glob(os.path.join
                                           (self.base_folder,
                                            'Playbacks/*{}'.format(self.year)))
+
+    def get_playback_folder(self, date=-1):
+        """
+        Devuelve la carpeta de playbacks asociada a la fecha
+
+        Parameters
+        ----------
+        date: string
+            Fecha en formato 'ddmm'
+
+        Returns
+        -------
+        folder: string
+            Carpeta
+        """
+        if date == -1:
+            raise Exception('Date should be in format ddmm (int or string)')
+        date = str(date)
+        if '_' in date:
+            [year, month, day] = date.split('_')
+            date = day + month
+        which_one = [x.endswith(''.join([date, '2018'])) for x in
+                     self.playback_folders]
+        how_many = sum(which_one)
+        if how_many != 1:
+            raise Exception('There are {} playback folders for date {}'.
+                            format(how_many, date))
+        return self.playback_folders[np.where(which_one)[0][0]]
 
     def get_date_by_folder(self, folder):
         """
@@ -82,8 +119,11 @@ class Experiment:
             Carpeta
         """
         date = str(date)
-        day = date[:2]
-        month = date[2:]
+        if '_' in date:
+            [year, month, day] = date.split('_')
+        else:
+            day = date[:2]
+            month = date[2:]
         daytime_candidate = os.path.join(self.base_folder,
                                          '{}-{}-{}-day'.format(self.year,
                                                                month, day))
@@ -104,7 +144,86 @@ class Experiment:
                           delimiter='\t')
         return log
 
-    def get_random_file(self, daytime=False, playback=False, show_me=False):
+    def plot_instance(self, log_entry, plot_envelope=True, subsampling=1,
+                      min_vs=0.02, min_sound=500):
+        files = self.get_files_by_log_entry(entry=log_entry)
+        [s_file, vs_file, pb_file] = files
+        if pb_file != 'NA':
+            delay = log_entry['delay']
+        num_plots = 3-sum([x == 'NA' for x in files])
+        if vs_file != 'NA':
+            num_plots += 1
+        fig, ax = plt.subplots(num_plots, figsize=(12, 3*num_plots),
+                               sharex=True)
+        n_plot = 0
+        max_time = 0
+        if s_file != 'NA':
+            fu, tu, Sxx = s_file.get_file_spectrogram()
+            ax[n_plot].pcolormesh(tu-delay, fu, np.log(Sxx),
+                                  cmap=plt.get_cmap('Greys'),
+                                  rasterized=True)
+            ax[n_plot].set_ylim(0, 8000)
+            ax[n_plot].set_title(s_file.fname)
+            n_plot += 1
+            max_time = max(max_time, max(tu)-delay)
+        if pb_file != 'NA':
+            fu, tu, Sxx = pb_file.get_file_spectrogram()
+            ax[n_plot].pcolormesh(tu, fu, np.log(Sxx),
+                                  cmap=plt.get_cmap('Greys'),
+                                  rasterized=True)
+            ax[n_plot].set_ylim(0, 8000)
+            ax[n_plot].set_title(pb_file.fname)
+            n_plot += 1
+            max_time = max(max_time, max(tu))
+        if vs_file != 'NA':
+            ax[n_plot].plot(vs_file.time-delay, vs_file.data)
+            vs_file.calculate_envelope(subsampling=subsampling)
+            ax[n_plot].plot(vs_file.time-delay, vs_file.envelope)
+            peaks = vs_file.get_intersilabic_freq(min_value=min_vs)
+            ax[n_plot].plot(vs_file.subtime[peaks]-delay,
+                            vs_file.subenv[peaks], '.')
+            ax[n_plot].set_title(vs_file.fname)
+            ax[n_plot+1].plot(vs_file.subtime[peaks][:-1]-delay,
+                              1/np.diff(vs_file.subtime[peaks]), 'o',
+                              label='vS')
+            if pb_file != 'NA':
+                s_peaks = pb_file.get_intersilabic_freq(min_value=min_sound)
+                ax[n_plot+1].plot(pb_file.subtime[s_peaks][:-1],
+                                  1/np.diff(pb_file.subtime[s_peaks]), 'o',
+                                  label='sound')
+            ax[n_plot+1].legend()
+            ax[n_plot+1].set_ylabel('1/dt entre picos')
+            ax[n_plot+1].set_xlabel('tiempo (s)')
+            max_time = max(max_time, max(vs_file.time)-delay)
+        ax[n_plot].set_xlim(-delay,)
+        fig.tight_layout()
+        return 1
+
+    def get_files_by_log_entry(self, entry):
+        [s_file, vs_file, pb_file] = ['NA', 'NA', 'NA']
+        s_name = entry['s_fname']
+        s_fname = search_file(s_name, self.base_folder)
+        fs, s_data = wavfile.read(s_fname)
+        s_file = dataFile(s_data, fs, 'sound', s_name)
+        vs_name = entry['vS_fname']
+        if vs_name != 'NA':
+            vs_fname = search_file(vs_name, self.base_folder)
+            fs, vs_data = wavfile.read(vs_fname)
+            vs_max = entry['vS_max']
+            vs_min = entry['vS_min']
+            vs_data = normalizar(vs_data, minout=vs_min, maxout=vs_max,
+                                 zeromean=False)
+            vs_file = dataFile(vs_data, fs, 'vs', vs_name)
+        playback_name = entry['playback_fname']
+        if playback_name != 'NA':
+            pb_fname = search_file(playback_name, self.base_folder)
+            fs, pb_data = wavfile.read(pb_fname)
+            pb_file = dataFile(pb_data, fs, 'playback', playback_name)
+            pb_file.calculate_envelope()
+        return [s_file, vs_file, pb_file]
+
+    def get_random_file(self, daytime=False, playback=False, show_me=False,
+                        pb_type='any', vs_threshold=0.04):
         done = False
         if daytime:
             folders = self.day_folders
@@ -115,45 +234,60 @@ class Experiment:
         while not done:
             folder = next(it_folder)
             try:
-                log = self.load_log(folder)
-                if playback:
-                    log2 = log[log['trigger'] == 'playback']
-                else:
-                    log2 = log[log['trigger'] != 'playback']
-                rand_select = log2.iloc[random.randint(0, len(log2))]
-                vs_file = rand_select['vS_fname']
-                vs_max = rand_select['vS_max']
-                vs_min = rand_select['vS_min']
-                fname = os.path.join(folder, vs_file)
-                fs, data = wavfile.read(fname)
-                data = normalizar(data, minout=vs_min, maxout=vs_max,
-                                  zeromean=False)
-                done = True
+                log = self.load_log(folder, playabackOnly=playback)
+                if playback and pb_type != 'any':
+                    playback_fname = [x for x in log['playback_fname']]
+                    pb_index = [i for i, val in enumerate(playback_fname) if
+                                pb_type in val]
+                    log = log.loc[pb_index]
+                rand_select = log.iloc[random.randint(0, len(log))]
+                if rand_select['vS_max'] > vs_threshold:
+                    vs_file = rand_select['vS_fname']
+                    vs_max = rand_select['vS_max']
+                    vs_min = rand_select['vS_min']
+                    vs_fname = os.path.join(folder, vs_file)
+                    fs, vs_data = wavfile.read(vs_fname)
+                    vs_data = normalizar(vs_data, minout=vs_min, maxout=vs_max,
+                                         zeromean=False)
+                    s_file = rand_select['s_fname']
+                    s_fname = os.path.join(folder, s_file)
+                    fs, s_data = wavfile.read(s_fname)
+                    done = True
             except:
                 pass
         if done:
             print(vs_file)
             print(folder)
             if show_me:
-                plt.figure()
-                plt.plot(np.arange(len(data))/fs, data)
-            return data, fs
+                fig, ax = plt.subplots(2, sharex=True)
+                fu, tu, Sxx = dataFile(s_data, fs, 0, 0).get_file_spectrogram()
+                ax[0].pcolormesh(tu, fu, np.log(Sxx),
+                                 cmap=plt.get_cmap('Greys'),
+                                 rasterized=True)
+                ax[0].set_ylim(0, 8000)
+                ax[1].plot(np.arange(len(vs_data))/fs, vs_data)
+                ax[1].set_ylim(-0.15, 0.15)
+            return rand_select
         else:
             print('Try again')
             return 1
 
 
 class dataFile:
-    def __init__(self, data, fs):
+    def __init__(self, data, fs, datatype, fname, delay=0):
         self.data = data
         self.fs = fs
+        self.datatype = datatype
+        self.fname = fname
         self.npoints = len(self.data)
-        self.time = np.arange(self.npoints)/self.fs
         self.envelope = np.asarray([0])
         self.subsampled = np.asarray([0])
         self.subsampling = 0
         self.subtime = np.asarray([0])
         self.subenv = np.asarray([0])
+        self.delay = delay
+        self.time = np.arange(self.npoints)/self.fs
+        self.delayed_time = self.time-self.delay
 
     def butter_lowpass(data, fs, lcutoff=3000.0, order=15):
         nyq = 0.5*fs
@@ -178,10 +312,12 @@ class dataFile:
         return yh
 
     def resample(self, new_fs=44150):
-        resampled = signal.resample(self.data, int(len(self.data)*new_fs/self.fs))
+        resampled = signal.resample(self.data,
+                                    int(len(self.data)*new_fs/self.fs))
         return resampled
 
-    def calculate_envelope(self, method='hilbert', f_corte=100, logenv=False):
+    def calculate_envelope(self, method='hilbert', f_corte=80, logenv=False,
+                           subsampling=200):
         envelope = np.abs(signal.hilbert(self.data))
         envelope = self.butter_lowpass_filter(envelope, self.fs, order=5,
                                               lcutoff=f_corte)
@@ -189,6 +325,8 @@ class dataFile:
             envelope = np.log(envelope)
         if method != 'hilbert':
             print('Hilbert is the only available method (and what you got)')
+        self.envelope = envelope
+        self.subsample(subsampling=subsampling)
         return envelope
 
     def autocorr(self, subsampling=100, mode='full', plot=False):
@@ -201,7 +339,7 @@ class dataFile:
             plt.plot(self.subtime, autocorr)
         return autocorr
 
-    def subsample(self, subsampling=10):
+    def subsample(self, subsampling=200):
         subsamp_data = self.data[::subsampling]
         self.subsampled = subsamp_data
         subsamp_envelope = self.envelope[::subsampling]
@@ -211,7 +349,8 @@ class dataFile:
         self.subsampling = subsampling
         return sb_time, subsamp_data, subsamp_envelope
 
-    def plot(self, plotEnvelope=False, subsampling=1):
+    def plot(self, plotEnvelope=True, subsampling=1, plot_peaks=False,
+             min_value=0.03):
         plt.figure()
         plt.plot(self.time, self.data, alpha=0.3)
         if plotEnvelope:
@@ -221,10 +360,51 @@ class dataFile:
                 self.subsample(subsampling=subsampling)
             plt.plot(self.time, self.envelope)
             plt.plot(self.subtime, self.subenv)
+            if plot_peaks:
+                peaks = self.get_intersilabic_freq(min_value=min_value)
+                plt.plot(self.subtime[peaks], self.subenv[peaks], '.')
+                plt.twinx()
+                plt.plot(self.subtime[peaks][:-1],
+                         1/np.diff(self.subtime[peaks]), 'o')
         return 0
 
     def envelope_spectrogram(self, tstep=0.01, sigma_factor=5,
                              plot=False, fmin=0, fmax=50, freq_resolution=5):
+        """
+        Espectrograma de la envolvente
+
+        Parameters
+        ----------
+        tstep(float):
+            Paso temporal del espectrograma
+
+        sigma_factor(float):
+            Relacion entre el tamaño de la ventana y la dispersion. Se usa
+            ventana gaussiana
+
+        plot(boolean):
+            Plotear?
+
+        fmin(float):
+            minima frecuencia del grafico
+
+        fmax(float):
+            maxima frecuencia del grafico
+
+        freq_resolution(float):
+            Resolucion en frecuencia
+
+        Returns
+        -------
+        fu(array):
+            array de frecuencias
+
+        tu(array):
+            array de tiempos
+
+        Sxx(array x array):
+            intensidad
+        """
         time_win = 1/freq_resolution
         window = int(self.fs*time_win)
         overlap = 1-(tstep/time_win)
@@ -239,14 +419,19 @@ class dataFile:
                                          scaling='spectrum')
         Sxx = np.clip(Sxx, a_min=np.amax(Sxx)*0.0001, a_max=np.amax(Sxx))
         if plot:
-            fig, ax = plt.subplots(2, figsize=(16,4), sharex=True)
+            fig, ax = plt.subplots(2, figsize=(16, 4), sharex=True)
             ax[0].plot(self.time, self.data)
             ax[0].plot(self.time, self.envelope)
             ax[1].pcolormesh(tu, fu, np.log(Sxx), cmap=plt.get_cmap('Greys'),
-                           rasterized=True)
+                             rasterized=True)
             ax[1].set_ylim(fmin, fmax)
             fig.tight_layout()
         return fu, tu, Sxx
+
+    def get_intersilabic_freq(self, min_value=0.03):
+        supra_umbral = consecutive(np.where(self.subenv > min_value)[0])
+        peaks = [supra_umbral[i][np.argmax(self.subenv[val])] for i, val in enumerate(supra_umbral)]
+        return peaks
 
     def get_file_spectrogram(self, window=1024, overlap=1/1.1, sigma=102.4,
                              plot=False, fmin=0, fmax=8000):
@@ -329,10 +514,6 @@ class Protocol:
         date: string
             Fecha en formato 'ddmm'
 
-        with_delays: boolean
-            Si True, agrega una columna al final que da el delay entre el
-            playback y el estimulo (para alinear)
-
         Returns
         -------
         playback_log: pandas dataFrame
@@ -367,6 +548,9 @@ class Protocol:
         with_delays: boolean
             Si True, agrega una columna al final que da el delay entre el
             playback y el estimulo (para alinear)
+
+        save: boolean
+            Si True, guarda el log generado
 
         Returns
         -------
@@ -416,7 +600,7 @@ class Protocol:
                 reduced_log = playback_log.loc[pb_index]
                 pb_fname = os.path.join(pb_folder, pb_type)
                 fs_b, pb = wavfile.read(pb_fname)
-                pbFile = dataFile(pb, fs_b)
+                pbFile = dataFile(pb, fs_b, 0, 0)
                 fu, tu, Sxx = pbFile.get_file_spectrogram()
                 fig, ax = plt.subplots(2, figsize=(14, 4), sharex=True)
                 ax[0].pcolormesh(tu, fu, np.log(Sxx),
@@ -436,7 +620,7 @@ class Protocol:
                     vs = normalizar(vs_raw, minout=vs_min, maxout=vs_max,
                                     zeromean=False)
                     vs_time = np.arange(len(vs))/fs-vs_delay
-                    vsFile = dataFile(vs, fs)
+                    vsFile = dataFile(vs, fs, 0, 0)
                     vs_envelope = vsFile.calculate_envelope(logenv=logenv)
                     ax[1].plot(vs_time, vs_envelope, 'k', alpha=alpha)
                     ax[1].set_xlim(-2, max(tu)+2)
@@ -543,16 +727,22 @@ def progressbar(array, length=0):
         yield next(iter_)
 
 
-# %% Defino directorios de trabajo (files y resultados)
+# %%
 if __name__ == "__main__":
     birdname = 'CeRo'
     year = 2018
     exp = Experiment(birdname=birdname, year=year)
     pb = Protocol(birdname=birdname, year=year)
-    data, fs = exp.get_random_file(playback=True)
-    rnd_file = dataFile(data, fs)
+    # %%
+    rnd_data = exp.get_random_file(playback=True, pb_type='SYNHOPF',
+                                   vs_threshold=0.08, show_me=False)
+    [s_file, vs_file, pb_file] = exp.get_files_by_log_entry(rnd_data)
     subsampling = 200
-    rnd_file.plot(plotEnvelope=True, subsampling=subsampling)
-#    rnd_file.autocorr(subsampling=subsampling, plot=True)
-#    rnd_file.envelope_spectrogram(plot=True, fmax=200,window=10240*2, sigma=1024*3)
+    exp.plot_instance(rnd_data, subsampling=subsampling, min_vs=0.02)
+#    vs_file.plot(plotEnvelope=True, subsampling=subsampling, plot_peaks=True,
+#                 min_value=0.02)
+#    vs_file.autocorr(subsampling=subsampling, plot=True)
+#    vs_file.envelope_spectrogram(tstep=0.01, sigma_factor=5, plot=True,
+#                                 fmin=0,
+#                                 fmax=50, freq_resolution=2)
 #    pb.plotProtocol([2608, 2708, '2808'], test=True, logenv=True)

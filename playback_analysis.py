@@ -34,6 +34,20 @@ def search_file(filename, search_path):
     return None
 
 
+def NextPowerOfTwo(number):
+    return int(np.ceil(np.log2(number)))
+
+
+def n_pad_Pow2(arr):
+    nextPower = NextPowerOfTwo(len(arr))
+    deficit = int(np.power(2, nextPower) - len(arr))
+    return deficit
+
+
+def checkIfPow2(n):
+    return bool(n and not (n & (n-1)))
+
+
 class Experiment:
     """
     Todo lo que es folder-file-wise. Nada de manejo ni analisis de datos.
@@ -74,6 +88,7 @@ class Experiment:
         day = name_split[2]
         month = name_split[1]
         return ''.join([month, day])
+
     def get_files_by_log_entry(self, entry):
         [s_file, vs_file, pb_file] = ['NA', 'NA', 'NA']
         s_name = entry['s_fname']
@@ -96,7 +111,6 @@ class Experiment:
             pb_file = dataFile(pb_data, fs, 'playback', playback_name)
             pb_file.calculate_envelope()
         return [s_file, vs_file, pb_file]
-
 
     def get_folder_by_date(self, date, daytime=True):
         """
@@ -277,8 +291,6 @@ class Experiment:
 
 
 class dataFile:
-#    __slots__ = {'Experiment', 'birdname', 'year', 'base_folder',
-#                 'night_folders', 'playback_folders'}
     #FIXME: quitar envelope de propiedades, calcular cada vez que haga falta?
     def __init__(self, data, fs, datatype, fname, delay=0):
         self.data = data
@@ -294,17 +306,6 @@ class dataFile:
         self.delay = delay
         self.time = np.arange(self.npoints)/self.fs
         self.delayed_time = self.time-self.delay
-
-#    def _kill(self):
-#        self.data = np.nan
-#        self.envelope = np.nan
-#        self.subsampled = np.nan
-#        self.subenv = np.nan
-#        return
-#
-#    def _erase_data(self):
-#        self.data = np.nan
-#        return
 
     def autocorr(self, subsampling=100, mode='full', plot=False):
         if self.subsampling != subsampling:
@@ -344,14 +345,21 @@ class dataFile:
         return yl
 
     def calculate_envelope(self, method='hilbert', f_corte=80, logenv=False,
-                           subsampling=200):
-        envelope = np.abs(signal.hilbert(self.data))
-        envelope = self.butter_lowpass_filter(envelope, self.fs, order=5,
-                                              lcutoff=f_corte)
+                           subsampling=200, pow2pad=True):
+        n_pad = 0
+        n_dat = len(data)
+        if pow2pad and not checkIfPow2(n_dat):
+            n_pad = n_pad_Pow2(self.data)
+        elif len(self.data) % 2 == 1:
+            n_pad = 1
+        envelope = np.abs(signal.hilbert(self.data, n_dat+n_pad))
+        envelope = self.butter_lowpass_filter(envelope, self.fs, order=5, lcutoff=f_corte)
         if logenv:
             envelope = np.log(envelope)
         if method != 'hilbert':
             print('Hilbert is the only available method (and what you got)')
+        if n_pad > 0:
+            envelope = envelope[:-n_pad]
         self.envelope = envelope
         self.subsample(subsampling=subsampling)
         return envelope
@@ -452,7 +460,8 @@ class dataFile:
 
     def get_intersilabic_freq(self, min_value=0.03):
         supra_umbral = consecutive(np.where(self.subenv > min_value)[0])
-        peaks = [supra_umbral[i][np.argmax(self.subenv[val])] for i, val in enumerate(supra_umbral)]
+        peaks = [supra_umbral[i][np.argmax(self.subenv[val])] for i, val
+                 in enumerate(supra_umbral)]
         return peaks
 
     def plot(self, plotEnvelope=True, subsampling=1, plot_peaks=False,
@@ -488,6 +497,7 @@ class dataFile:
 class Protocol:
     __slots__ = {'Experiment', 'birdname', 'year', 'base_folder',
                  'night_folders', 'playback_folders'}
+
     def __init__(self, birdname, year):
         self.Experiment = Experiment(birdname=birdname, year=year)
         self.birdname = birdname

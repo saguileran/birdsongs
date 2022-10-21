@@ -1,0 +1,10 @@
+name,value
+c,35000.
+ancho,0.2
+largo,3.5
+s1overCH,(36/0.8)*1e9
+s1overLB,1e-04
+s1overLG, (50*1e-03)/.5
+RB,(.5)*1e07
+r,0.1
+rdis,(300./5.)*(10000.)

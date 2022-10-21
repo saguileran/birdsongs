@@ -1,0 +1,12 @@
+os
+glob
+peakutils
+lmfit
+time
+numpy
+matplotlib 
+pandas
+math
+scipy
+random
+#signal_envelope

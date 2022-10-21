@@ -1,4 +1,0 @@
-# ignore all wavs and pdfs
-*.wav
-*.pdf
-__pycache__/

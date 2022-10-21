@@ -1,0 +1,7 @@
+%matplotlib
+
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots()
+
+ln, = ax.plot(range(5))

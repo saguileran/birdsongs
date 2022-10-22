@@ -174,7 +174,7 @@ def Windows(s, t, fs, window_time=0.05, overlap=1):
     
     return s_windowed, t_windowed
 
-def FFandSCI(s, time, fs, t0, window_time=0.01, method='song'):
+def FFandSCI(s, time, fs, t0, Ndata, window_time=0.01, method='song'):
     s, t = Windows(s, time, fs, window_time=window_time)
     
     SCI,      time_ampl = np.zeros(np.shape(s)[0]), np.zeros(np.shape(s)[0])
@@ -192,7 +192,7 @@ def FFandSCI(s, time, fs, t0, window_time=0.01, method='song'):
     
     time_ampl += t0
     # time interpolated
-    tim_inter       = np.linspace(time_ampl[0], time_ampl[-1], fs)
+    tim_inter       = np.linspace(time_ampl[0], time_ampl[-1], Ndata)
     # functions to interpolate
     time_ampl1 = time_ampl.reshape((-1,1))
     

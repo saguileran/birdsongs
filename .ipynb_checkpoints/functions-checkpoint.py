@@ -1,22 +1,20 @@
 import os, glob, peakutils, lmfit, time #emcee, 
 import numpy as np
-from matplotlib import cm
-import matplotlib as mpl
 import pandas as pd
 from math import floor, ceil
+from matplotlib import cm
+import matplotlib as mpl
 import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 from scipy.io import wavfile
 from scipy import signal
-from scipy.signal import argrelextrema
-from scipy.signal import butter
 from scipy.interpolate import interp1d
+from scipy.signal import argrelextrema, butter, savgol_filter, find_peaks
 from sklearn.linear_model import LinearRegression
-from matplotlib.gridspec import GridSpec
-from scipy.signal import savgol_filter
 from random import uniform
 from numpy.polynomial import Polynomial
 from multiprocessing import Pool
-from scipy.signal import find_peaks
+#from pydub import AudioSegment
 #import signal_envelope as se
 #from scipy.signal import hilbert
 #from scipy.interpolate import UnivariateSpline
@@ -126,7 +124,7 @@ def get_spectrogram(data, sampling_rate, window=1024, overlap=1/1.1,
     return fu, tu, Sxx
 
 
-def SpectralContent(data, fs, method='song', fmin=300, fmax=10000):#, dt_transit=0.002):
+def SpectralContent(data, fs, method='synth', fmin=300, fmax=10000):#, dt_transit=0.002):
     segment = data # [int(dt_transit*fs):]
     fourier = np.abs(np.fft.rfft(segment))
     freqs   = np.fft.rfftfreq(len(segment), d=1/fs)
@@ -151,9 +149,27 @@ def SpectralContent(data, fs, method='song', fmin=300, fmax=10000):#, dt_transit
             difs   = np.diff(mm)
         f_aff = fs / np.mean(np.diff(mm))
     elif method == 'synth':
-        maximos = peakutils.indexes(fourier, thres=0.5, min_dist=5)
-        if amp < 500:             f_aff = 0
-        elif len(maximos) > 0:    f_aff = freqs[maximos[0]]
+        maximos = peakutils.indexes(fourier, thres=0.15, min_dist=5)
+        #if amp < 50 :             f_aff = 0.1
+        if len(maximos) > 0:    f_aff = freqs[maximos[0]]
+        else :                  f_aff = np.max(freqs)
+    return f_msf, f_aff, amp
+
+def SpectralContentSynth(data, fs, fmin=300, fmax=10000):#, dt_transit=0.002):
+    segment = data # [int(dt_transit*fs):]
+    fourier = np.abs(np.fft.rfft(segment))
+    freqs   = np.fft.rfftfreq(len(segment), d=1/fs)
+    min_bin = np.argmin(np.abs(freqs-fmin))
+    max_bin = np.argmin(np.abs(freqs-fmax))
+    fourier = np.abs(np.fft.rfft(segment))[min_bin:max_bin]
+    
+    freqs = np.fft.rfftfreq(len(segment), d=1/fs)[min_bin:max_bin]
+    f_msf = np.sum(freqs*fourier)/np.sum(fourier)
+    amp   = max(segment)-min(segment)
+    
+    maximos = peakutils.indexes(fourier, thres=0.15, min_dist=5)
+    if len(maximos) > 0:    f_aff = freqs[maximos[0]]
+    else :                  f_aff = np.max(freqs)
     return f_msf, f_aff, amp
 
 def rk4(f, v, dt):
@@ -177,7 +193,7 @@ def Windows(s, t, fs, window_time=0.05, overlap=1):
     
     return s_windowed, t_windowed
 
-def FFandSCI(s, time, fs, t0, window_time=0.01, method='song'):
+def FFandSCI(s, time, fs, t0, window_time=0.01, method='synth'):
     Ndata = time.size
     s, t = Windows(s, time, fs, window_time=window_time)
     
@@ -185,32 +201,12 @@ def FFandSCI(s, time, fs, t0, window_time=0.01, method='song'):
     freq_amp, Ampl_freq = np.zeros(np.shape(s)[0]), np.zeros(np.shape(s)[0])
     
     for i in range(np.shape(s)[0]):
-        amplitud_freq     = np.abs(np.fft.rfft(s[i]))
-        freq = np.fft.rfftfreq(len(s[i]), d=1/fs)#[3:-3]
-        
-        # calculating peaks of fft
-        #y    = amplitud_freq[3:-3] #np.abs(np.fft.rfft(s[i]))[5:-5]
-        
-        #peaks, _ = find_peaks(y, distance=20)#, height=np.max(y)/5)
-        #if peaks.size!=0:  max1 = peaks[0]+3
-        #else:              
-        max1 = np.argmax(amplitud_freq)
-        
-        #maximos = peakutils.indexes(amplitud_freq, thres=0.05, min_dist=5)
-        #if len(maximos)!=0: max1    = freq[maximos[0]]
-        #else:               max1 = np.argmax(amplitud_freq)
-        #else:  
-            #max1 = np.argmax(amplitud_freq)
-            #print(max1)
-            
-        
-        f_msf, f_aff, amp = SpectralContent(s[i], fs, method=method, fmin=300, fmax=10000)
-        #max1 = f_aff
+        f_msf, f_aff, amp = SpectralContentSynth(s[i], fs, fmin=300, fmax=10000) # method=method
         
         SCI[i]       = f_msf/f_aff
-        time_ampl[i] = t[i,0]#floor(np.shape(t)[1]/2)] #window_length*i # left point
-        freq_amp[i]  = f_aff#max1/window_time
-        Ampl_freq[i] = np.amax(amplitud_freq)
+        time_ampl[i] = t[i,0] #floor(np.shape(t)[1]/2)] #window_length*i # left point
+        freq_amp[i]  = f_aff #max1/window_time
+        Ampl_freq[i] = amp#np.amax(amplitud_freq)
     
     time_ampl += t0
     

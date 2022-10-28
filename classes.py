@@ -1,11 +1,26 @@
 from functions import *
 
+# ------------------- PATHS ------------------------
+root_path     = "C:\\Users\\sebas\\Documents\\GitHub\\" # root_path = '/home/siete/Downloads/audios/'
+base_path     = "{}BirdSongs\\".format(root_path) 
+audios_path   = '{}Audios\\'.format(root_path)
+auxdata_path  = '{}AuxiliarData\\'.format(base_path)
+results_path  = '{}Results\\'.format(base_path) 
+examples_path = '{}Results\\Examples\\'.format(base_path)
+sound_files   = glob.glob(os.path.join(audios_path, '*wav')) #'*'+birdname+'*wav'   
+
+if not os.path.exists(results_path):    os.makedirs(results_path)
+if not os.path.exists(examples_path):    os.makedirs(examples_path)
+
+# ----------- CLASSES ----------------------
 class Sillable:    
-    def __init__(self, s, fs, t0, window_time):
+    def __init__(self, s, fs, t0, window_time, p):
         self.t0 = t0
         self.s  = s
         self.fs = fs
+        self.p  = p
         
+        self.params  = self.p.valuesdict()
         self.NN      = 256 
         self.sigma   = self.NN/10
         self.overlap = 1/1.1
@@ -42,7 +57,7 @@ class Sillable:
         b          = np.array([param['b0'], param['b1'], param['b2']])
         
         t_1   = np.linspace(0,self.T,len(self.s))   # np.shape(copeton.silaba.time_inter)[0])
-        t_par = np.array([t_1/t_1, t_1, t_1**2])
+        t_par = np.array([np.ones(t_1.size), t_1, t_1**2])
 
         # approx alpha and beta as polynomials
         poly = Polynomial.fit(self.time_inter, self.freq_amp_smooth, deg=10)
@@ -154,10 +169,8 @@ class Sillable:
         self.SCI_out                = SCI
         self.time_out = np.linspace(0, self.tu_out[-1], len(self.out_amp)) #-self.t0
     
-    def Audio(self):
-        out = normalizar(self.out_amp) 
-        
-        wavfile.write('{}/synth4_amp_{}_{}.wav'.format(examples_path,num_file,no_silaba), self.fs, np.asarray(out+np.abs(np.mean(out)),  dtype=np.float32))
+    def Audio(self,num_file,no_silaba):
+        wavfile.write('{}/synth4_amp_{}_{}.wav'.format(examples_path,num_file,no_silaba), self.fs, np.asarray(normalizar(self.out_amp),  dtype=np.float32))
         wavfile.write('{}/song_{}_{}.wav'.format(examples_path,num_file,no_silaba),       self.fs, np.asarray(normalizar(self.s),        dtype=np.float32))
     
     ## ----------------------- PLOT FUNCTIONS --------------------------
@@ -303,6 +316,31 @@ class Sillable:
         
         return mi, end-start
     
+    def FindGammaAndBs(self, brute, Ns1=51, Ns2=21):
+        # ----------- gamma opt ------------------
+        brute["Ns"] = Ns1
+        self.p["gamma"].set(vary=True)
+        datos, t_exe = self.OptimizationSCI(self.p, **brute)  
+        self.p["gamma"].set(value=datos.params["gamma"].value, vary=False)
+        self.params["gamma"] = datos.params["gamma"].value   # opt_gamma
+
+        brute["Ns"] = Ns2
+        # ---------------- b1--------------------
+        self.p["b1"].set(vary=True)
+        datos1, t_exe1 = self.OptimizationFF(self.p, **brute) 
+        self.p["b1"].set(vary=False, value=datos.params["b1"].value)
+        self.params["b1"] = datos.params["b1"].value
+        # ---------------- b0--------------------
+        self.p["b0"].set(vary=True)
+        datos2, t_exe2 = self.OptimizationFF(self.p, **brute) 
+        self.p["b0"].set(vary=False, value=datos.params["b0"].value)
+        self.params["b0"] = datos.params["b0"].value
+
+    return [t_exe, t_exe1, t_exe2]
+    
+    
+    
+    
     
     
 class Song(Sillable):
@@ -326,6 +364,17 @@ class Song(Sillable):
         self.Sxx      = Sxx_all
         self.window_time = 0.005
         
+        self.p = lmfit.Parameters()
+        # add wi  : (NAME    VALUE  VARY   MIN    MAX  EXPR  BRUTE_STEP)
+        self.p.add_many(('a0',   0.11,  False, -2,   2,    None, None), 
+                       ('a1',    5e-2,  False, -1,   1,    None, None),  
+                       ('b0',    -0.2,  False, -1,   0.5,  None, None),  
+                       ('b1',    1.1,   False,  0.2,   5,  None, None), 
+                       ('gamma', 60000, False,  0.1,  1e5, None, None),
+                       ('b2',    0.,    False, None, None, None, None), 
+                       ('a2',    0.,    False, None, None, None, None) )
+        self.parametros = self.p.valuesdict()
+        
         
         self.silabas = self.Silabas()
         
@@ -336,17 +385,7 @@ class Song(Sillable):
         self.silb_complet = silaba
         self.time_silaba  = self.time[ss[0]:ss[-1]]# -0.02/2
         self.t0           = self.time[ss[0]]
-        self.silaba       = Sillable(silaba, self.fs, self.t0, self.window_time)
-        self.p = lmfit.Parameters()
-        # add wi  : (NAME    VALUE  VARY   MIN    MAX  EXPR  BRUTE_STEP)
-        self.p.add_many(('a0',    0.11,  False, -2,   2,    None, None), 
-                       ('a1',    5e-2,  False, -1,   1,    None, None),  
-                       ('b0',    -0.2,  False, -1,   0.2,    None, None),  
-                       ('b1',    1.1,   False,  0.2,   2,    None, None), 
-                       ('gamma', 60000, False,  0.1,  1e5, None, None),
-                       ('b2',    0.,    False, None, None, None, None), 
-                       ('a2',    0.,    False, None, None, None, None) )
-        self.parametros = self.p.valuesdict()
+        self.silaba       = Sillable(silaba, self.fs, self.t0, self.window_time, self.p)
         
     def Chunck(self, no_chunck):
         self.no_chunck     = no_chunck

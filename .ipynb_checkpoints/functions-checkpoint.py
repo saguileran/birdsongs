@@ -14,6 +14,7 @@ from sklearn.linear_model import LinearRegression
 from random import uniform
 from numpy.polynomial import Polynomial
 from multiprocessing import Pool
+Pool()
 #from pydub import AudioSegment
 #import signal_envelope as se
 #from scipy.signal import hilbert
@@ -150,27 +151,12 @@ def SpectralContent(data, fs, method='synth', fmin=300, fmax=10000):#, dt_transi
         f_aff = fs / np.mean(np.diff(mm))
     elif method == 'synth':
         maximos = peakutils.indexes(fourier, thres=0.15, min_dist=5)
-        #if amp < 50 :             f_aff = 0.1
-        if len(maximos) > 0:    f_aff = freqs[maximos[0]]
-        else :                  f_aff = np.max(freqs)
+        if amp < 50 :             f_aff = 0.1
+        elif len(maximos) > 0:    f_aff = freqs[maximos[0]]
+        else :                    f_aff = np.max(freqs)
     return f_msf, f_aff, amp
 
-def SpectralContentSynth(data, fs, fmin=300, fmax=10000):#, dt_transit=0.002):
-    segment = data # [int(dt_transit*fs):]
-    fourier = np.abs(np.fft.rfft(segment))
-    freqs   = np.fft.rfftfreq(len(segment), d=1/fs)
-    min_bin = np.argmin(np.abs(freqs-fmin))
-    max_bin = np.argmin(np.abs(freqs-fmax))
-    fourier = np.abs(np.fft.rfft(segment))[min_bin:max_bin]
-    
-    freqs = np.fft.rfftfreq(len(segment), d=1/fs)[min_bin:max_bin]
-    f_msf = np.sum(freqs*fourier)/np.sum(fourier)
-    amp   = max(segment)-min(segment)
-    
-    maximos = peakutils.indexes(fourier, thres=0.15, min_dist=5)
-    if len(maximos) > 0:    f_aff = freqs[maximos[0]]
-    else :                  f_aff = np.max(freqs)
-    return f_msf, f_aff, amp
+
 
 def rk4(f, v, dt):
     k1 = f(v)    
@@ -193,15 +179,27 @@ def Windows(s, t, fs, window_time=0.05, overlap=1):
     
     return s_windowed, t_windowed
 
+def SpectralContentSynth(segment, fs):
+    fourier = np.abs(np.fft.rfft(segment))
+    freqs   = np.fft.rfftfreq(len(segment), d=1/fs)
+    maximos = peakutils.indexes(fourier, thres=0.15, min_dist=5)
+    
+    f_msf = np.sum(freqs*fourier)/np.sum(fourier)
+    amp   = max(segment)-min(segment)
+    
+    if len(maximos)>0 and amp>25:   f_aff = freqs[maximos[0]]
+    else:                           f_aff = 0.1 #np.argmax(fourier) #np.max(freqs)
+    
+    return f_msf, f_aff, amp
+
 def FFandSCI(s, time, fs, t0, window_time=0.01, method='synth'):
-    Ndata = time.size
     s, t = Windows(s, time, fs, window_time=window_time)
     
     SCI,      time_ampl = np.zeros(np.shape(s)[0]), np.zeros(np.shape(s)[0])
     freq_amp, Ampl_freq = np.zeros(np.shape(s)[0]), np.zeros(np.shape(s)[0])
     
-    for i in range(np.shape(s)[0]):
-        f_msf, f_aff, amp = SpectralContentSynth(s[i], fs, fmin=300, fmax=10000) # method=method
+    for i in range(s.shape[0]):
+        f_msf, f_aff, amp = SpectralContentSynth(s[i], fs) # method=method
         
         SCI[i]       = f_msf/f_aff
         time_ampl[i] = t[i,0] #floor(np.shape(t)[1]/2)] #window_length*i # left point
@@ -210,7 +208,7 @@ def FFandSCI(s, time, fs, t0, window_time=0.01, method='synth'):
     
     time_ampl += t0
     
-    tim_inter       = np.linspace(time_ampl[0], time_ampl[-1], Ndata)  # time interpolated
+    tim_inter       = np.linspace(time_ampl[0], time_ampl[-1], time.size)  # time interpolated
     #time_ampl1 = time_ampl.reshape((-1,1)) # functions to interpolate
     
     model = LinearRegression().fit(time_ampl.reshape((-1,1)), freq_amp)

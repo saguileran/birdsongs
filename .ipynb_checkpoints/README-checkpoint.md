@@ -1,3 +1,3 @@
 # Song Birds 
 
-This is my dissertation requiere to get the universitary degree of physics at National University of Colombia.
+This is my dissertation requiered to obtain a degree of physics at the National University of Colombia.

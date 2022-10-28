@@ -14,7 +14,7 @@ from sklearn.linear_model import LinearRegression
 from random import uniform
 from numpy.polynomial import Polynomial
 from multiprocessing import Pool
-Pool()
+
 #from pydub import AudioSegment
 #import signal_envelope as se
 #from scipy.signal import hilbert
@@ -182,12 +182,13 @@ def Windows(s, t, fs, window_time=0.05, overlap=1):
 def SpectralContentSynth(segment, fs):
     fourier = np.abs(np.fft.rfft(segment))
     freqs   = np.fft.rfftfreq(len(segment), d=1/fs)
-    maximos = peakutils.indexes(fourier, thres=0.15, min_dist=5)
+    maximos = peakutils.indexes(fourier, thres=0.2, min_dist=5)
     
     f_msf = np.sum(freqs*fourier)/np.sum(fourier)
     amp   = max(segment)-min(segment)
+    max1  = np.max(fourier) #max amplitud fourier
     
-    if len(maximos)>0 and amp>25:   f_aff = freqs[maximos[0]]
+    if len(maximos)>0 and max1>5:  f_aff = freqs[maximos[0]]
     else:                           f_aff = 0.1 #np.argmax(fourier) #np.max(freqs)
     
     return f_msf, f_aff, amp
@@ -220,4 +221,4 @@ def FFandSCI(s, time, fs, t0, window_time=0.01, method='synth'):
     Ampl_freq    = savgol_filter(inte_Amp_freq(tim_inter), window_length=13, polyorder=3)
     #print(np.shape(tim_inter), np.shape(freq_amp_int), np.shape(Ampl_freq))
     
-    return SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int , tim_inter
+    return SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int, tim_inter

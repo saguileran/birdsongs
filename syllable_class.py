@@ -53,7 +53,7 @@ class Sillable:
         self.beta  = 1e-4*y*b[1] + b[0]   # self.beta = np.dot(b, t_par)
         self.alpha = np.dot(a, t_par);  
     
-    def BirdModel(self, sampling=44100, oversamp=20):
+    def BirdModel(self, sampling=44100, oversamp=20, prct_noise=0):
         N_total = len(self.s)
 
         #sampling and necessary constants
@@ -71,7 +71,7 @@ class Sillable:
         n_out, tcount, taux, tiempot = 0, 0, 0, 0
         forcing1, forcing2, A1 = 0., 0., 0
         
-        v = 1e-12*np.array([5, 10, 1, 10, 1])
+        v = 1e-12*np.array([5, 10, 1, 10, 1]);  self.Vs = [v]
         #'''
         BirdDataOff          = pd.read_csv(auxdata_path+'BirdData_Copeton_off.csv')
         BirdDataOn           = pd.read_csv(auxdata_path+'BirdData_Copeton_on.csv')
@@ -82,10 +82,10 @@ class Sillable:
         
         t = tau = int(largo/(c*dt + 0.0))
         def dxdt_synth(v):
-            x, y, i1, i2, i3 = v #x, y, i1, i2, i3 = v[0], v[1], v[2], v[3], v[4]
-            dv    = np.zeros(5)
+            [x, y, i1, i2, i3], dv = v, np.zeros(5) #x, y, i1, i2, i3 = v[0], v[1], v[2], v[3], v[4]
+            #dv    = np.zeros(5)
             dv[0] = y
-            dv[1] = - alfa1*gm**2 - beta1*gm**2*x - gm**2*x**3 - gm*x**2*y + gm**2*x**2 - gm*x*y
+            dv[1] = - alpha*gm**2 - beta*gm**2*x - gm**2*x**3 - gm*x**2*y + gm**2*x**2 - gm*x*y
             dv[2] = i2
             dv[3] = -s1overLG*s1overCH*i1 - rdis*(s1overLB+s1overLG)*i2 \
                 + i3*(s1overLG*s1overCH-rdis*RB*s1overLG*s1overLB) \
@@ -93,9 +93,9 @@ class Sillable:
             dv[4] = -(s1overLB/s1overLG)*i2 - RB*s1overLB*i3 + s1overLB*forcing1
             return dv
 
-        gm       = self.p["gamma"].value #self.gamma
-        alfa1    = self.alpha[0] 
-        beta1    = self.beta[0]
+        gm       = self.p["gamma"].value
+        alpha    = self.alpha[0] 
+        beta     = self.beta[0]
         amplitud = self.envelope[0]
 
         while t < tmax and v[1] > -5000000:
@@ -108,22 +108,22 @@ class Sillable:
             forcing1, forcing2, PRESSURE = db[t], ddb, a[t] #  -rPin(t-tau),  dPout/dt,   v(t)y(t) + Pin(t-tau)
 
             tiempot += dt
-            v = rk4(dxdt_synth, v, dt)
+            v = rk4(dxdt_synth, v, dt);   self.Vs.append(v);
 
-            preout = RB*v[4]
+            #preout = RB*v[4]
             s1overCH, s1overLB, s1overLG, RB, r, rdis = BirdDataOn['value'][3:]
 
-            noise    = 0.21*(uniform(0, 1) - 0.5)
-            beta1   += 0.0*noise
-            A1       = amplitud + 0.0*noise
+            noise    = 0.21*(uniform(0, 1)-0.5)
+            A1       = amplitud + prct_noise*noise
 
             if taux == oversamp and n_out<self.fs-1:
-                out[n_out]   = preout*10
+                out[n_out]   = RB*v[4]*10
                 n_out       += 1
 
-                beta1, alfa1 = self.beta[n_out], self.alpha[n_out]
-                amplitud     = self.envelope[n_out]
-                taux         = 0
+                beta      = self.beta[n_out]     + prct_noise*noise
+                amplitud  = self.envelope[n_out] + prct_noise*noise
+                alpha     = self.alpha[n_out]
+                taux      = 0
                 #if (n_out*100/N_total) % 5 == 0:  print('{:.0f}%'.format(100*n_out/N_total)) # dp = 5 (() % dp == 0)
                 
             t += 1;   taux += 1;
@@ -146,8 +146,9 @@ class Sillable:
         self.fu_out   = fu_s
         self.Sxx_out  = Sxx_s
         self.time_out = np.linspace(0, len(self.out_amp)/self.fs, len(self.out_amp))
+        self.Vs       = np.array(self.Vs)
         
-        SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int , time_inter = FFandSCI(self.out_amp, self.time, self.fs, self.t0, method="synth", window_time=self.window_time) #FFandSCI(self.out_amp, self.tu_out, fs=self.fs,window_length=self.window_length, method='song')
+        SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int, time_inter = FFandSCI(self.out_amp, self.time, self.fs, self.t0, method="synth", window_time=self.window_time) #FFandSCI(self.out_amp, self.tu_out, fs=self.fs,window_length=self.window_length, method='song')
         
         self.time_ampl_out          = time_ampl
         self.time_inter_out         = time_inter-time_inter[0]
@@ -173,7 +174,7 @@ class Sillable:
         ax[0][0].legend(); ax[0][0].set_ylabel("Amplitud (a.u.)")
         
         out = normalizar(self.out_amp) 
-        ax[1][0].plot(self.time_out, out+np.abs(np.mean(out)), label='normalized output')
+        ax[1][0].plot(self.time_out, out+np.abs(np.mean(out)), label='synthetic')
         ax[1][0].set_title('Synthetic') 
         ax[1][0].plot(self.time_out, self.s_amp_env, label='envelope')
         ax[1][0].legend(); ax[1][0].set_xlabel('t (s)'); ax[1][0].set_ylabel("Amplitud (a.u.)")
@@ -249,7 +250,7 @@ class Sillable:
         ax[0][0].plot(self.time_ampl, self.freq_amp*1e-3, 'r+', label='sampled ff', ms=5)
         ax[0][0].legend()#title="Fundamenta Frequency")
         ax[0][0].set_ylim((1, 15)); ax[0][0].set_xlim((self.tu[0], self.tu[-1]))
-        ax[0][0].set_xlabel('time (s)');     ax[0][0].set_ylabel('f (hz)')
+        ax[0][0].set_ylabel('f (khz)'); #ax[0][0].set_xlabel('time (s)');     
         ax[0][0].set_title('Fundamental Frequency (FF)')
 
         ax[0][1].plot(self.time_ampl, self.SCI, 'o', ms=3, label='Real mean {0:.2f}'.format(np.mean(self.SCI)))
@@ -260,93 +261,15 @@ class Sillable:
             ax[0][1].plot(self.time_ampl, m*self.time_ampl+b, 'b-', label='m={0:.2f}, b={1:.2f} '.format(m,b))
             ax[0][1].plot(self.time_ampl, mo*self.time_ampl+bo, 'r-', label='m={0:.2f}, b={1:.2f} '.format(mo,bo))
         ax[0][1].legend()
-        ax[0][1].set_xlabel('time (s)'); ax[0][1].set_ylabel('SCI')
+        ax[0][1].set_ylabel('SCI (adimensionless)'); #ax[0][1].set_xlabel('time (s)'); 
         ax[0][1].set_title('Spectral Content Index (SCI)')
         
-        ax[1][0].plot(self.time_inter, self.ScoreFF(), "-o", color="k", label='Σ R(FF)/len(s)= {:.4f}'.format(np.sum(self.ScoreFF())))
-        ax[1][0].set_xlabel('time (s)'); ax[1][0].set_ylabel('Error (kHz)'); ax[1][0].legend()
-        ax[1][0].set_title('Fundamental Frequency Error (ΔFF)'); ax[1][0].set_ylim((-0.1,10))
+        ax[1][0].plot(self.time_inter, self.deltaFF, "-o", color="k", label='Σ R(FF)/len(s)= {:.4f}'.format(self.scoreFF))
+        ax[1][0].set_xlabel('time (s)'); ax[1][0].set_ylabel('Error (\\times 10^{4}$Hz)'); ax[1][0].legend()
+        ax[1][0].set_title('Fundamental Frequency Error (ΔFF)'); ax[1][0].set_ylim((0,1))
         
-        ax[1][1].plot(self.time_ampl, self.ScoreSCI(), "-o", color="k", label='Σ R(SCI) = {:.4f}'.format(np.sum(self.ScoreSCI())) )
-        ax[1][1].set_xlabel('time (s)'); ax[1][1].set_ylabel('Error (adimensionless)'); ax[1][1].legend()
+        ax[1][1].plot(self.time_ampl, self.deltaSCI, "-o", color="k", label='Σ R(SCI)/len(s) = {:.4f}'.format(self.scoreSCI))
+        ax[1][1].set_xlabel('time (s)'); ax[1][1].set_ylabel('Error (adimensionless)'); ax[1][1].legend(); ax[1][1].set_ylim((0,1))
         ax[1][1].set_title('Spectral Content Index Error (ΔSCI)')
         
         fig.suptitle("Scored Variables", fontsize=20)#, family='fantasy')
-    
-    ## ---------------- SCORED FUNCTIONS --------------
-    def Solve(self, parametros):
-        self.AlphaBeta(parametros)
-        self.BirdModel()
-        
-        self.scoreFF  = np.sum(1e-3*abs(self.freq_amp_smooth_out - self.freq_amp_smooth))/len(self.s)
-        self.scoreSCI = np.sum(abs(self.SCI_out-self.SCI))
-        
-    def OptimizationFF1(self, **kwargs):  
-        def residualFF(p):  return self.scoreFF    
-        start = time.time()
-        mi    = lmfit.minimize(residualFF, self.p, nan_policy='omit', **kwargs) #, max_nfev=500) #dual_annealing # , Ns=200
-        end   = time.time()
-        
-        return mi, end-start
-        
-        
-        
-        
-    def OptFF(self, param):
-        self.AlphaBeta(param)
-        self.BirdModel()
-        return np.sum(self.ScoreFF())/len(self.s)
-    
-    def OptSCI(self, param):
-        self.AlphaBeta(param)
-        self.BirdModel()
-        return np.sum(self.ScoreSCI())
-    
-    def ScoreFF(self):  return 1e-3*abs(self.freq_amp_smooth_out - self.freq_amp_smooth)
-    def ScoreSCI(self): return abs(self.SCI_out-self.SCI) 
-    
-    
-    
-    
-    def OptimizationFF(self, p, **kwargs): #max_nfev=500
-        def residualFF(p):  return self.OptFF(p.valuesdict())
-        start = time.time()
-        mi    = lmfit.minimize(residualFF, p, nan_policy='omit', **kwargs) #, max_nfev=500) #dual_annealing # , Ns=200
-        end   = time.time()
-        
-        return mi, end-start
-    
-    def OptimizationSCI(self, p, **kwargs): #max_nfev=500
-        def residualSCI(p): return self.OptSCI(p.valuesdict())
-        start = time.time()
-        mi    = lmfit.minimize(residualSCI, p, nan_policy='omit', **kwargs) #, max_nfev=500) #dual_annealing # , Ns=200
-        end   = time.time()
-        
-        return mi, end-start
-    
-    def OptimalGamma(self, brute):
-        # ----------- gamma opt ------------------
-        self.p["gamma"].set(vary=True)
-        datos, t_exe = self.OptimizationSCI(self.p, **brute)  
-        self.p["gamma"].set(value=datos.params["gamma"].value, vary=False)
-        self.params["gamma"] = datos.params["gamma"].value   # opt_gamma
-        print("γ* =  {0:.4f}".format(self.p["gamma"].value))
-        
-        return t_exe 
-    
-    def OptimalBs(self, brute):
-        # ---------------- b0--------------------
-        self.p["b0"].set(vary=True)
-        datos2, t_exe2 = self.OptimizationFF(self.p, **brute) 
-        self.p["b0"].set(vary=False, value=datos2.params["b0"].value)
-        self.params["b0"] = datos2.params["b0"].value
-        print("b_0*={0:.4f}".format(self.p["b0"].value))
-        # ---------------- b1--------------------
-        self.p["b1"].set(vary=True)
-        datos1, t_exe1 = self.OptimizationFF(self.p, **brute) 
-        self.p["b1"].set(vary=False, value=datos1.params["b1"].value)
-        self.params["b1"] = datos1.params["b1"].value
-        print("b_1*={0:.4f}".format(self.p["b1"].value))
-        
-
-        return [t_exe1, t_exe2]

@@ -2,6 +2,15 @@ from functions import *
 from paths import *
 
 class Syllable:    
+    """
+    Store and define a syllable and its properties
+    INPUT:
+        s  = signal
+        fs = sampling rate
+        t0 = initial time of the syllable
+        p  = lmfit parameters object (defines who is gonna be calculated)
+        window_time = window time lenght to make chuncks
+    """
     def __init__(self, s, fs, t0, window_time, p):
         self.t0 = t0
         self.s  = s
@@ -14,7 +23,7 @@ class Syllable:
         self.overlap = 1/1.1
         
         self.window_time   = window_time # 0.005#0.01
-        self.window_length = 0.008
+        #self.window_length = 0.008
         
         sil_filtered = butter_lowpass_filter(self.s, self.fs, lcutoff=15000.0, order=6)
         self.s = butter_highpass_filter(sil_filtered, self.fs, hcutoff=2000.0, order=5)

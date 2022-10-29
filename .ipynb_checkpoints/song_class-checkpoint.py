@@ -53,7 +53,13 @@ class Song(Syllable):
         self.t0            = self.time[ss[0]]
         self.syllable      = Syllable(self.silb_complet, self.fs, self.t0, self.window_time, self.p)
         self.TimesInd.append([ss])
-        
+    
+    def Chunck(self, no_chunck):
+        self.no_chunck     = no_chunck
+        chunks_s, chunks_t = Windows(self.silb_complet, self.time_syllable, self.fs, window_time=0.02, overlap=1) # overla=1 not overlap
+        self.chunck        = Sillable(chunks_s[no_chunck], self.fs, self.t0, self.window_time, self.p)
+        self.chunck.t0     = chunks_t[no_chunck][0]
+    
     # ------------- solver for some parameters -----------------
     def SolveSyllable(self, p):
         self.syllable.p = p
@@ -106,11 +112,6 @@ class Song(Syllable):
         
         return end0-start0, end1-start1
     
-    def Chunck(self, no_chunck):
-        self.no_chunck     = no_chunck
-        chunks_s, chunks_t = Windows(self.silb_complet, self.time_syllable, self.fs, window_time=0.02, overlap=1) # overla=1 not overlap
-        self.chunck        = Sillable(chunks_s[no_chunck], self.fs, self.t0, self.window_time, self.p)
-        self.chunck.t0     = chunks_t[no_chunck][0]
             
         
     def Plot(self, file_name, flag=0): #flag = 1 or 0

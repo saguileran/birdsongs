@@ -21,8 +21,7 @@ from multiprocessing import Pool
 
 def envelope_cabeza(signal, method='percentile', intervalLength=210, perc=90):
     """
-    Calcula envolvente. En segmentos de intervalLength calcula el maximo
-    (si no se especifica metodo) o el percentil especificado.
+    Compute the envelope of an audio by calculating the maximum or percentil on each segments 
     """
     if method == 'percentile':        pp = perc
     else:                             pp = 100
@@ -69,8 +68,8 @@ def butter_highpass_filter(data, fs, hcutoff=100.0, order=5):
 
 def consecutive(data, stepsize=1, min_length=1):
     """
-    Parte una tira de datos en bloques de datos consecutivos.
-    Ej:
+    Split an array in chuncks with consecutive data
+    Esample:
         [1,2,3,4,6,7,9,10,11] -> [[1,2,3,4],[6,7],[9,10,11]]
     """
     candidates = np.split(data, np.where(np.diff(data) != stepsize)[0]+1)
@@ -79,7 +78,7 @@ def consecutive(data, stepsize=1, min_length=1):
 
 def normalizar(arr, minout=-1, maxout=1, pmax=100, pmin=5, method='extremos'): #extremos
     """
-    Normaliza un array en el intervalo minout-maxout
+    Normalice an array in the interval minout-maxout
     """
     norm_array = np.copy(np.asarray(arr, dtype=np.double))
     if method == 'extremos':
@@ -98,20 +97,18 @@ def normalizar(arr, minout=-1, maxout=1, pmax=100, pmin=5, method='extremos'): #
 def get_spectrogram(data, sampling_rate, window=1024, overlap=1/1.1,
                     sigma=102.4, scale=0.000001):
     """
-    Computa el espectrograma de la señal usando ventana gaussiana.
+    Compute the spectrogram of a signal using gaussian window
+    INPUT:
+        sampling_rate = sampling rate of signal
+        window        = window number of points 
+        overlap       = percentage of overlpa between windows
+        sigma         = window dispersion
+    OUTPUT:
+        tu  = spectrum times
+        fu  = frequencies
+        Sxx = spectrogram, 
 
-    sampling_rate = sampleo de la señal
-    Window        = numero de puntos en la ventana
-    overlap       = porcentaje de overlap entre ventanas
-    sigma         = dispersion de la ventana
-
-    Devuelve:
-
-    tu = tiempos espectro
-    fu = frecuencias
-    Sxx = espectrograma
-
-    Ejemplo de uso:
+    Example:
     tt, ff, SS = get_spectrogram(song, 44100)
     plt.pcolormesh(tt, ff, np.log(SS), cmap=plt.get_cmap('Greys'), rasterized=True)
     """
@@ -124,6 +121,15 @@ def get_spectrogram(data, sampling_rate, window=1024, overlap=1/1.1,
     return fu, tu, Sxx
 
 def rk4(f, v, dt):
+    """
+    Implent of Runge-Kuta 4th order
+    INPUT:
+        f  = differential equations functions y'=f(y)
+        v  = vector y of the differential equations [x,y,i1,i2,i3]
+        dt = rk4 time step
+    OUTPUT:
+        rk4 approximation 
+    """
     k1 = f(v)    
     k2 = f(v + dt/2.0*k1)
     k3 = f(v + dt/2.0*k2)
@@ -131,7 +137,19 @@ def rk4(f, v, dt):
     return v + dt*(2.0*(k2+k3)+k1+k4)/6.0
     
 def Windows(s, t, fs, window_time=0.05, overlap=1):
-    window_chunck = floor(window_time*fs) # seconds*fs = NoDatos
+    """
+    Split tow signals, s and t, in chunks of at least lenght window_time
+    INPUT:
+        s  = signal amplitud 
+        t  = time asocitaed to signal
+        fs = sampling rate
+        window_time = window time length by chunck
+        overlap     = percentage of overlpa between chuncks
+    OUTPUT:
+        s_windowed = signal chuncked vector
+        t_windowed = time chuncked vector
+    """
+    window_chunck = floor(window_time*fs) 
     fraction      = np.size(s)/window_chunck
     window_new    = floor(window_chunck + (fraction%1)*window_chunck/(fraction//1))  # se podria usar ceil
 
@@ -141,6 +159,16 @@ def Windows(s, t, fs, window_time=0.05, overlap=1):
     return s_windowed, t_windowed
 
 def SpectralContent(segment, fs):
+    """"
+    Calculate the spectral content for a signal, a ratio between the fundamenta frequency (FF) and the mean switching frequency (msf) frequency
+    INPUT:
+        segment = signal to calculate its spectral content 
+        fs      = smaple rate of audio
+    OUTPUT:
+        f_msf = mean switching frequency
+        f_aff = fundamenta frequency
+        max1  = amplitud fundamental frequency
+    """
     fourier = np.abs(np.fft.rfft(segment))
     freqs   = np.fft.rfftfreq(len(segment), d=1/fs)
     maximos = peakutils.indexes(fourier, thres=0.2, min_dist=5)
@@ -150,12 +178,27 @@ def SpectralContent(segment, fs):
     max1  = np.max(fourier) #max amplitud fourier
     
     if len(maximos)>0 and max1>50:  f_aff = freqs[maximos[0]]
-    else:                          f_aff = 0.1 #np.argmax(fourier) #np.max(freqs)
+    else:                           f_aff = 0.1 #np.argmax(fourier)
     
-    return f_msf, f_aff, amp
+    return f_msf, f_aff, max1#amp
 
-def FFandSCI(s, time, fs, t0, window_time=0.01):
-    s, t = Windows(s, time, fs, window_time=window_time)
+def FFandSCI(s, time, fs, t0, window_time=0.01, overlap=1):
+    """
+    Compute the fundamental frequency (FF) and spectral content index (SCI) using chuncks
+    INPUT:
+        s    = signal 
+        time = time vector of the signal
+        t0   = initial time for the signal
+        window_time =
+    OUTPUT:
+        SCI          = sound content index array
+        time_ampl    = time array sampled by chuncks
+        freq_amp     = frequency array sampled by chuncks
+        Ampl_freq    = amplitud frequency array sampled by chuncks
+        freq_amp_int = frequency array with same size as signal input
+        tim_inter    = time array with same size as signal input
+    """
+    s, t = Windows(s, time, fs, window_time=0.005, overlap=0.5)
     
     SCI,      time_ampl = np.zeros(np.shape(s)[0]), np.zeros(np.shape(s)[0])
     freq_amp, Ampl_freq = np.zeros(np.shape(s)[0]), np.zeros(np.shape(s)[0])
@@ -164,9 +207,9 @@ def FFandSCI(s, time, fs, t0, window_time=0.01):
         f_msf, f_aff, amp = SpectralContent(s[i], fs) 
         
         SCI[i]       = f_msf/f_aff
-        time_ampl[i] = t[i,0] #floor(np.shape(t)[1]/2)] #window_length*i # left point
-        freq_amp[i]  = f_aff #max1/window_time
-        Ampl_freq[i] = amp#np.amax(amplitud_freq)
+        time_ampl[i] = t[i,0] #window_length*i # left point
+        freq_amp[i]  = f_aff  #max1/window_time
+        Ampl_freq[i] = amp    #np.amax(amplitud_freq)
     
     time_ampl += t0
     

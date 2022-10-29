@@ -1,6 +1,11 @@
 from syllable_class import *
 
 class Song(Syllable):
+    """
+    Store a song and its properties in a class 
+    INPUT:
+        file_name = song audio file name path
+    """
     def __init__(self, file_name):
         fs, s = wavfile.read(file_name)
         if len(np.shape(s))>1 and s.shape[1]==2 :s = (s[:,1]+s[:,0])/2 # two channels to one

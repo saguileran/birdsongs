@@ -9,7 +9,7 @@ from matplotlib.gridspec import GridSpec
 from scipy.io import wavfile
 from scipy import signal
 from scipy.interpolate import interp1d
-from scipy.signal import argrelextrema, butter, savgol_filter, find_peaks
+from scipy.signal import argrelextrema, butter, savgol_filter, find_peaks #hilbert
 from sklearn.linear_model import LinearRegression
 from random import uniform
 from numpy.polynomial import Polynomial
@@ -17,7 +17,6 @@ from multiprocessing import Pool
 
 #from pydub import AudioSegment
 #import signal_envelope as se
-#from scipy.signal import hilbert
 #from scipy.interpolate import UnivariateSpline
 
 def envelope_cabeza(signal, method='percentile', intervalLength=210, perc=90):
@@ -124,40 +123,6 @@ def get_spectrogram(data, sampling_rate, window=1024, overlap=1/1.1,
     Sxx = np.clip(Sxx, a_min=np.amax(Sxx)*scale, a_max=np.amax(Sxx))
     return fu, tu, Sxx
 
-
-def SpectralContent(data, fs, method='synth', fmin=300, fmax=10000):#, dt_transit=0.002):
-    segment = data # [int(dt_transit*fs):]
-    fourier = np.abs(np.fft.rfft(segment))
-    freqs   = np.fft.rfftfreq(len(segment), d=1/fs)
-    min_bin = np.argmin(np.abs(freqs-fmin))
-    max_bin = np.argmin(np.abs(freqs-fmax))
-    fourier = np.abs(np.fft.rfft(segment))[min_bin:max_bin]
-    
-    freqs = np.fft.rfftfreq(len(segment), d=1/fs)[min_bin:max_bin]
-    f_msf = np.sum(freqs*fourier)/np.sum(fourier)
-    amp   = max(segment)-min(segment)
-    f_aff = 0
-    
-    if method == 'song': 
-        f_aff = freqs[np.argmax(fourier*(freqs/(freqs+500)**2))]
-    elif method == 'syllable':
-        orden = 10
-        mm    = argrelextrema(segment, np.greater, order=orden)[0]
-        difs  = np.diff(mm)
-        while np.std(difs)/np.mean(difs) > 1/3 and orden > 1:
-            orden -= 1
-            mm     = argrelextrema(segment, np.greater, order=orden)[0]
-            difs   = np.diff(mm)
-        f_aff = fs / np.mean(np.diff(mm))
-    elif method == 'synth':
-        maximos = peakutils.indexes(fourier, thres=0.15, min_dist=5)
-        if amp < 50 :             f_aff = 0.1
-        elif len(maximos) > 0:    f_aff = freqs[maximos[0]]
-        else :                    f_aff = np.max(freqs)
-    return f_msf, f_aff, amp
-
-
-
 def rk4(f, v, dt):
     k1 = f(v)    
     k2 = f(v + dt/2.0*k1)
@@ -165,10 +130,6 @@ def rk4(f, v, dt):
     k4 = f(v + dt*k3)
     return v + dt*(2.0*(k2+k3)+k1+k4)/6.0
     
-def sigmoid(x, dt=1, b=0, minout=0, maxout=1, fs=44100, rev=1):    
-    return ((1/(1+np.exp(-((5/(dt*fs))*x+b))))*(maxout-minout)+minout)[::rev] # a = 5/(dt*fs), ax+b
-
-
 def Windows(s, t, fs, window_time=0.05, overlap=1):
     window_chunck = floor(window_time*fs) # seconds*fs = NoDatos
     fraction      = np.size(s)/window_chunck
@@ -179,7 +140,7 @@ def Windows(s, t, fs, window_time=0.05, overlap=1):
     
     return s_windowed, t_windowed
 
-def SpectralContentSynth(segment, fs):
+def SpectralContent(segment, fs):
     fourier = np.abs(np.fft.rfft(segment))
     freqs   = np.fft.rfftfreq(len(segment), d=1/fs)
     maximos = peakutils.indexes(fourier, thres=0.2, min_dist=5)
@@ -188,19 +149,19 @@ def SpectralContentSynth(segment, fs):
     amp   = max(segment)-min(segment)
     max1  = np.max(fourier) #max amplitud fourier
     
-    if len(maximos)>0 and max1>5:  f_aff = freqs[maximos[0]]
-    else:                           f_aff = 0.1 #np.argmax(fourier) #np.max(freqs)
+    if len(maximos)>0 and max1>50:  f_aff = freqs[maximos[0]]
+    else:                          f_aff = 0.1 #np.argmax(fourier) #np.max(freqs)
     
     return f_msf, f_aff, amp
 
-def FFandSCI(s, time, fs, t0, window_time=0.01, method='synth'):
+def FFandSCI(s, time, fs, t0, window_time=0.01):
     s, t = Windows(s, time, fs, window_time=window_time)
     
     SCI,      time_ampl = np.zeros(np.shape(s)[0]), np.zeros(np.shape(s)[0])
     freq_amp, Ampl_freq = np.zeros(np.shape(s)[0]), np.zeros(np.shape(s)[0])
     
     for i in range(s.shape[0]):
-        f_msf, f_aff, amp = SpectralContentSynth(s[i], fs) # method=method
+        f_msf, f_aff, amp = SpectralContent(s[i], fs) 
         
         SCI[i]       = f_msf/f_aff
         time_ampl[i] = t[i,0] #floor(np.shape(t)[1]/2)] #window_length*i # left point

@@ -1,7 +1,7 @@
 from functions import *
 from paths import *
 
-class Sillable:    
+class Syllable:    
     def __init__(self, s, fs, t0, window_time, p):
         self.t0 = t0
         self.s  = s
@@ -29,7 +29,7 @@ class Sillable:
         self.T        = self.tu[-1]-self.tu[0]
         self.fs_new   = int(self.T*self.fs)   # number of points for the silabale/chunck
         
-        SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int , time_inter = FFandSCI(self.s, self.time, self.fs, self.t0, window_time=self.window_time, method="synth")
+        SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int , time_inter = FFandSCI(self.s, self.time, self.fs, self.t0, window_time=self.window_time)#, method="synth")
         
         self.time_ampl          = time_ampl-time_ampl[0]
         self.time_inter         = time_inter-time_inter[0]
@@ -53,7 +53,7 @@ class Sillable:
         self.beta  = 1e-4*y*b[1] + b[0]   # self.beta = np.dot(b, t_par)
         self.alpha = np.dot(a, t_par);  
     
-    def BirdModel(self, sampling=44100, oversamp=20, prct_noise=0):
+    def MotorGestures(self, sampling=44100, oversamp=20, prct_noise=0):
         N_total = len(self.s)
 
         #sampling and necessary constants
@@ -72,18 +72,14 @@ class Sillable:
         forcing1, forcing2, A1 = 0., 0., 0
         
         v = 1e-12*np.array([5, 10, 1, 10, 1]);  self.Vs = [v]
-        #'''
-        BirdDataOff          = pd.read_csv(auxdata_path+'BirdData_Copeton_off.csv')
-        BirdDataOn           = pd.read_csv(auxdata_path+'BirdData_Copeton_on.csv')
-        BirdDataOff['value'] = BirdDataOff['value'].apply(lambda x: eval(x))
-        BirdDataOn['value']  = BirdDataOn['value'].apply(lambda x: eval(x))
-                
-        c, ancho, largo, s1overCH, s1overLB, s1overLG, RB, r, rdis = BirdDataOff['value']
         
-        t = tau = int(largo/(c*dt + 0.0))
+        BirdData = pd.read_csv(auxdata_path+'CopetonData.csv')
+        ancho, largo, s1overCH, s1overLB, s1overLG, RB, r, rdis = BirdData['value'][:8]
+        
+        c = 3.5e4
+        t = tau = int(largo/(c*dt)) #( + 0.0)
         def dxdt_synth(v):
             [x, y, i1, i2, i3], dv = v, np.zeros(5) #x, y, i1, i2, i3 = v[0], v[1], v[2], v[3], v[4]
-            #dv    = np.zeros(5)
             dv[0] = y
             dv[1] = - alpha*gm**2 - beta*gm**2*x - gm**2*x**3 - gm*x**2*y + gm**2*x**2 - gm*x*y
             dv[2] = i2
@@ -93,11 +89,9 @@ class Sillable:
             dv[4] = -(s1overLB/s1overLG)*i2 - RB*s1overLB*i3 + s1overLB*forcing1
             return dv
 
-        gm       = self.p["gamma"].value
-        alpha    = self.alpha[0] 
-        beta     = self.beta[0]
-        amplitud = self.envelope[0]
-
+        gm, amplitud = self.p["gamma"].value, self.envelope[0]
+        alpha, beta  = self.alpha[0], self.beta[0]
+        
         while t < tmax and v[1] > -5000000:
             # -------- trachea ---------------
             dbold  = db[t]                              # forcing 1, before
@@ -105,13 +99,12 @@ class Sillable:
             db[t]  = -r*a[t-tau]                        # forcing 1, after: -rPin(t-tau)
             ddb    = (db[t]-dbold)/dt                   # Derivada, dPout/dt=Delta forcing1/dt
 
-            forcing1, forcing2, PRESSURE = db[t], ddb, a[t] #  -rPin(t-tau),  dPout/dt,   v(t)y(t) + Pin(t-tau)
-
+            #  -rPin(t-tau),  dPout/dt,   v(t)y(t) + Pin(t-tau)
+            forcing1, forcing2, PRESSURE = db[t], ddb, a[t] 
+            
             tiempot += dt
             v = rk4(dxdt_synth, v, dt);   self.Vs.append(v);
-
-            #preout = RB*v[4]
-            s1overCH, s1overLB, s1overLG, RB, r, rdis = BirdDataOn['value'][3:]
+            s1overCH, s1overLB, s1overLG, RB, r, rdis = BirdData["value"][8:]
 
             noise    = 0.21*(uniform(0, 1)-0.5)
             A1       = amplitud + prct_noise*noise
@@ -148,7 +141,7 @@ class Sillable:
         self.time_out = np.linspace(0, len(self.out_amp)/self.fs, len(self.out_amp))
         self.Vs       = np.array(self.Vs)
         
-        SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int, time_inter = FFandSCI(self.out_amp, self.time, self.fs, self.t0, method="synth", window_time=self.window_time) #FFandSCI(self.out_amp, self.tu_out, fs=self.fs,window_length=self.window_length, method='song')
+        SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int, time_inter = FFandSCI(self.out_amp, self.time, self.fs, self.t0, window_time=self.window_time) #  method="synth",
         
         self.time_ampl_out          = time_ampl
         self.time_inter_out         = time_inter-time_inter[0]
@@ -156,11 +149,11 @@ class Sillable:
         self.freq_amp_smooth_out    = freq_amp_int           # satisfies fs
         self.freq_amp_out           = freq_amp                         # less values than smooth
         self.SCI_out                = SCI
-        self.time_out = np.linspace(0, self.tu_out[-1], len(self.out_amp)) #-self.t0
+        self.time_out = np.linspace(0, self.tu_out[-1], len(self.out_amp)) 
     
-    def Audio(self,num_file,no_silaba):
-        wavfile.write('{}/synth4_amp_{}_{}.wav'.format(examples_path,num_file,no_silaba), self.fs, np.asarray(normalizar(self.out_amp),  dtype=np.float32))
-        wavfile.write('{}/song_{}_{}.wav'.format(examples_path,num_file,no_silaba),       self.fs, np.asarray(normalizar(self.s),        dtype=np.float32))
+    def Audio(self,num_file,no_syllable):
+        wavfile.write('{}/synth4_amp_{}_{}.wav'.format(examples_path,num_file,no_syllable), self.fs, np.asarray(normalizar(self.out_amp),  dtype=np.float32))
+        wavfile.write('{}/song_{}_{}.wav'.format(examples_path,num_file,no_syllable),       self.fs, np.asarray(normalizar(self.s),        dtype=np.float32))
     
     ## ----------------------- PLOT FUNCTIONS --------------------------
     def PlotSynth(self):

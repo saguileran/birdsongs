@@ -15,7 +15,7 @@ class Song(Syllable):
         self.sigma    = self.NN/10
         self.umbral   = 0.05
         
-        self.TimesInd = []
+        self.SylInd   = []
         self.fs       = fs
         self.s        = s
         self.envelope = normalizar(envelope_cabeza(self.s,intervalLength=0.01*self.fs), minout=0, method='extremos')
@@ -52,7 +52,7 @@ class Song(Syllable):
         self.time_syllable = self.time[ss[0]:ss[-1]]# -0.02/2
         self.t0            = self.time[ss[0]]
         self.syllable      = Syllable(self.silb_complet, self.fs, self.t0, self.window_time, self.p)
-        self.TimesInd.append([ss])
+        self.SylInd.append([ss])
     
     def Chunck(self, no_chunck):
         self.no_chunck     = no_chunck
@@ -88,11 +88,11 @@ class Song(Syllable):
         self.syllable.p["gamma"].set(vary=True)
         
         mi    = lmfit.minimize(self.residualSCI, self.syllable.p, nan_policy='omit', **kwargs) 
-        self.syllable.p["gamma"].set(value=mi.params["gamma"].value, vary=False)
+        #self.syllable.p["gamma"].set(value=mi.params["gamma"].value, vary=False)
+        self.p["gamma"].set(value=mi.params["gamma"].value, vary=False)
         end   = time.time()
-        print("γ* =  {0:.4f}".format(self.syllable.p["gamma"].value))
-        
-        return end-start
+        print("γ* =  {0:.0f}, t={1:.4f} min".format(self.syllable.p["gamma"].value, (end-start)/60))
+        #return end-start
     
     def OptimalBs(self, kwargs):
         # ---------------- b0--------------------
@@ -101,20 +101,44 @@ class Song(Syllable):
         mi0    = lmfit.minimize(self.residualFF, self.syllable.p, nan_policy='omit', **kwargs) #, max_nfev=500) #dual_annealing # , Ns=200
         self.syllable.p["b0"].set(vary=False, value=mi0.params["b0"].value)
         end0   = time.time()
-        print("b_0*={0:.4f}".format(self.syllable.p["b0"].value))
+        print("b_0*={0:.4f}, t={1:.4f} min".format(self.syllable.p["b0"].value, (end0-start0)/60))
         # ---------------- b1--------------------
         start1 = time.time()
         self.syllable.p["b1"].set(vary=True)
         mi1    = lmfit.minimize(self.residualFF, self.syllable.p, nan_policy='omit', **kwargs) 
         self.syllable.p["b1"].set(vary=False, value=mi1.params["b1"].value)
         end1   = time.time()
-        print("b_1*={0:.4f}".format(self.p["b1"].value))
+        print("b_1*={0:.4f}, t={1:.4f} min".format(self.p["b1"].value, (end1-start1)/60))
+        #return end0-start0, end1-start1
+
         
-        return end0-start0, end1-start1
+    def WholeSong(self, num_file, kwargs, flag, maxi=5):
+        self.SyllableNo(1)          # first syllable
+        self.SolveSyllable(self.p)  # solve first syllable
+        
+        kwargs["Ns"] = 51;   self.OptimalGamma(kwargs)
+        kwargs["Ns"] = 21;   self.OptimalBs(kwargs)
+        self.syllable.Audio(num_file, 0)
+            
+        for i in range(2,maxi+1):#self.syllables.size+1): #self.syllables:
+            self.SyllableNo(i)
+            self.SolveSyllable(self.p)
+            self.OptimalBs(kwargs)
+            self.syllable.Audio(num_file, i)
+            if flag:
+                self.syllable.PlotAlphaBeta()
+                self.syllable.PlotSynth()
+                self.syllable.Plot(0)
+
+    def SyntheticSyllable(self):
+        self.s_synth = np.empty_like(self.s)
+        for i in range(self.syllables.size):
+            self.s_synth[self.SylInd[i]] = self.syllables[i]
+        
     
             
         
-    def Plot(self, file_name, flag=0): #flag = 1 or 0
+    def Plot(self, file_name, flag=0): 
         fig, ax = plt.subplots(3, 1, figsize=(12, 9))#, sharex=True, gridspec_kw={'width_ratios': [1, 1]})
         fig.subplots_adjust(hspace=0.4)
         

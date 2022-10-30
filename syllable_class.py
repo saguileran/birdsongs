@@ -17,7 +17,7 @@ class Syllable:
         self.fs = fs
         self.p  = p
         
-        self.params  = self.p.valuesdict()
+        #self.params  = self.p.valuesdict()
         self.NN      = 256 
         self.sigma   = self.NN/10
         self.overlap = 1/1.1
@@ -112,7 +112,7 @@ class Syllable:
             forcing1, forcing2, PRESSURE = db[t], ddb, a[t] 
             
             tiempot += dt
-            v = rk4(dxdt_synth, v, dt);   self.Vs.append(v);
+            v = rk4(dxdt_synth, v, dt);   
             s1overCH, s1overLB, s1overLG, RB, r, rdis = BirdData["value"][8:]
 
             noise    = 0.21*(uniform(0, 1)-0.5)
@@ -121,7 +121,8 @@ class Syllable:
             if taux == oversamp and n_out<self.fs-1:
                 out[n_out]   = RB*v[4]*10
                 n_out       += 1
-
+                self.Vs.append(v);
+                
                 beta      = self.beta[n_out]     + prct_noise*noise
                 amplitud  = self.envelope[n_out] + prct_noise*noise
                 alpha     = self.alpha[n_out]
@@ -275,3 +276,26 @@ class Syllable:
         ax[1][1].set_title('Spectral Content Index Error (ΔSCI)')
         
         fig.suptitle("Scored Variables", fontsize=20)#, family='fantasy')
+    
+    def PlotVs(self, xlim=(0,0.025)):
+        fig, ax = plt.subplots(3, 1, figsize=(12, 9))
+        fig.subplots_adjust(hspace=0.4)
+
+        time = self.time[:self.Vs.shape[0]]
+        
+        ax[0].plot(time, self.Vs[:,4], color='b')
+        #ax[0].set_xlim((0,1e5))
+        ax[0].set_xlabel("time (s)"); ax[0].set_ylabel("$P_{out}$");
+        ax[0].set_title("Trachea Output Pressure")
+
+        ax[1].plot(time, self.Vs[:,1], color='g') 
+        ax[1].set_xlim(xlim)
+        ax[1].set_xlabel("time (s)"); ax[1].set_ylabel("$P_{in}$");
+        ax[1].set_title("Trachea Input Pressure")
+
+        ax[2].plot(time, self.Vs[:,0], color='r')
+        ax[2].set_xlim(xlim)
+        ax[2].set_xlabel("time (s)"); ax[2].set_ylabel("$x(t)$");
+        ax[2].set_title("Labial position")
+
+        fig.suptitle('Labial Parameters (vector $v$)', fontsize=20)

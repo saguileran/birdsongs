@@ -179,8 +179,8 @@ def SpectralContent(segment, fs):
     amp   = max(segment)-min(segment)
     max1  = np.max(fourier) #max amplitud fourier
     
-    if len(maximos)>0 and max1>50:  f_aff = freqs[maximos[0]]
-    else:                           f_aff = 0.1 #np.argmax(fourier)
+    if len(maximos)>0 and max1>5:  f_aff = freqs[maximos[0]]
+    else:                          f_aff = -1e6 # to penalize the bad outputs #np.argmax(fourier)
     
     return f_msf, f_aff, max1#amp
 

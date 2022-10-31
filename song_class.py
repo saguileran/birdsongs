@@ -72,69 +72,18 @@ class Song(Syllable):
         return self.chunck
     
     # ------------- solver for some parameters -----------------
-    def Solve(self, p):
-        self.syllable.p = p
-        self.syllable.AlphaBeta()
-        self.syllable.MotorGestures()
-        
-        deltaFF  = np.abs(self.syllable.freq_amp_smooth_out-self.syllable.freq_amp_smooth)
-        deltaSCI = np.abs(self.syllable.SCI_out-self.syllable.SCI)
-        self.syllable.deltaSCI = deltaSCI#/np.max(deltaSCI)
-        self.syllable.deltaFF  = 1e-4*deltaFF#/np.max(deltaFF)
-        self.syllable.scoreSCI = np.sum(self.syllable.deltaSCI)/self.syllable.deltaSCI.size
-        self.syllable.scoreFF  = np.sum(abs(self.syllable.deltaFF))/self.syllable.deltaFF.size
-        
-    # score functions, they are a real number (we are interest that both are one)    
-    def residualSCI(self, p):
-        self.Solve(p)
-        return self.syllable.scoreSCI
-    
-    def residualFF(self, p):
-        self.Solve(p)
-        return self.syllable.scoreFF
-    
-    # ----------- OPTIMIZATION FUNCTIONS --------------
-    def OptimalGamma(self, kwargs):
-        start = time.time()
-        self.syllable.p["gamma"].set(vary=True)
-        
-        mi    = lmfit.minimize(self.residualSCI, self.syllable.p, nan_policy='omit', **kwargs) 
-        #self.syllable.p["gamma"].set(value=mi.params["gamma"].value, vary=False)
-        self.p["gamma"].set(value=int(mi.params["gamma"].value), vary=False)
-        end   = time.time()
-        print("γ* =  {0:.0f}, t={1:.4f} min".format(self.syllable.p["gamma"].value, (end-start)/60))
-        #return end-start
-    
-    def OptimalBs(self, kwargs):
-        # ---------------- b0--------------------
-        start0 = time.time()
-        self.syllable.p["b0"].set(vary=True)
-        mi0    = lmfit.minimize(self.residualFF, self.syllable.p, nan_policy='omit', **kwargs) #, max_nfev=500) #dual_annealing # , Ns=200
-        self.syllable.p["b0"].set(vary=False, value=mi0.params["b0"].value)
-        end0   = time.time()
-        print("b_0*={0:.4f}, t={1:.4f} min".format(self.syllable.p["b0"].value, (end0-start0)/60))
-        # ---------------- b1--------------------
-        start1 = time.time()
-        self.syllable.p["b1"].set(vary=True)
-        mi1    = lmfit.minimize(self.residualFF, self.syllable.p, nan_policy='omit', **kwargs) 
-        self.syllable.p["b1"].set(vary=False, value=mi1.params["b1"].value)
-        end1   = time.time()
-        print("b_1*={0:.4f}, t={1:.4f} min".format(self.p["b1"].value, (end1-start1)/60))
-        #return end0-start0, end1-start1
-
-        
     def WholeSong(self, num_file, kwargs, flag, maxi=5):
         self.SyllableNo(1)          # first syllable
-        self.Solve(self.p)  # solve first syllable
+        self.syllable.Solve(self.p)  # solve first syllable
         
-        kwargs["Ns"] = 51;   self.OptimalGamma(kwargs)
-        kwargs["Ns"] = 21;   self.OptimalBs(kwargs)
+        kwargs["Ns"] = 51;   self.syllable.OptimalGamma(kwargs)
+        kwargs["Ns"] = 21;   self.syllable.OptimalBs(kwargs)
         self.syllable.Audio(num_file, 0)
             
         for i in range(2,maxi+1):#self.syllables.size+1): #self.syllables:
             self.SyllableNo(i)
-            self.Solve(self.p)
-            self.OptimalBs(kwargs)
+            self.syllable.Solve(self.p)
+            self.syllable.OptimalBs(kwargs)
             self.syllable.Audio(num_file, i)
             if flag:
                 self.syllable.PlotAlphaBeta()

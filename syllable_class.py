@@ -82,7 +82,7 @@ class Syllable:
         
         BirdData = pd.read_csv(auxdata_path+'CopetonData.csv')
         ancho, largo = BirdData['value'][:2]
-        s1overCH, s1overLB, s1overLG, RB, r, rdis = BirdData['value'][8:]#[3:8]#[8:]
+        s1overCH, s1overLB, s1overLG, RB, r, rdis = BirdData['value'][2:8]#[8:]
         
         c = 3.5e4
         t = tau = int(largo/(c*dt)) #( + 0.0)
@@ -136,10 +136,10 @@ class Syllable:
         self.out_amp           = np.zeros_like(out)
         not_zero               = np.where(self.synth_env > 0.005)
         self.out_amp[not_zero] = out[not_zero] * self.envelope[not_zero] / self.synth_env[not_zero]
-        self.s_amp_env         = normalizar(envelope_cabeza(self.out_amp, intervalLength=0.01*np.size(self.s)), minout=0)
         
         sil_filtered_out = butter_lowpass_filter(self.out_amp, self.fs, lcutoff=15000.0, order=6)
-        self.out_amp = butter_highpass_filter(sil_filtered_out, self.fs, hcutoff=2000.0, order=5)
+        self.out_amp     = butter_highpass_filter(sil_filtered_out, self.fs, hcutoff=2000.0, order=5)
+        self.s_amp_env   = normalizar(envelope_cabeza(self.out_amp, intervalLength=0.01*np.size(self.s)), minout=0)
         
         
         fu_s, tu_s, Sxx_s = get_spectrogram(self.out_amp, self.fs, window=self.NN,  overlap=self.overlap, sigma=self.sigma)  # out normalized
@@ -187,11 +187,15 @@ class Syllable:
         self.Solve(p)
         return self.scoreFF
     
+    def residualFFandSCI(self, p):
+        self.Solve(p)
+        return self.scoreFF+self.scoreSCI
+    
     # ----------- OPTIMIZATION FUNCTIONS --------------
     def OptimalGamma(self, kwargs):
         start = time.time()
         self.p["gamma"].set(vary=True)
-        mi    = lmfit.minimize(self.residualSCI, self.p, nan_policy='omit', **kwargs) 
+        mi    = lmfit.minimize(self.residualFFandSCI, self.p, nan_policy='omit', **kwargs) 
         self.p["gamma"].set(value=mi.params["gamma"].value, vary=False)
         end   = time.time()
         print("γ* =  {0:.0f}, t={1:.4f} min".format(self.p["gamma"].value, (end-start)/60))

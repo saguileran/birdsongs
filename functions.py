@@ -14,6 +14,8 @@ from sklearn.linear_model import LinearRegression
 from random import uniform
 from numpy.polynomial import Polynomial
 from multiprocessing import Pool
+from IPython.display import display
+
 
 #from pydub import AudioSegment
 #import signal_envelope as se
@@ -167,7 +169,7 @@ def SpectralContent(segment, fs):
     OUTPUT:
         f_msf = mean switching frequency
         f_aff = fundamenta frequency
-        max1  = amplitud fundamental frequency
+        max1  = amplitud fundamental frequency = amp
     """
     fourier = np.abs(np.fft.rfft(segment))
     freqs   = np.fft.rfftfreq(len(segment), d=1/fs)
@@ -182,7 +184,7 @@ def SpectralContent(segment, fs):
     
     return f_msf, f_aff, max1#amp
 
-def FFandSCI(s, time, fs, t0, window_time=0.01, overlap=1):
+def FFandSCI(s, time, fs, t0, window_time=0.005, overlap=0.5):
     """
     Compute the fundamental frequency (FF) and spectral content index (SCI) using chuncks
     INPUT:
@@ -198,7 +200,7 @@ def FFandSCI(s, time, fs, t0, window_time=0.01, overlap=1):
         freq_amp_int = frequency array with same size as signal input
         tim_inter    = time array with same size as signal input
     """
-    s, t = Windows(s, time, fs, window_time=0.005, overlap=0.5)
+    s, t = Windows(s, time, fs, window_time=window_time, overlap=overlap)
     
     SCI,      time_ampl = np.zeros(np.shape(s)[0]), np.zeros(np.shape(s)[0])
     freq_amp, Ampl_freq = np.zeros(np.shape(s)[0]), np.zeros(np.shape(s)[0])

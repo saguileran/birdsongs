@@ -7,11 +7,10 @@ class Syllable:
     INPUT:
         s  = signal
         fs = sampling rate
-        t0 = initial time of the syllable
         p  = lmfit parameters object (defines who is gonna be calculated)
         window_time = window time lenght to make chuncks
     """
-    def __init__(self, s, fs, t0, window_time, p):
+    def __init__(self, s, fs, t0, p, window_time=0.005, IL=0.01):
         self.t0 = t0
         self.s  = s
         self.fs = fs
@@ -23,14 +22,13 @@ class Syllable:
         self.overlap = 1/1.1
         
         self.window_time   = window_time # 0.005#0.01
-        #self.window_length = 0.008
         
         sil_filtered = butter_lowpass_filter(self.s, self.fs, lcutoff=15000.0, order=6)
         self.s = butter_highpass_filter(sil_filtered, self.fs, hcutoff=2000.0, order=5)
         
         fu_sil, tu_sil, Sxx_sil = get_spectrogram(self.s, self.fs, window=self.NN, overlap=self.overlap, sigma=self.sigma) #espectro silaba
         
-        self.envelope = normalizar(envelope_cabeza(self.s,intervalLength=0.01*np.size(self.s)), minout=0)
+        self.envelope = normalizar(envelope_cabeza(self.s,intervalLength=IL*np.size(self.s)), minout=0)
         self.time     = np.linspace(0, len(self.s)/self.fs, len(self.s))
         self.fu       = fu_sil
         self.tu       = tu_sil-tu_sil[0]#+self.t0-self.window_time/2#+self.t0-self.window_time/2
@@ -83,7 +81,8 @@ class Syllable:
         v = 1e-12*np.array([5, 10, 1, 10, 1]);  self.Vs = [v]
         
         BirdData = pd.read_csv(auxdata_path+'CopetonData.csv')
-        ancho, largo, s1overCH, s1overLB, s1overLG, RB, r, rdis = BirdData['value'][:8]
+        ancho, largo = BirdData['value'][:2]
+        s1overCH, s1overLB, s1overLG, RB, r, rdis = BirdData['value'][8:]#[3:8]#[8:]
         
         c = 3.5e4
         t = tau = int(largo/(c*dt)) #( + 0.0)
@@ -113,7 +112,7 @@ class Syllable:
             
             tiempot += dt
             v = rk4(dxdt_synth, v, dt);   
-            s1overCH, s1overLB, s1overLG, RB, r, rdis = BirdData["value"][8:]
+            #s1overCH, s1overLB, s1overLG, RB, r, rdis = BirdData["value"][8:]
 
             noise    = 0.21*(uniform(0, 1)-0.5)
             A1       = amplitud + prct_noise*noise
@@ -165,6 +164,67 @@ class Syllable:
         wavfile.write('{}/synth4_amp_{}_{}.wav'.format(examples_path,num_file,no_syllable), self.fs, np.asarray(normalizar(self.out_amp),  dtype=np.float32))
         wavfile.write('{}/song_{}_{}.wav'.format(examples_path,num_file,no_syllable),       self.fs, np.asarray(normalizar(self.s),        dtype=np.float32))
     
+    # -------------- --------------
+    def Solve(self, p):
+        self.p = p
+        self.AlphaBeta()
+        self.MotorGestures()
+        
+        deltaFF  = np.abs(self.freq_amp_smooth_out-self.freq_amp_smooth)
+        deltaSCI = np.abs(self.SCI_out-self.SCI)
+        
+        self.deltaSCI = deltaSCI#/np.max(deltaSCI)
+        self.deltaFF  = 1e-4*deltaFF#/np.max(deltaFF)
+        self.scoreSCI = np.sum(self.deltaSCI)/self.deltaSCI.size
+        self.scoreFF  = np.sum(abs(self.deltaFF))/self.deltaFF.size
+    
+    # share methods with the other class
+    def residualSCI(self, p):
+        self.Solve(p)
+        return self.scoreSCI
+    
+    def residualFF(self, p):
+        self.Solve(p)
+        return self.scoreFF
+    
+    # ----------- OPTIMIZATION FUNCTIONS --------------
+    def OptimalGamma(self, kwargs):
+        start = time.time()
+        self.p["gamma"].set(vary=True)
+        mi    = lmfit.minimize(self.residualSCI, self.p, nan_policy='omit', **kwargs) 
+        self.p["gamma"].set(value=mi.params["gamma"].value, vary=False)
+        end   = time.time()
+        print("γ* =  {0:.0f}, t={1:.4f} min".format(self.p["gamma"].value, (end-start)/60))
+        return mi.params["gamma"].value
+    
+    def OptimalBs(self, kwargs):
+        # ---------------- b0--------------------
+        start0 = time.time()
+        self.p["b0"].set(vary=True)
+        mi0    = lmfit.minimize(self.residualFF, self.p, nan_policy='omit', **kwargs) 
+        self.p["b0"].set(vary=False, value=mi0.params["b0"].value)
+        end0   = time.time()
+        print("b_0*={0:.4f}, t={1:.4f} min".format(self.p["b0"].value, (end0-start0)/60))
+        # ---------------- b1--------------------
+        start1 = time.time()
+        self.p["b1"].set(vary=True)
+        mi1    = lmfit.minimize(self.residualFF, self.p, nan_policy='omit', **kwargs) 
+        self.p["b1"].set(vary=False, value=mi1.params["b1"].value)
+        end1   = time.time()
+        print("b_1*={0:.4f}, t={1:.4f} min".format(self.p["b1"].value, (end1-start1)/60))
+        #return self.p["b0"].value, self.p["b1"].value #end0-start0, end1-start1
+    
+    def OptimalParams(self, num_file, kwargs):
+        self.Solve(self.p)  # solve first syllable
+        
+        kwargs["Ns"] = 51;   self.OptimalGamma(kwargs)
+        kwargs["Ns"] = 21;   self.OptimalBs(kwargs)
+        self.syllable.Audio(num_file, 0)
+        
+    
+    
+    
+    
     ## ----------------------- PLOT FUNCTIONS --------------------------
     def PlotSynth(self):
         
@@ -197,6 +257,7 @@ class Syllable:
 
         #fig.tight_layout(); 
         fig.suptitle('Sound Waves and Spectrograms', fontsize=20)#, family='fantasy');
+        plt.show()
         
     def PlotAlphaBeta(self, xlim=(-0.05,.2), ylim=(-0.2,0.9)):
         fig = plt.figure(constrained_layout=True, figsize=(10, 6))
@@ -212,7 +273,7 @@ class Syllable:
         c       = viridis(np.linspace(0.3, 1, np.size(self.time_inter)))
         
         ax1.scatter(self.time_inter, self.alpha, c=c, label="alfa")
-        ax1.set_title('Air-sac Pressure')
+        ax1.set_title('Air-Sac Pressure')
         ax1.grid()
         ax1.set_ylabel('α (a.u.)'); #ax1.set_xlabel('Time (s)'); 
         ax1.set_ylim(xlim);        #ax[0].legend()
@@ -232,16 +293,22 @@ class Syllable:
         #---------------------------------------------------------------
 
         ax3.scatter(self.alpha, self.beta, c=c, label="Parameters", marker="_")
-        ax3.plot(-1/27, 1/3, 'ko', label="Cuspid Point"); 
-        ax3.axvline(0, color='red', lw=1, label="Hopf Bifurcation")
-        ax3.plot(mu1_men, mu2, '-g', lw=1, label="Saddle-Noddle\nBifurcation"); 
+        ax3.plot(-1/27, 1/3, 'ko')#, label="Cuspid Point"); 
+        ax3.axvline(0, color='red', lw=1)#, label="Hopf Bifurcation")
+        ax3.plot(mu1_men, mu2, '-g', lw=1)#, label="Saddle-Noddle\nBifurcation"); 
+        ax3.text(-0.01,0.6, "Hopf",rotation=90, color="r")
+        ax3.text(-0.04,0.39,"CP",  rotation=0,  color="k")
+        ax3.text(-0.03,0.2,  "SN",  rotation=0,  color="g")
+        ax3.text(0.1, 0.005, "SN",  rotation=0,  color="g")
+        
         ax3.plot(mu1_mas, mu2, '-g', lw=1)
-        ax3.fill_between(mu1_mas, mu2, 10, where=mu1_mas > 0, color='gray', alpha=0.25, label='BirdSongs')
+        ax3.fill_between(mu1_mas, mu2, 10, where=mu1_mas > 0, color='gray', alpha=0.25)#, label='BirdSongs')
         ax3.set_ylabel('Tension (a.u.)'); ax3.set_xlabel('Pressure (a.u.)')
         ax3.set_title('Parameter Space')
         ax3.legend()
         ax3.set_xlim(xlim); ax3.set_ylim(ylim)
-        fig.suptitle("Air-sac Pressure (α) and Labial Tension (β) Parameters", fontsize=20)#, family='fantasy')
+        fig.suptitle("Air-Sac Pressure (α) and Labial Tension (β) Parameters", fontsize=20)#, family='fantasy')
+        plt.show()
 
     def Plot(self, flag=0):
         fig, ax = plt.subplots(2, 2, figsize=(14, 7), gridspec_kw={'width_ratios': [3, 2]},sharex=True)
@@ -276,10 +343,11 @@ class Syllable:
         ax[1][1].set_title('Spectral Content Index Error (ΔSCI)')
         
         fig.suptitle("Scored Variables", fontsize=20)#, family='fantasy')
+        plt.show()
     
     def PlotVs(self, xlim=(0,0.025)):
         fig, ax = plt.subplots(3, 1, figsize=(12, 9))
-        fig.subplots_adjust(hspace=0.4)
+        fig.subplots_adjust(wspace=0.4, hspace=0.4)
 
         time = self.time[:self.Vs.shape[0]]
         
@@ -297,5 +365,7 @@ class Syllable:
         ax[2].set_xlim(xlim)
         ax[2].set_xlabel("time (s)"); ax[2].set_ylabel("$x(t)$");
         ax[2].set_title("Labial position")
+        ax[2].sharex(ax[1])
 
         fig.suptitle('Labial Parameters (vector $v$)', fontsize=20)
+        plt.show()

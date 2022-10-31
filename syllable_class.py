@@ -36,8 +36,9 @@ class Syllable:
         self.T        = self.tu[-1]-self.tu[0]
         self.fs_new   = int(self.T*self.fs)   # number of points for the silabale/chunck
         
-        SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int , time_inter = FFandSCI(self.s, self.time, self.fs, self.t0, window_time=self.window_time)#, method="synth")
+        SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int , time_inter, NoHarm = FFandSCI(self.s, self.time, self.fs, self.t0, window_time=self.window_time)#, method="synth")
         
+        self.NoHarm             = NoHarm
         self.time_ampl          = time_ampl-time_ampl[0]
         self.time_inter         = time_inter-time_inter[0]
         self.Ampl_freq_filtered = Ampl_freq     #_filtered
@@ -150,8 +151,9 @@ class Syllable:
         self.time_out = np.linspace(0, len(self.out_amp)/self.fs, len(self.out_amp))
         self.Vs       = np.array(self.Vs)
         
-        SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int, time_inter = FFandSCI(self.out_amp, self.time, self.fs, self.t0, window_time=self.window_time) #  method="synth",
+        SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int, time_inter, NoHarm = FFandSCI(self.out_amp, self.time, self.fs, self.t0, window_time=self.window_time) #  method="synth",
         
+        self.NoHarm_out             = NoHarm 
         self.time_ampl_out          = time_ampl
         self.time_inter_out         = time_inter-time_inter[0]
         self.Ampl_freq_filtered_out = Ampl_freq #Ampl_freq_filtered
@@ -170,15 +172,16 @@ class Syllable:
         self.AlphaBeta()
         self.MotorGestures()
         
-        deltaFF  = np.abs(self.freq_amp_smooth_out-self.freq_amp_smooth)
-        deltaSCI = np.abs(self.SCI_out-self.SCI)
+        deltaFF     = np.abs(self.freq_amp_smooth_out-self.freq_amp_smooth)
+        deltaSCI    = np.abs(self.SCI_out-self.SCI)
+        deltaNoHarm = np.abs(self.NoHarm_out-self.NoHarm).astype(float)
         
-        self.deltaSCI = deltaSCI#/np.max(deltaSCI)
-        self.deltaFF  = 1e-4*deltaFF#/np.max(deltaFF)
-        self.scoreSCI = np.sum(self.deltaSCI)/self.deltaSCI.size
-        self.scoreFF  = np.sum(abs(self.deltaFF))/self.deltaFF.size
+        self.deltaSCI    = deltaSCI     #/np.max(deltaSCI)
+        self.deltaFF     = 1e-4*deltaFF #/np.max(deltaFF)
+        self.scoreSCI    = np.sum(self.deltaSCI)/self.deltaSCI.size
+        self.scoreFF     = np.sum(abs(self.deltaFF))/self.deltaFF.size
+        self.DeltaNoHarm = deltaNoHarm*10**(deltaNoHarm-2)
     
-    # share methods with the other class
     def residualSCI(self, p):
         self.Solve(p)
         return self.scoreSCI
@@ -189,7 +192,7 @@ class Syllable:
     
     def residualFFandSCI(self, p):
         self.Solve(p)
-        return self.scoreFF+self.scoreSCI
+        return self.scoreFF+self.scoreSCI+self.DeltaNoHarm
     
     # ----------- OPTIMIZATION FUNCTIONS --------------
     def OptimalGamma(self, kwargs):

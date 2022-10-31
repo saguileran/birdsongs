@@ -182,7 +182,7 @@ def SpectralContent(segment, fs):
     if len(maximos)>0 and max1>5:  f_aff = freqs[maximos[0]]
     else:                          f_aff = -1e6 # to penalize the bad outputs #np.argmax(fourier)
     
-    return f_msf, f_aff, max1#amp
+    return f_msf, f_aff, max1, len(maximos)#amp
 
 def FFandSCI(s, time, fs, t0, window_time=0.005, overlap=0.5):
     """
@@ -204,16 +204,20 @@ def FFandSCI(s, time, fs, t0, window_time=0.005, overlap=0.5):
     
     SCI,      time_ampl = np.zeros(np.shape(s)[0]), np.zeros(np.shape(s)[0])
     freq_amp, Ampl_freq = np.zeros(np.shape(s)[0]), np.zeros(np.shape(s)[0])
+    TotalHarm = 0
     
     for i in range(s.shape[0]):
-        f_msf, f_aff, amp = SpectralContent(s[i], fs) 
+        f_msf, f_aff, amp, NoHarm = SpectralContent(s[i], fs) 
         
         SCI[i]       = f_msf/f_aff
         time_ampl[i] = t[i,0] #window_length*i # left point
         freq_amp[i]  = f_aff  #max1/window_time
         Ampl_freq[i] = amp    #np.amax(amplitud_freq)
+        TotalHarm   += NoHarm
     
     time_ampl += t0
+    
+    TotalHarm = int(TotalHarm/s.shape[0])
     
     tim_inter       = np.linspace(time_ampl[0], time_ampl[-1], time.size)  # time interpolated
     #time_ampl1 = time_ampl.reshape((-1,1)) # functions to interpolate
@@ -227,4 +231,4 @@ def FFandSCI(s, time, fs, t0, window_time=0.005, overlap=0.5):
     Ampl_freq    = savgol_filter(inte_Amp_freq(tim_inter), window_length=13, polyorder=3)
     #print(np.shape(tim_inter), np.shape(freq_amp_int), np.shape(Ampl_freq))
     
-    return SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int, tim_inter
+    return SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int, tim_inter, TotalHarm

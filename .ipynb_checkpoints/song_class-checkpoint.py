@@ -7,7 +7,7 @@ class Song(Syllable):
     INPUT:
         file_name = song audio file name path
     """
-    def __init__(self, file_name):
+    def __init__(self, file_name, window_time=0.005):
         fs, s = wavfile.read(file_name)
         if len(np.shape(s))>1 and s.shape[1]==2 :s = (s[:,1]+s[:,0])/2 # two channels to one
         
@@ -28,29 +28,29 @@ class Song(Syllable):
         self.Sxx      = Sxx_all
         
         self.p = lmfit.Parameters()
-        # add wi  : (NAME    VALUE  VARY   MIN    MAX  EXPR  BRUTE_STEP)
-        self.p.add_many(('a0',   0.11,   False, 0,   0.25,   None, None), 
-                        ('a1',    0.05,  False, -2,     2,  None, None),  
-                        ('b0',    -0.1,  False, -1,   0.5,  None, None),  
-                        ('b1',    1,     False,  0.2,   2,  None, None), 
-                        ('gamma', 4e4,   False,  0.1,  1e5, None, None),
-                        ('b2',    0.,    False, None, None, None, None), 
-                        ('a2',    0.,    False, None, None, None, None))
+        # add params:   (NAME   VALUE    VARY    MIN  MAX  EXPR BRUTE_STEP)
+        self.p.add_many(('a0',   0.11,   False ,   0, 0.25, None, None), 
+                        ('a1',   0.05,   False,   -2,    2, None, None),  
+                        ('b0',   -0.1,   False,   -1,  0.5, None, None),  
+                        ('b1',      1,   False,  0.2,    2, None, None), 
+                        ('gamma', 4e4,   False,  1e4,  1e5, None, None),
+                        ('b2',     0.,   False, None, None, None, None), 
+                        ('a2',     0.,   False, None, None, None, None))
         #self.parametros = self.p.valuesdict()
-        self.window_time = 0.005
+        self.window_time = window_time
         self.syllables   = self.Syllables()
         
     def Syllables(self):
         supra      = np.where(self.envelope > self.umbral)[0]
         syllables  = consecutive(supra, min_length=100)
-        return [ss for ss in syllables if len(ss) > self.NN] # elimino silabas cortas    
+        return [ss for ss in syllables if len(ss) > self.NN] # remove short syllables
     
     def SyllableNo(self, no_syllable):
         self.no_syllable   = no_syllable
-        ss                 = self.syllables[no_syllable-1]  # silbido in indexes 
-        syllable           = self.s[ss[0]:ss[-1]]       # silaba en audio
+        ss                 = self.syllables[no_syllable-1]  # syllable indexes 
+        syllable           = self.s[ss[0]:ss[-1]]       # audios syllable
         self.silb_complet  = syllable
-        self.time_syllable = self.time[ss[0]:ss[-1]]# -0.02/2
+        self.time_syllable = self.time[ss[0]:ss[-1]]
         self.t0            = self.time[ss[0]]
         self.syllable      = Syllable(self.silb_complet, self.fs, self.t0, self.p, self.window_time)
         self.SylInd.append([ss])
@@ -72,7 +72,7 @@ class Song(Syllable):
         return self.chunck
     
     # ------------- solver for some parameters -----------------
-    def WholeSong(self, num_file, kwargs, flag, maxi=5):
+    def WholeSong(self, num_file, kwargs, plot):#, maxi=5):
         self.SyllableNo(1)          # first syllable
         self.syllable.Solve(self.p)  # solve first syllable
         
@@ -80,12 +80,12 @@ class Song(Syllable):
         kwargs["Ns"] = 21;   self.syllable.OptimalBs(kwargs)
         self.syllable.Audio(num_file, 0)
             
-        for i in range(2,maxi+1):#self.syllables.size+1): #self.syllables:
+        for i in range(2,self.syllables.size+1): # maxi+1):#
             self.SyllableNo(i)
             self.syllable.Solve(self.p)
             self.syllable.OptimalBs(kwargs)
             self.syllable.Audio(num_file, i)
-            if flag:
+            if plot:
                 self.syllable.PlotAlphaBeta()
                 self.syllable.PlotSynth()
                 self.syllable.Plot(0)
@@ -106,7 +106,9 @@ class Song(Syllable):
         ax[0].pcolormesh(self.tu, self.fu/1000, np.log(self.Sxx), cmap=plt.get_cmap('Greys'), rasterized=True)
         ax[0].plot(self.syllable.time_inter+self.t0, self.syllable.freq_amp_smooth*1e-3, 'b-', label='FF'.format(self.syllable.fs), lw=2)
         ax[0].plot(self.syllable.time_ampl+self.t0, self.syllable.freq_amp*1e-3, 'r+', label='sampled FF', ms=2)
-        for ss in self.syllables:   ax[0].plot([self.time[ss[0]], self.time[ss[-1]]], [0, 0], 'k', lw=5)
+        for i in range(len(self.syllables)):#for ss in self.syllables:   
+            ax[0].plot([self.time[self.syllables[i][0]], self.time[self.syllables[i][-1]]], [0, 0], 'k', lw=5)
+            ax[0].text((self.time[self.syllables[i][-1]]-self.time[self.syllables[i][0]])/2, 0.5, str(i))
         
         ax[0].set_ylim(0, 12.000); ax[0].set_xlim(min(self.time), max(self.time));
         ax[0].set_title("Complete Song Spectrum"); 

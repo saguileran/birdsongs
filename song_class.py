@@ -6,6 +6,7 @@ class Song(Syllable):
     Store a song and its properties in a class 
     INPUT:
         file_name = song audio file name path
+        window_time = window time length to compute the fundamenta frequency
     """
     def __init__(self, file_name, window_time=0.005):
         fs, s = wavfile.read(file_name)
@@ -95,9 +96,7 @@ class Song(Syllable):
         for i in range(self.syllables.size):
             self.s_synth[self.SylInd[i]] = self.syllables[i]
         
-    
-            
-        
+    # -------------------- PLOT --------------    
     def Plot(self, file_name, flag=0): 
         fig, ax = plt.subplots(3, 1, figsize=(12, 9))
         fig.subplots_adjust(hspace=0.4, wspace=0.4)

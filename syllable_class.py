@@ -48,9 +48,8 @@ class Syllable:
         self.time               = np.linspace(0, self.tu[-1], len(self.s))
     
     def AlphaBeta(self): 
-        #self.gamma = param['gamma']
-        a          = np.array([self.p["a0"].value, self.p["a1"].value, 0]);   
-        b          = np.array([self.p["b0"].value, self.p["b1"].value, 0])
+        a = np.array([self.p["a0"].value, self.p["a1"].value, self.p["a2"].value]);   
+        b = np.array([self.p["b0"].value, self.p["b1"].value, self.p["b2"].value])
         
         t_1   = np.linspace(0,self.T,len(self.s))   
         t_par = np.array([np.ones(t_1.size), t_1, t_1**2])
@@ -58,8 +57,8 @@ class Syllable:
         poly = Polynomial.fit(self.time_inter, self.freq_amp_smooth, deg=10)
         x, y = poly.linspace(np.size(self.s))
         
-        self.beta  = 1e-4*y*b[1] + b[0]   # self.beta = np.dot(b, t_par)
-        self.alpha = np.dot(a, t_par);  
+        self.beta  = b[0] + b[1]*(1e-4*y) + b[2]*(1e-4*y)**2
+        self.alpha = np.dot(a, t_par);  # self.beta = np.dot(b, t_par)
     
     def MotorGestures(self, sampling=44100, oversamp=20, prct_noise=0):
         N_total = len(self.s)
@@ -119,7 +118,7 @@ class Syllable:
             A1       = amplitud + prct_noise*noise
 
             if taux == oversamp and n_out<self.fs-1:
-                out[n_out]   = RB*v[4]*10
+                out[n_out]   = RB*v[4]*10   # out =  
                 n_out       += 1
                 self.Vs.append(v);
                 
@@ -227,9 +226,29 @@ class Syllable:
         kwargs["Ns"] = 51;   self.OptimalGamma(kwargs)
         kwargs["Ns"] = 21;   self.OptimalBs(kwargs)
         self.syllable.Audio(num_file, 0)
+    
+    # Solve the minimization problem at once
+    def CompleteSolution(self, kwargs):
+        start = time.time()
+        # add params:   (NAME   VALUE    VARY    MIN  MAX  EXPR BRUTE_STEP)
+        self.p.add_many(('a0',   0.11,   True ,   0, 0.25,  None, 0.01), 
+                        ('a1',   0.05,   True,   -2,    2,  None, 0.1),  
+                        ('b0',   -0.1,   True,   -1,  0.5,  None, 0.03),  
+                        ('b1',      1,   True,  0.2,    2,  None, 0.04), 
+                        ('gamma', 4e4,   True,  1e4,  1e5,  None, 1000),
+                        ('b2',     0.,   False, None, None, None, None), 
+                        ('a2',     0.,   False, None, None, None, None))
+        mi    = lmfit.minimize(self.residualFFandSCI, self.p, nan_policy='omit', **kwargs) 
+        self.p["a0"].set(   vary=False, value=mi.params["a0"].value)
+        self.p["a1"].set(   vary=False, value=mi.params["a1"].value)
+        self.p["b0"].set(   vary=False, value=mi.params["b0"].value)
+        self.p["b1"].set(   vary=False, value=mi.params["b1"].value)
+        self.p["gamma"].set(vary=False, value=mi.params["gamma"].value)
         
-    
-    
+        self.Solve(self.p)
+        end = time.time()
+        
+        print("Time of execution = {0:.4f}".format(end-start))
     
     
     ## ----------------------- PLOT FUNCTIONS --------------------------

@@ -1,5 +1,5 @@
-from functions import *
-from paths import *
+from .functions import *
+from .paths import *
 
 class Syllable:    
     """

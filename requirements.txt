@@ -11,5 +11,3 @@ scipy
 random
 multiprocessing
 sklearn
-IPython
-#signal_envelope

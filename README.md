@@ -11,10 +11,10 @@ First clone the repository and change the branch to `birdsongs`
 ```bat
 git clone https://github.com/saguileran/birdsongs.git
 cd birdsongs
-git branch -a 
 git checkout birdsongs
 ```
 
+you can verify the branches using the command `git branch -a`
 
 ## Abstract
 

@@ -4,6 +4,5 @@ numpy
 matplotlib 
 pandas
 scipy
-multiprocessing
 sklearn
 IPython

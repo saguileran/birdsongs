@@ -1,7 +1,7 @@
 from .functions import *
 from .paths import *
 
-class Syllable:    
+class Syllable:
     """
     Store and define a syllable and its properties
     INPUT:
@@ -15,14 +15,14 @@ class Syllable:
         self.s  = s
         self.fs = fs
         self.p  = p
-        
+
         #self.params  = self.p.valuesdict()
-        self.NN      = 256 
+        self.NN      = 256
         self.sigma   = self.NN/10
         self.overlap = 1/1.1
-        
+
         self.window_time   = window_time # 0.005#0.01
-        
+
         sil_filtered = butter_lowpass_filter(self.s, self.fs, lcutoff=15000.0, order=6)
         self.s = butter_highpass_filter(sil_filtered, self.fs, hcutoff=2000.0, order=5)
         

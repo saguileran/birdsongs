@@ -1,4 +1,4 @@
-from syllable_class import *
+from .syllable_class import *
 Pool() # crea pool to parallel programming for optimization
 
 class Song(Syllable):

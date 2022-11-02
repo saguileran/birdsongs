@@ -1,9 +1,3 @@
----
-layout: home
-title: Home
----
-
-
 Bird Songs
 ==============
 

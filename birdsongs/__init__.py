@@ -1,3 +1,4 @@
 from .functions import *
-from .song_class import *
-from .syllable_class import *
+from .paths import *
+from .syllable import *
+from .song import *

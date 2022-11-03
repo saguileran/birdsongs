@@ -1,13 +1,18 @@
 import os, glob
 
-root_path     = "C:\\Users\\sebas\\Documents\\GitHub\\" # root_path = '/home/siete/Downloads/audios/'
-base_path     = "{}BirdSongs\\".format(root_path) 
-auxdata_path  = '{}data_auxiliar\\'.format(base_path)
-results_path  = '{}results\\'.format(base_path) 
-audios_path   = '{}audios\\'.format(root_path)
-examples_path = '{}examples\\'.format(audios_path)
+class Paths(object):
+    def __init__(self, root_path, bird_name=""):
+        self.root     = root_path
+        self.base     = "{}birdsongs\\".format(self.root) 
+        self.auxdata  = '{}auxiliar_data\\'.format(self.base)
+        self.results  = '{}results\\'.format(self.base) 
+        self.audios   = '{}audios\\'.format(self.root)
+        self.examples = '{}examples\\'.format(self.audios)
 
-if not os.path.exists(results_path):    os.makedirs(results_path)
-if not os.path.exists(examples_path):    os.makedirs(examples_path)
+        if not os.path.exists(self.results):    os.makedirs(self.results)
+        if not os.path.exists(self.examples):    os.makedirs(self.examples)
 
-sound_files   = glob.glob(os.path.join(audios_path, '*wav')) #'*'+birdname+'*wav' 
+        self.sound_files   = glob.glob(os.path.join(self.audios, '*wav')) #'*'+birdname+'*wav' 
+        self.no_files      = len(self.sound_files)
+        
+        print("The folder has {0} songs".format(self.no_files))

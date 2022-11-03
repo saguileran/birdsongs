@@ -1,4 +1,4 @@
-import os, glob, peakutils, lmfit, time #emcee,
+import peakutils, lmfit, time #emcee,
 import numpy as np
 import pandas as pd
 from math import floor, ceil

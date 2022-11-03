@@ -7,24 +7,28 @@ class Syllable:
     INPUT:
         s  = signal
         fs = sampling rate
-        p  = lmfit parameters object (defines who is gonna be calculated)
+        t0 = initial time of the syllable
         window_time = window time lenght to make chuncks
+        IL = interval length to calculate the envelope
     """
-    def __init__(self, s, fs, t0, p, window_time=0.005, IL=0.01):
+    def __init__(self, s, fs, t0, window_time=0.005, IL=0.01):
         self.t0 = t0
         self.s  = s
         self.fs = fs
-        self.p  = p
-
+        
+        self.max_freq = 15000
+        self.min_freq = 2000
+        
         #self.params  = self.p.valuesdict()
+        
         self.NN      = 256
         self.sigma   = self.NN/10
         self.overlap = 1/1.1
 
         self.window_time   = window_time # 0.005#0.01
 
-        sil_filtered = butter_lowpass_filter(self.s, self.fs, lcutoff=15000.0, order=6)
-        self.s = butter_highpass_filter(sil_filtered, self.fs, hcutoff=2000.0, order=5)
+        sil_filtered = butter_lowpass_filter(self.s, self.fs, lcutoff=self.max_freq, order=6)
+        self.s = butter_highpass_filter(sil_filtered, self.fs, hcutoff=self.min_freq, order=5)
         
         fu_sil, tu_sil, Sxx_sil = get_spectrogram(self.s, self.fs, window=self.NN, overlap=self.overlap, sigma=self.sigma) #espectro silaba
         
@@ -80,7 +84,7 @@ class Syllable:
         
         v = 1e-12*np.array([5, 10, 1, 10, 1]);  self.Vs = [v]
         
-        BirdData = pd.read_csv(auxdata_path+'CopetonData.csv')
+        BirdData = pd.read_csv(self.paths.auxdata+'CopetonData.csv')
         ancho, largo = BirdData['value'][:2]
         s1overCH, s1overLB, s1overLG, RB, r, rdis = BirdData['value'][2:8]#[8:]
         
@@ -161,9 +165,9 @@ class Syllable:
         self.SCI_out                = SCI
         self.time_out = np.linspace(0, self.tu_out[-1], len(self.out_amp)) 
     
-    def Audio(self,num_file,no_syllable):
-        wavfile.write('{}/synth4_amp_{}_{}.wav'.format(examples_path,num_file,no_syllable), self.fs, np.asarray(normalizar(self.out_amp),  dtype=np.float32))
-        wavfile.write('{}/song_{}_{}.wav'.format(examples_path,num_file,no_syllable),       self.fs, np.asarray(normalizar(self.s),        dtype=np.float32))
+    def WriteAudio(self):
+        wavfile.write('{}/synth4_amp_{}_{}.wav'.format(self.paths.examples,self.no_syllable), self.fs, np.asarray(normalizar(self.out_amp),  dtype=np.float32))
+        wavfile.write('{}/song_{}_{}.wav'.format(self.paths.examples,self.no_syllable),       self.fs, np.asarray(normalizar(self.s),        dtype=np.float32))
     
     # -------------- --------------
     def Solve(self, p):
@@ -220,12 +224,12 @@ class Syllable:
         print("b_1*={0:.4f}, t={1:.4f} min".format(self.p["b1"].value, (end1-start1)/60))
         #return self.p["b0"].value, self.p["b1"].value #end0-start0, end1-start1
     
-    def OptimalParams(self, num_file, kwargs):
+    def OptimalParams(self, kwargs):
         self.Solve(self.p)  # solve first syllable
         
         kwargs["Ns"] = 51;   self.OptimalGamma(kwargs)
         kwargs["Ns"] = 21;   self.OptimalBs(kwargs)
-        self.syllable.Audio(num_file, 0)
+        self.WriteAudio()
     
     # Solve the minimization problem at once
     def CompleteSolution(self, kwargs):

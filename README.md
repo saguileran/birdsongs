@@ -35,3 +35,10 @@ you can verify the branches using the command `git branch -a`
 <br>
 
 <div class="csl-entry">[2] Newville, M., Stensitzki, T., Allen, D. B., &#38; Ingargiola, A. (2014). <i>LMFIT: Non-Linear Least-Square Minimization and Curve-Fitting for Python</i>. <a href="https://doi.org/10.5281/ZENODO.11813">https://doi.org/10.5281/ZENODO.11813</a></div>
+
+
+## Audios References
+
+- xeno-canto Sharing bird sounds from around the world 
+    https://xeno-canto.org/species/Zonotrichia-capensis?dir=0&order=cnt&pg=19
+- https://media.ebird.org/catalog?taxonCode=rucspa6&mediaType=audio

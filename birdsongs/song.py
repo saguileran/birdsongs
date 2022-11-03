@@ -5,17 +5,23 @@ class Song(Syllable):
     """
     Store a song and its properties in a class 
     INPUT:
-        file_name = song audio file name path
-        window_time = window time length to compute the fundamenta frequency
+        pahts = paths object with all the folder paths requiered
+        no_file = number of the file to analyze
+        window_time = window time length to compute the fundamental frequency
+        umbral = threshold to detect a syllable, less than one
     """
-    def __init__(self, file_name, window_time=0.005):
-        fs, s = wavfile.read(file_name)
+    def __init__(self, paths, no_file, window_time=0.005, umbral=0.05):
+        self.no_file   = no_file
+        self.paths     = paths
+        
+        self.file_name = self.paths.sound_files[self.no_file-1]
+        fs, s = wavfile.read(self.file_name)
         if len(np.shape(s))>1 and s.shape[1]==2 :s = (s[:,1]+s[:,0])/2 # two channels to one
         
         self.NN       = 1024 
-        self.overlap  = 0.8 #1/1.1
+        self.overlap  = 0.8 
         self.sigma    = self.NN/10
-        self.umbral   = 0.05
+        self.umbral   = umbral
         
         self.SylInd   = []
         self.fs       = fs
@@ -38,31 +44,43 @@ class Song(Syllable):
                         ('b2',     0.,   False, None, None, None, None), 
                         ('a2',     0.,   False, None, None, None, None))
         #self.parametros = self.p.valuesdict()
-        self.window_time = window_time
-        self.syllables   = self.Syllables()
+        self.window_time  = window_time
+        self.syllables    = self.Syllables()
+        self.no_syllables = len(self.syllables)
         
     def Syllables(self):
         supra      = np.where(self.envelope > self.umbral)[0]
         syllables  = consecutive(supra, min_length=100)
         return [ss for ss in syllables if len(ss) > self.NN] # remove short syllables
     
-    def SyllableNo(self, no_syllable):
+    def Syllable(self, no_syllable):
         self.no_syllable   = no_syllable
-        ss                 = self.syllables[no_syllable-1]  # syllable indexes 
+        ss                 = self.syllables[self.no_syllable-1]  # syllable indexes 
         syllable           = self.s[ss[0]:ss[-1]]       # audios syllable
-        self.silb_complet  = syllable
+        self.syll_complet  = syllable
         self.time_syllable = self.time[ss[0]:ss[-1]]
-        self.t0            = self.time[ss[0]]
-        self.syllable      = Syllable(self.silb_complet, self.fs, self.t0, self.p, self.window_time)
-        self.SylInd.append([ss])
+        #self.t0            = self.time[ss[0]]
+        
+        self.syllable      = Syllable(self.syll_complet, self.fs, self.time[ss[0]],  self.window_time)
+        
+        self.syllable.no_syllable = self.no_syllable
+        self.syllable.no_file     = self.no_file
+        self.syllable.p           = self.p
+        self.syllable.paths       = self.paths
+        
+        self.SylInd.append([[no_syllable], [ss]])
         
         return self.syllable
     
     def Chunck(self, no_chunck):
         self.no_chunck     = no_chunck
-        chunks_s, chunks_t = Windows(self.silb_complet, self.time_syllable, self.fs, window_time=0.02, overlap=1) # overla=1 not overlap
-        self.chunck        = Syllable(chunks_s[no_chunck], self.fs, self.t0, self.p, self.window_time, IL=0.005)
-        self.chunck.t0     = chunks_t[no_chunck][0]
+        chunks_s, chunks_t = Windows(self.syll_complet, self.time_syllable, self.fs, window_time=0.02, overlap=1) # overla=1 not overlap
+        self.chunck        = Syllable(chunks_s[no_chunck], self.fs, chunks_t[self.no_chunck][0], window_time=0.0025, IL=0.005)
+        
+        self.chunck.no_syllable = self.no_chunck
+        self.chunck.no_file     = self.no_file
+        self.chunck.p           = self.p
+        self.chunck.paths       = self.paths
         
         self.chunck.NN      = 1024/8 
         self.chunck.sigma   = self.NN/10
@@ -73,38 +91,43 @@ class Song(Syllable):
         return self.chunck
     
     # ------------- solver for some parameters -----------------
-    def WholeSong(self, num_file, kwargs, plot):#, maxi=5):
-        self.SyllableNo(1)          # first syllable
-        self.syllable.Solve(self.p)  # solve first syllable
-        
-        kwargs["Ns"] = 51;   self.syllable.OptimalGamma(kwargs)
-        kwargs["Ns"] = 21;   self.syllable.OptimalBs(kwargs)
-        self.syllable.Audio(num_file, 0)
-            
-        for i in range(2,self.syllables.size+1): # maxi+1):#
-            self.SyllableNo(i)
-            self.syllable.Solve(self.p)
-            self.syllable.OptimalBs(kwargs)
-            self.syllable.Audio(num_file, i)
+    def WholeSong(self, kwargs, plot=False, syll_max=0):
+        self.OptGamma = self.AllGammas(kwargs)
+        self.p["gamma"].set(value=self.OptGamma)
+        if syll_max==0: syll_max=self.syllables.size+1
+        for i in range(1,syll_max): # maxi+1):#
+            syllable = self.Syllable(i)
+            syllable.Solve(self.p)
+            syllable.OptimalBs(kwargs)
+            syllable.Audio()
             if plot:
                 self.syllable.PlotAlphaBeta()
                 self.syllable.PlotSynth()
                 self.syllable.Plot(0)
 
+    def AllGammas(self, kwargs):
+        self.Gammas = np.zeros(self.no_syllables)
+        for i in range(self.no_syllables):
+            syllable = self.Syllable(i)
+            syllable.SolveSyllable(self.p)
+            syllable.OptimalGamma(kwargs)
+            self.Gammas[i] = syllable.p["gamma"].value
+        return np.mean(self.Gammas)
+            
     def SyntheticSyllable(self):
         self.s_synth = np.empty_like(self.s)
         for i in range(self.syllables.size):
-            self.s_synth[self.SylInd[i]] = self.syllables[i]
+            self.s_synth[self.SylInd[i][1]] = self.syllables[i]
         
     # -------------------- PLOT --------------    
-    def Plot(self, file_name, flag=0): 
+    def Plot(self, flag=0): 
         fig, ax = plt.subplots(3, 1, figsize=(12, 9))
         fig.subplots_adjust(hspace=0.4, wspace=0.4)
         #fig.tight_layout(pad=3.0)
         
         ax[0].pcolormesh(self.tu, self.fu/1000, np.log(self.Sxx), cmap=plt.get_cmap('Greys'), rasterized=True)
-        ax[0].plot(self.syllable.time_inter+self.t0, self.syllable.freq_amp_smooth*1e-3, 'b-', label='FF'.format(self.syllable.fs), lw=2)
-        ax[0].plot(self.syllable.time_ampl+self.t0, self.syllable.freq_amp*1e-3, 'r+', label='sampled FF', ms=2)
+        ax[0].plot(self.syllable.time_inter+self.syllable.t0, self.syllable.freq_amp_smooth*1e-3, 'b-', label='FF'.format(self.syllable.fs), lw=2)
+        ax[0].plot(self.syllable.time_ampl+self.syllable.t0, self.syllable.freq_amp*1e-3, 'r+', label='sampled FF', ms=2)
         for i in range(len(self.syllables)):#for ss in self.syllables:   
             ax[0].plot([self.time[self.syllables[i][0]], self.time[self.syllables[i][-1]]], [0, 0], 'k', lw=5)
             ax[0].text((self.time[self.syllables[i][-1]]-self.time[self.syllables[i][0]])/2, 0.5, str(i))
@@ -126,16 +149,16 @@ class Song(Syllable):
             ax[0].plot(self.chunck.time_inter+self.chunck.t0, self.chunck.freq_amp_smooth*1e-3, 'g-', label='Chunck', lw=4)
             ax[2].plot(self.chunck.time_inter+self.chunck.t0, self.chunck.freq_amp_smooth*1e-3, 'g-', label='Chunck', lw=10)
         
-        ax[2].pcolormesh(self.syllable.tu+self.t0, self.syllable.fu*1e-3, np.log(self.syllable.Sxx), cmap=plt.get_cmap('Greys'), rasterized=True) 
-        ax[2].plot(self.syllable.time_inter+self.t0, self.syllable.freq_amp_smooth*1e-3, 'b-', lw=5, label='Smoothed and Interpolated\nto {0}=fs'.format(self.syllable.fs))
-        ax[2].plot(self.syllable.time_ampl+self.t0, self.syllable.freq_amp*1e-3, 'r+', label='sampled FF', ms=3)
+        ax[2].pcolormesh(self.syllable.tu+self.syllable.t0, self.syllable.fu*1e-3, np.log(self.syllable.Sxx), cmap=plt.get_cmap('Greys'), rasterized=True) 
+        ax[2].plot(self.syllable.time_inter+self.syllable.t0, self.syllable.freq_amp_smooth*1e-3, 'b-', lw=5, label='Smoothed and Interpolated\nto {0}=fs'.format(self.syllable.fs))
+        ax[2].plot(self.syllable.time_ampl+self.syllable.t0, self.syllable.freq_amp*1e-3, 'r+', label='sampled FF', ms=3)
         ax[2].set_ylim((2, 11)); 
-        ax[2].set_xlim((self.syllable.time_inter[0]-0.001+self.t0, self.syllable.time_inter[-1]+0.001+self.t0));
+        ax[2].set_xlim((self.syllable.time_inter[0]-0.001+self.syllable.t0, self.syllable.time_inter[-1]+0.001+self.syllable.t0));
         ax[2].legend(loc='upper right')
         ax[2].set_xlabel('t (s)'); ax[2].set_ylabel('f (khz)')
         ax[2].set_title('Single Syllable Spectrum, No {}'.format(self.no_syllable))
         
         ax[0].legend(loc='upper right')
-        fig.suptitle('Audio: {}'.format(file_name[39:]), fontsize=20)#, family='fantasy')
+        fig.suptitle('Audio: {}'.format(self.file_name[39:]), fontsize=20)#, family='fantasy')
         plt.show()
         print('Number of syllables {}'.format(len(self.syllables)))

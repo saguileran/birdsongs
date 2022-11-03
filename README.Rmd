@@ -1,8 +1,0 @@
----
-output:
-  md_document:
-    variant: markdown_github
-bibliography: bibliography.bib
----
-
-[@xie2018]

@@ -1,7 +1,7 @@
 from .functions import *
 from .paths import *
 
-class Syllable:
+class Syllable(object):
     """
     Store and define a syllable and its properties
     INPUT:
@@ -11,36 +11,40 @@ class Syllable:
         window_time = window time lenght to make chuncks
         IL = interval length to calculate the envelope
     """
-    def __init__(self, s, fs, t0, window_time=0.005, IL=0.01):
+    def __init__(self, s, fs, t0, window_time=0.005, Nt=200, llambda=1.5, NN=256):
         self.t0 = t0
-        self.s  = s
+        self.Nt = Nt
+        self.s  = sound.normalize(s, max_amp=1.0)
         self.fs = fs
-        
-        self.max_freq = 15000
-        self.min_freq = 2000
+        self.llambda = llambda
         
         #self.params  = self.p.valuesdict()
+        self.NN         = NN
+        self.no_overlap = self.NN//2 
+        self.time       = np.linspace(0, len(self.s)/self.fs, len(self.s))
+        self.window_time   = window_time # 0.005 # 0.01
         
-        self.NN      = 256
-        self.sigma   = self.NN/10
-        self.overlap = 1/1.1
+        Sxx_power, tn, fn, ext = sound.spectrogram (self.s, self.fs, nperseg=self.NN, noverlap=self.no_overlap, mode='psd')  
+        Sxx_dB = util.power2dB(Sxx_power) + 96
+        Sxx_dB_noNoise, noise_profile, _ = sound.remove_background(Sxx_dB, gauss_std=25, gauss_win=50, llambda=self.llambda)
 
-        self.window_time   = window_time # 0.005#0.01
+        self.fu  = fn
+        self.tu  = np.linspace(0, self.time[-1], Sxx_power.shape[1]) #tn #*self.time[-1]/tn[-1]
+        self.Sxx = sound.smooth(Sxx_dB_noNoise, std=0.5)
+        self.Sxx_dB = util.power2dB(self.Sxx) +96
+        
 
-        sil_filtered = butter_lowpass_filter(self.s, self.fs, lcutoff=self.max_freq, order=6)
-        self.s = butter_highpass_filter(sil_filtered, self.fs, hcutoff=self.min_freq, order=5)
+        self.envelope = sound.envelope(self.s, Nt=self.Nt) 
+        t_env = np.arange(0,len(self.envelope),1)*len(self.s)/self.fs/len(self.envelope)
+        t_env[-1] = self.time[-1] 
+        fun_s = interp1d(t_env, self.envelope)
+        self.envelope = fun_s(self.time)
         
-        fu_sil, tu_sil, Sxx_sil = get_spectrogram(self.s, self.fs, window=self.NN, overlap=self.overlap, sigma=self.sigma) #espectro silaba
         
-        self.envelope = normalizar(envelope_cabeza(self.s,intervalLength=IL*np.size(self.s)), minout=0)
-        self.time     = np.linspace(0, len(self.s)/self.fs, len(self.s))
-        self.fu       = fu_sil
-        self.tu       = tu_sil-tu_sil[0]#+self.t0-self.window_time/2#+self.t0-self.window_time/2
-        self.Sxx      = Sxx_sil
         self.T        = self.tu[-1]-self.tu[0]
         self.fs_new   = int(self.T*self.fs)   # number of points for the silabale/chunck
         
-        SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int , time_inter, NoHarm = FFandSCI(self.s, self.time, self.fs, self.t0, window_time=self.window_time)#, method="synth")
+        SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int , time_inter, NoHarm = FFandSCI(self.s, self.time, self.fs, self.t0, window_time=self.window_time)
         
         self.NoHarm             = NoHarm
         self.time_ampl          = time_ampl-time_ampl[0]
@@ -85,10 +89,8 @@ class Syllable:
         v = 1e-12*np.array([5, 10, 1, 10, 1]);  self.Vs = [v]
         
         BirdData = pd.read_csv(self.paths.auxdata+'CopetonData.csv')
-        ancho, largo = BirdData['value'][:2]
-        s1overCH, s1overLB, s1overLG, RB, r, rdis = BirdData['value'][2:8]#[8:]
+        c, ancho, largo, s1overCH, s1overLB, s1overLG, RB, r, rdis = BirdData['value']
         
-        c = 3.5e4
         t = tau = int(largo/(c*dt)) #( + 0.0)
         def dxdt_synth(v):
             [x, y, i1, i2, i3], dv = v, np.zeros(5) #x, y, i1, i2, i3 = v[0], v[1], v[2], v[3], v[4]
@@ -104,7 +106,7 @@ class Syllable:
         gm, amplitud = self.p["gamma"].value, self.envelope[0]
         alpha, beta  = self.alpha[0], self.beta[0]
         
-        while t < tmax and v[1] > -5000000:
+        while t < tmax and v[1] > -5e6:
             # -------- trachea ---------------
             dbold  = db[t]                              # forcing 1, before
             a[t]   = (.50)*(1.01*A1*v[1]) + db[t-tau]   # a = Pin, pressure:v(t)y(t) + Pin(t-tau) # envelope*
@@ -116,7 +118,6 @@ class Syllable:
             
             tiempot += dt
             v = rk4(dxdt_synth, v, dt);   
-            #s1overCH, s1overLB, s1overLG, RB, r, rdis = BirdData["value"][8:]
 
             noise    = 0.21*(uniform(0, 1)-0.5)
             A1       = amplitud + prct_noise*noise
@@ -136,38 +137,54 @@ class Syllable:
         #print('100%')
 
         # pre processing synthetic data
-        self.synth_env         = normalizar(envelope_cabeza(out, intervalLength=0.05*np.size(self.s)), minout=0)
+        out = sound.normalize(out, max_amp=1)
+        self.synth_env = sound.envelope(out, Nt=self.Nt) 
+        t_env = np.arange(0,len(self.synth_env),1)*len(out)/self.fs/len(self.synth_env)
+        t_env[-1] = self.time[-1] 
+        fun_s = interp1d(t_env, self.synth_env)
+        self.synth_env = fun_s(self.time)
+        
+        
         self.out_amp           = np.zeros_like(out)
         not_zero               = np.where(self.synth_env > 0.005)
         self.out_amp[not_zero] = out[not_zero] * self.envelope[not_zero] / self.synth_env[not_zero]
         
-        sil_filtered_out = butter_lowpass_filter(self.out_amp, self.fs, lcutoff=15000.0, order=6)
-        self.out_amp     = butter_highpass_filter(sil_filtered_out, self.fs, hcutoff=2000.0, order=5)
-        self.s_amp_env   = normalizar(envelope_cabeza(self.out_amp, intervalLength=0.01*np.size(self.s)), minout=0)
+        self.out_amp = sound.normalize(self.out_amp, max_amp=1.0)
+        
+        self.s_amp_env = sound.envelope(self.out_amp, Nt=self.Nt) 
+        t_env = np.arange(0,len(self.s_amp_env),1)*len(self.out_amp)/self.fs/len(self.s_amp_env)
+        t_env[-1] = self.time[-1] 
+        fun_s = interp1d(t_env, self.s_amp_env)
+        self.s_amp_env = fun_s(self.time)
+              
+        Sxx_power, tn, fn, ext = sound.spectrogram (self.out_amp, self.fs, nperseg=self.NN, noverlap=self.no_overlap, mode='psd')  
+        Sxx_dB = util.power2dB(Sxx_power) + 96
+        Sxx_dB_noNoise, noise_profile, _ = sound.remove_background(Sxx_dB, 
+                gauss_std=25, gauss_win=50, llambda=self.llambda//3)
+
+        self.fu_out  = fn
+        self.tu_out  = np.linspace(0, self.time[-1], Sxx_power.shape[1]) #tn#*self.time[-1]/tn[-1]
+        self.Sxx_out = sound.smooth(Sxx_dB_noNoise, std=0.5)
+        self.Sxx_dB_out = util.power2dB(self.Sxx) +96
         
         
-        fu_s, tu_s, Sxx_s = get_spectrogram(self.out_amp, self.fs, window=self.NN,  overlap=self.overlap, sigma=self.sigma)  # out normalized
-        
-        self.tu_out   = tu_s-tu_s[0]#-self.window_time/2 # -self.t0
-        self.fu_out   = fu_s
-        self.Sxx_out  = Sxx_s
         self.time_out = np.linspace(0, len(self.out_amp)/self.fs, len(self.out_amp))
         self.Vs       = np.array(self.Vs)
         
-        SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int, time_inter, NoHarm = FFandSCI(self.out_amp, self.time, self.fs, self.t0, window_time=self.window_time) #  method="synth",
+        SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int, time_inter, NoHarm = FFandSCI(self.out_amp, self.time, self.fs, self.t0, window_time=self.window_time)
         
         self.NoHarm_out             = NoHarm 
         self.time_ampl_out          = time_ampl
         self.time_inter_out         = time_inter-time_inter[0]
-        self.Ampl_freq_filtered_out = Ampl_freq #Ampl_freq_filtered
+        self.Ampl_freq_filtered_out = Ampl_freq  #Ampl_freq_filtered
         self.freq_amp_smooth_out    = freq_amp_int           # satisfies fs
         self.freq_amp_out           = freq_amp                         # less values than smooth
         self.SCI_out                = SCI
         self.time_out = np.linspace(0, self.tu_out[-1], len(self.out_amp)) 
     
     def WriteAudio(self):
-        wavfile.write('{}/synth4_amp_{}_{}.wav'.format(self.paths.examples,self.no_syllable), self.fs, np.asarray(normalizar(self.out_amp),  dtype=np.float32))
-        wavfile.write('{}/song_{}_{}.wav'.format(self.paths.examples,self.no_syllable),       self.fs, np.asarray(normalizar(self.s),        dtype=np.float32))
+        wavfile.write('{}/synth4_amp_{}_{}.wav'.format(self.paths.examples,self.no_syllable), self.fs, np.asarray(self.out_amp,  dtype=np.float32))
+        wavfile.write('{}/song_{}_{}.wav'.format(self.paths.examples,self.no_syllable),       self.fs, np.asarray(self.s,     dtype=np.float32))
     
     # -------------- --------------
     def Solve(self, p):
@@ -198,37 +215,40 @@ class Syllable:
         return self.scoreFF+self.scoreSCI+self.DeltaNoHarm
     
     # ----------- OPTIMIZATION FUNCTIONS --------------
-    def OptimalGamma(self, kwargs):
+    def OptimalGamma(self, method_kwargs):
+        kwargs = {k: method_kwargs[k] for k in set(list(method_kwargs.keys())) - set(["method"])}
+    
         start = time.time()
         self.p["gamma"].set(vary=True)
-        mi    = lmfit.minimize(self.residualFFandSCI, self.p, nan_policy='omit', **kwargs) 
+        mi    = lmfit.minimize(self.residualFFandSCI, self.p, nan_policy='omit', method=method_kwargs["method"], **kwargs) 
         self.p["gamma"].set(value=mi.params["gamma"].value, vary=False)
         end   = time.time()
         print("γ* =  {0:.0f}, t={1:.4f} min".format(self.p["gamma"].value, (end-start)/60))
         return mi.params["gamma"].value
     
-    def OptimalBs(self, kwargs):
+    def OptimalBs(self, method_kwargs):
+        kwargs = {k: method_kwargs[k] for k in set(list(method_kwargs.keys())) - set(["method"])}
         # ---------------- b0--------------------
         start0 = time.time()
         self.p["b0"].set(vary=True)
-        mi0    = lmfit.minimize(self.residualFF, self.p, nan_policy='omit', **kwargs) 
+        mi0    = lmfit.minimize(self.residualFF, self.p, nan_policy='omit', method=method_kwargs["method"], **kwargs) 
         self.p["b0"].set(vary=False, value=mi0.params["b0"].value)
         end0   = time.time()
         print("b_0*={0:.4f}, t={1:.4f} min".format(self.p["b0"].value, (end0-start0)/60))
         # ---------------- b1--------------------
         start1 = time.time()
         self.p["b1"].set(vary=True)
-        mi1    = lmfit.minimize(self.residualFF, self.p, nan_policy='omit', **kwargs) 
+        mi1    = lmfit.minimize(self.residualFF, self.p, nan_policy='omit', method=method_kwargs["method"], **kwargs) 
         self.p["b1"].set(vary=False, value=mi1.params["b1"].value)
         end1   = time.time()
         print("b_1*={0:.4f}, t={1:.4f} min".format(self.p["b1"].value, (end1-start1)/60))
         #return self.p["b0"].value, self.p["b1"].value #end0-start0, end1-start1
     
-    def OptimalParams(self, kwargs):
+    def OptimalParams(self, method_kwargs):
         self.Solve(self.p)  # solve first syllable
         
-        kwargs["Ns"] = 51;   self.OptimalGamma(kwargs)
-        kwargs["Ns"] = 21;   self.OptimalBs(kwargs)
+        kwargs["Ns"] = 51;   self.OptimalGamma(method_kwargs)
+        kwargs["Ns"] = 21;   self.OptimalBs(method_kwargs)
         self.WriteAudio()
     
     # Solve the minimization problem at once
@@ -261,25 +281,24 @@ class Syllable:
         fig, ax = plt.subplots(2, 2, figsize=(12, 5), sharex=True, sharey='col')
         fig.subplots_adjust(top=0.85)     
         
-        ax[0][0].plot(self.time, normalizar(self.s), label='canto')
+        ax[0][0].plot(self.time, self.s, label='canto')
         ax[0][0].set_title('Real')
         ax[0][0].plot(self.time, self.envelope, label='envelope')
         ax[0][0].legend(); ax[0][0].set_ylabel("Amplitud (a.u.)")
-        
-        out = normalizar(self.out_amp) 
-        ax[1][0].plot(self.time_out, out+np.abs(np.mean(out)), label='synthetic')
+        ax[1][0].plot(self.time_out, self.out_amp, label='synthetic')
         ax[1][0].set_title('Synthetic') 
-        ax[1][0].plot(self.time_out, self.s_amp_env, label='envelope')
+        ax[1][0].plot(self.time_out, self.s_amp_env
+, label='envelope')
         ax[1][0].legend(); ax[1][0].set_xlabel('t (s)'); ax[1][0].set_ylabel("Amplitud (a.u.)")
 
         Delta_tu   = self.tu[-1] - self.tu[0]
         Delta_tu_s = 1#tu_s[-1] - tu_s[0]
 
-        ax[0][1].pcolormesh(self.tu, self.fu*1e-3, np.log(self.Sxx), cmap=plt.get_cmap('Greys'), rasterized=True)
+        ax[0][1].pcolormesh(self.tu, self.fu*1e-3, self.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)
         ax[0][1].plot(self.time_inter, self.freq_amp_smooth*1e-3, 'b-', label='Smoothed and Interpolated\nto {0} fs'.format(self.fs), lw=2)
         ax[0][1].set_title('Real'); ax[0][1].set_ylabel('f (khz)'); ax[0][1].set_ylim(0, 20);
 
-        ax[1][1].pcolormesh(self.tu_out, self.fu_out*1e-3, np.log(self.Sxx_out), cmap=plt.get_cmap('Greys'), rasterized=True, label='output normalizado amplitud')
+        ax[1][1].pcolormesh(self.tu_out, self.fu_out*1e-3, self.Sxx_out, cmap=plt.get_cmap('Greys'), rasterized=True, label='output normalizado amplitud')
         ax[1][1].plot(self.time_inter, self.freq_amp_smooth_out*1e-3, 'b-', label='Smoothed and Interpolated\nto {0} fs'.format(self.fs), lw=2)
         ax[1][1].set_title('Synthetic') 
         ax[1][1].set_ylim(0, 20);   ax[1][1].set_xlim(min(self.time_out), max(self.time_out))
@@ -344,7 +363,7 @@ class Syllable:
         fig, ax = plt.subplots(2, 2, figsize=(14, 7), gridspec_kw={'width_ratios': [3, 2]},sharex=True)
         fig.subplots_adjust(top=0.85);   #fig.tight_layout(pad=3.0)
         
-        ax[0][0].pcolormesh(self.tu, self.fu*1e-3, np.log(self.Sxx), cmap=plt.get_cmap('Greys'), rasterized=True)
+        ax[0][0].pcolormesh(self.tu, self.fu*1e-3, self.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)
         ax[0][0].plot(self.time_inter, self.freq_amp_smooth*1e-3, 'bo', label='Real',ms=10)
         ax[0][0].plot(self.time_inter, self.freq_amp_smooth_out*1e-3, 'gx', label='Synthetic', ms=6)
         ax[0][0].plot(self.time_ampl, self.freq_amp*1e-3, 'r+', label='sampled ff', ms=5)

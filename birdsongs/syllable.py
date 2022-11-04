@@ -11,7 +11,7 @@ class Syllable(object):
         window_time = window time lenght to make chuncks
         IL = interval length to calculate the envelope
     """
-    def __init__(self, s, fs, t0, window_time=0.005, Nt=200, llambda=1.5, NN=256):
+    def __init__(self, s, fs, t0, window_time=0.005, Nt=200, llambda=1.5, NN=512, overlap=0.5):
         self.t0 = t0
         self.Nt = Nt
         self.s  = sound.normalize(s, max_amp=1.0)
@@ -20,10 +20,11 @@ class Syllable(object):
         
         #self.params  = self.p.valuesdict()
         self.NN         = NN
-        self.no_overlap = self.NN//2 
+        self.no_overlap = int(overlap*self.NN )
         self.time       = np.linspace(0, len(self.s)/self.fs, len(self.s))
         self.window_time   = window_time # 0.005 # 0.01
         
+        print(self.no_overlap, self.NN, self.no_overlap<self.NN)
         Sxx_power, tn, fn, ext = sound.spectrogram (self.s, self.fs, nperseg=self.NN, noverlap=self.no_overlap, mode='psd')  
         Sxx_dB = util.power2dB(Sxx_power) + 96
         Sxx_dB_noNoise, noise_profile, _ = sound.remove_background(Sxx_dB, gauss_std=25, gauss_win=50, llambda=self.llambda)
@@ -43,17 +44,16 @@ class Syllable(object):
         
         self.T        = self.tu[-1]-self.tu[0]
         self.fs_new   = int(self.T*self.fs)   # number of points for the silabale/chunck
+
+        #f0 = pyin(self.s, fmin=1000, fmax=15000, sr=self.fs, frame_length=128, win_length=None, hop_length=None, n_thresholds=100, beta_parameters=(2, 18), boltzmann_parameter=2, resolution=0.1, max_transition_rate=35.92, switch_prob=0.01, no_trough_prob=0.01, fill_na=nan, center=True, pad_mode='constant')
+        f0 = yin(self.s, fmin=1000, fmax=15000, sr=self.fs, frame_length=128, win_length=None, hop_length=None, trough_threshold=1, center=False, pad_mode='constant')
+        self.timeFF = np.linspace(0,self.time[-1],f0.size)
         
-        SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int , time_inter, NoHarm = FFandSCI(self.s, self.time, self.fs, self.t0, window_time=self.window_time)
+        self.FF = f0
+        #self.timeFF = timeFF
         
-        self.NoHarm             = NoHarm
-        self.time_ampl          = time_ampl-time_ampl[0]
-        self.time_inter         = time_inter-time_inter[0]
-        self.Ampl_freq_filtered = Ampl_freq     #_filtered
-        self.freq_amp_smooth    = freq_amp_int  #_smooth           # satisfies fs
-        self.freq_amp           = freq_amp                         # less values than smooth
-        self.SCI                = SCI
-        self.time               = np.linspace(0, self.tu[-1], len(self.s))
+        self.SCI = self.FF#SCI
+        self.NoHarm = 1# NoHarm
     
     def AlphaBeta(self): 
         a = np.array([self.p["a0"].value, self.p["a1"].value, self.p["a2"].value]);   
@@ -62,7 +62,7 @@ class Syllable(object):
         t_1   = np.linspace(0,self.T,len(self.s))   
         t_par = np.array([np.ones(t_1.size), t_1, t_1**2])
         # approx alpha and beta as polynomials
-        poly = Polynomial.fit(self.time_inter, self.freq_amp_smooth, deg=10)
+        poly = Polynomial.fit(self.timeFF, self.FF, deg=10)
         x, y = poly.linspace(np.size(self.s))
         
         self.beta  = b[0] + b[1]*(1e-4*y) + b[2]*(1e-4*y)**2
@@ -171,16 +171,14 @@ class Syllable(object):
         self.time_out = np.linspace(0, len(self.out_amp)/self.fs, len(self.out_amp))
         self.Vs       = np.array(self.Vs)
         
-        SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int, time_inter, NoHarm = FFandSCI(self.out_amp, self.time, self.fs, self.t0, window_time=self.window_time)
+        f0_out = yin(self.out_amp, fmin=1000, fmax=15000, sr=self.fs, frame_length=128,
+            win_length=None, hop_length=None, trough_threshold=1, center=False, pad_mode='constant')
+        self.timeFF_out = np.linspace(0,self.time[-1],f0_out.size)
         
-        self.NoHarm_out             = NoHarm 
-        self.time_ampl_out          = time_ampl
-        self.time_inter_out         = time_inter-time_inter[0]
-        self.Ampl_freq_filtered_out = Ampl_freq  #Ampl_freq_filtered
-        self.freq_amp_smooth_out    = freq_amp_int           # satisfies fs
-        self.freq_amp_out           = freq_amp                         # less values than smooth
-        self.SCI_out                = SCI
-        self.time_out = np.linspace(0, self.tu_out[-1], len(self.out_amp)) 
+        self.FF_out     = f0_out
+        self.SCI_out    = self.FF_out#timeFF_out #SCI_out
+        self.NoHarm_out = 1#NoHarm_out
+        self.time_out   = np.linspace(0, self.tu_out[-1], len(self.out_amp)) 
     
     def WriteAudio(self):
         wavfile.write('{}/synth4_amp_{}_{}.wav'.format(self.paths.examples,self.no_syllable), self.fs, np.asarray(self.out_amp,  dtype=np.float32))
@@ -192,13 +190,13 @@ class Syllable(object):
         self.AlphaBeta()
         self.MotorGestures()
         
-        deltaFF     = np.abs(self.freq_amp_smooth_out-self.freq_amp_smooth)
+        deltaFF     = np.abs(self.FF_out-self.FF)
         deltaSCI    = np.abs(self.SCI_out-self.SCI)
         deltaNoHarm = np.abs(self.NoHarm_out-self.NoHarm).astype(float)
         
         self.deltaSCI    = deltaSCI     #/np.max(deltaSCI)
         self.deltaFF     = 1e-4*deltaFF #/np.max(deltaFF)
-        self.scoreSCI    = np.sum(self.deltaSCI)/self.deltaSCI.size
+        self.scoreSCI    = np.sum(self.deltaSCI)#/self.deltaSCI.size
         self.scoreFF     = np.sum(abs(self.deltaFF))/self.deltaFF.size
         self.DeltaNoHarm = deltaNoHarm*10**(deltaNoHarm-2)
     
@@ -281,25 +279,25 @@ class Syllable(object):
         fig, ax = plt.subplots(2, 2, figsize=(12, 5), sharex=True, sharey='col')
         fig.subplots_adjust(top=0.85)     
         
-        ax[0][0].plot(self.time, self.s, label='canto')
+        ax[0][0].plot(self.time, self.s, label='canto', c='b')
         ax[0][0].set_title('Real')
-        ax[0][0].plot(self.time, self.envelope, label='envelope')
+        ax[0][0].plot(self.time, self.envelope, label='envelope', c='k')
         ax[0][0].legend(); ax[0][0].set_ylabel("Amplitud (a.u.)")
-        ax[1][0].plot(self.time_out, self.out_amp, label='synthetic')
+        ax[1][0].plot(self.time_out, self.out_amp, label='synthetic', c='g')
         ax[1][0].set_title('Synthetic') 
         ax[1][0].plot(self.time_out, self.s_amp_env
-, label='envelope')
+, label='envelope', c='k')
         ax[1][0].legend(); ax[1][0].set_xlabel('t (s)'); ax[1][0].set_ylabel("Amplitud (a.u.)")
 
         Delta_tu   = self.tu[-1] - self.tu[0]
         Delta_tu_s = 1#tu_s[-1] - tu_s[0]
 
         ax[0][1].pcolormesh(self.tu, self.fu*1e-3, self.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)
-        ax[0][1].plot(self.time_inter, self.freq_amp_smooth*1e-3, 'b-', label='Smoothed and Interpolated\nto {0} fs'.format(self.fs), lw=2)
+        ax[0][1].plot(self.timeFF, self.FF*1e-3, 'bo-', label='Smoothed and Interpolated\nto {0} fs'.format(self.fs), lw=2)
         ax[0][1].set_title('Real'); ax[0][1].set_ylabel('f (khz)'); ax[0][1].set_ylim(0, 20);
 
         ax[1][1].pcolormesh(self.tu_out, self.fu_out*1e-3, self.Sxx_out, cmap=plt.get_cmap('Greys'), rasterized=True, label='output normalizado amplitud')
-        ax[1][1].plot(self.time_inter, self.freq_amp_smooth_out*1e-3, 'b-', label='Smoothed and Interpolated\nto {0} fs'.format(self.fs), lw=2)
+        ax[1][1].plot(self.timeFF_out, self.FF_out*1e-3, 'go-', label='Smoothed and Interpolated\nto {0} fs'.format(self.fs), lw=2)
         ax[1][1].set_title('Synthetic') 
         ax[1][1].set_ylim(0, 20);   ax[1][1].set_xlim(min(self.time_out), max(self.time_out))
         ax[1][1].set_xlabel('t (s)'); ax[1][1].set_ylabel('f (khz)');
@@ -319,15 +317,15 @@ class Syllable(object):
         fig.tight_layout(pad=3.0)        #fig.subplots_adjust(top=0.85)
         
         viridis = cm.get_cmap('Blues')
-        c       = viridis(np.linspace(0.3, 1, np.size(self.time_inter)))
+        c       = viridis(np.linspace(0.3, 1, np.size(self.time)))
         
-        ax1.scatter(self.time_inter, self.alpha, c=c, label="alfa")
+        ax1.scatter(self.time, self.alpha, c=c, label="alfa")
         ax1.set_title('Air-Sac Pressure')
         ax1.grid()
         ax1.set_ylabel('α (a.u.)'); #ax1.set_xlabel('Time (s)'); 
         ax1.set_ylim(xlim);        #ax[0].legend()
 
-        ax2.scatter(self.time_inter, self.beta, c=c, label="beta")
+        ax2.scatter(self.time, self.beta, c=c, label="beta")
         ax2.set_title('Labial Tension')
         ax2.grid()
         ax2.set_xlabel(r'Time (s)'); ax2.set_ylabel('β (a.u.)')
@@ -364,30 +362,30 @@ class Syllable(object):
         fig.subplots_adjust(top=0.85);   #fig.tight_layout(pad=3.0)
         
         ax[0][0].pcolormesh(self.tu, self.fu*1e-3, self.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)
-        ax[0][0].plot(self.time_inter, self.freq_amp_smooth*1e-3, 'bo', label='Real',ms=10)
-        ax[0][0].plot(self.time_inter, self.freq_amp_smooth_out*1e-3, 'gx', label='Synthetic', ms=6)
-        ax[0][0].plot(self.time_ampl, self.freq_amp*1e-3, 'r+', label='sampled ff', ms=5)
+        ax[0][0].plot(self.timeFF, self.FF*1e-3, 'bo-', label='Real',ms=10)
+        ax[0][0].plot(self.timeFF_out, self.FF_out*1e-3, 'go-', label='Synthetic', ms=6)
+        #ax[0][0].plot(self.time_ampl, self.freq_amp*1e-3, 'r+', label='sampled ff', ms=5)
         ax[0][0].legend()#title="Fundamenta Frequency")
         ax[0][0].set_ylim((1, 15)); ax[0][0].set_xlim((self.tu[0], self.tu[-1]))
         ax[0][0].set_ylabel('f (khz)'); #ax[0][0].set_xlabel('time (s)');     
         ax[0][0].set_title('Fundamental Frequency (FF)')
 
-        ax[0][1].plot(self.time_ampl, self.SCI, 'o', ms=3, label='Real mean {0:.2f}'.format(np.mean(self.SCI)))
-        ax[0][1].plot(self.time_ampl, self.SCI_out, 'o', ms=3, label='Synth mean {0:.2f}'.format(np.mean(self.SCI_out)))
+        ax[0][1].plot(self.timeFF, self.SCI, 'o', ms=3, label='Real mean {0:.2f}'.format(np.mean(self.SCI)))
+        ax[0][1].plot(self.timeFF_out, self.SCI_out, 'o', ms=3, label='Synth mean {0:.2f}'.format(np.mean(self.SCI_out)))
         if flag: 
-            m,  b  = np.polyfit(self.time_ampl, self.SCI, 1)
-            mo, bo = np.polyfit(self.time_ampl, self.SCI_out, 1)
-            ax[0][1].plot(self.time_ampl, m*self.time_ampl+b, 'b-', label='m={0:.2f}, b={1:.2f} '.format(m,b))
-            ax[0][1].plot(self.time_ampl, mo*self.time_ampl+bo, 'r-', label='m={0:.2f}, b={1:.2f} '.format(mo,bo))
+            m,  b  = np.polyfit(self.timeFF, self.SCI, 1)
+            mo, bo = np.polyfit(self.timeFF_out, self.SCI_out, 1)
+            ax[0][1].plot(self.timeFF, m*self.timeFF+b, 'b-', label='m={0:.2f}, b={1:.2f} '.format(m,b))
+            ax[0][1].plot(self.timeFF, mo*self.timeFF+bo, 'r-', label='m={0:.2f}, b={1:.2f} '.format(mo,bo))
         ax[0][1].legend()
         ax[0][1].set_ylabel('SCI (adimensionless)'); #ax[0][1].set_xlabel('time (s)'); 
         ax[0][1].set_title('Spectral Content Index (SCI)')
         
-        ax[1][0].plot(self.time_inter, self.deltaFF, "-o", color="k", label='Σ R(FF)/len(s)= {:.4f}'.format(self.scoreFF))
+        ax[1][0].plot(self.timeFF, self.deltaFF, "-o", color="k", label='Σ R(FF)/len(s)= {:.4f}'.format(self.scoreFF))
         ax[1][0].set_xlabel('time (s)'); ax[1][0].set_ylabel('Error (\\times 10^{4}$Hz)'); ax[1][0].legend()
         ax[1][0].set_title('Fundamental Frequency Error (ΔFF)'); ax[1][0].set_ylim((0,1))
         
-        ax[1][1].plot(self.time_ampl, self.deltaSCI, "-o", color="k", label='Σ R(SCI)/len(s) = {:.4f}'.format(self.scoreSCI))
+        ax[1][1].plot(self.timeFF, self.deltaSCI, "-o", color="k", label='Σ R(SCI)/len(s) = {:.4f}'.format(self.scoreSCI))
         ax[1][1].set_xlabel('time (s)'); ax[1][1].set_ylabel('Error (adimensionless)'); ax[1][1].legend(); ax[1][1].set_ylim((0,1))
         ax[1][1].set_title('Spectral Content Index Error (ΔSCI)')
         

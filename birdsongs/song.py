@@ -66,7 +66,7 @@ class Song(Syllable):
         im_bin = rois.create_mask(Sxx_dB_blurred, bin_std=1.5, bin_per=0.5, mode='relative')
     
     
-    def Syllable(self, no_syllable, window_time=0.005, Nt=200, llambda=1.5):
+    def Syllable(self, no_syllable, window_time=0.01, Nt=200, llambda=1.5):
         self.no_syllable   = no_syllable
         ss                 = self.syllables[self.no_syllable-1]  # syllable indexes 
         syllable           = self.s[ss[0]:ss[-1]]       # audios syllable
@@ -85,16 +85,13 @@ class Song(Syllable):
         
         return self.syllable
     
-    def Chunck(self, no_chunck, window_time=0.001, Nt=20, llambda=1.5, len_win=0.01):
+    def Chunck(self, no_chunck, window_time=0.005, Nt=20, llambda=1.5, len_win=0.01):
         self.no_chunck     = no_chunck
-        chunks_s, chunks_t = Windows(self.syll_complet, self.time_syllable, self.fs, window_time=len_win, overlap=1) # overla=1 not overlap
+        chuncks = sound.wave2frames(self.syll_complet,  Nt=512)
+        times   = sound.wave2frames(self.time_syllable, Nt=512)
         
-        chunks_t_c = np.copy(chunks_t); chunks_t_c[-1,-1]=self.time_syllable[-1];
         
-        NN = self.NN//10
-        no_overlap =  NN/2
-        
-        self.chunck        = Syllable(chunks_s[no_chunck], self.fs, chunks_t[self.no_chunck][0], window_time=window_time, NN=NN, Nt=Nt, llambda=llambda)
+        self.chunck        = Syllable(chuncks[:,self.no_chunck-1], self.fs, times[self.no_chunck-1,0], NN=256, llambda=llambda, Nt=5)
         
         self.chunck.no_syllable = self.no_chunck
         self.chunck.no_file     = self.no_file
@@ -143,8 +140,8 @@ class Song(Syllable):
     
         ax[0].pcolormesh(self.tu, self.fu/1000, self.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)
         
-        ax[0].plot(self.syllable.time_inter+self.syllable.t0, self.syllable.freq_amp_smooth*1e-3, 'b-', label='FF'.format(self.syllable.fs), lw=2)
-        ax[0].plot(self.syllable.time_ampl+self.syllable.t0, self.syllable.freq_amp*1e-3, 'r+', label='sampled FF', ms=2)
+        ax[0].plot(self.syllable.timeFF+self.syllable.t0, self.syllable.FF*1e-3, 'bo', label='FF'.format(self.syllable.fs), lw=1)
+        #ax[0].plot(self.syllable.timeFF+self.syllable.t0, self.syllable.FF*1e-3, 'r+', label='sampled FF', ms=2)
         for i in range(len(self.syllables)):#for ss in self.syllables:   
             ax[0].plot([self.time[self.syllables[i][0]], self.time[self.syllables[i][-1]]], [0, 0], 'k', lw=5)
             ax[0].text((self.time[self.syllables[i][-1]]-self.time[self.syllables[i][0]])/2, 0.5, str(i))
@@ -163,14 +160,14 @@ class Song(Syllable):
 
         if flag==1:
             #ax[2].pcolormesh(self.chunck.tu, self.chunck.fu, self.chunck.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)
-            ax[0].plot(self.chunck.time_inter+self.chunck.t0, self.chunck.freq_amp_smooth*1e-3, 'g-', label='Chunck', lw=4)
-            ax[2].plot(self.chunck.time_inter+self.chunck.t0, self.chunck.freq_amp_smooth*1e-3, 'g-', label='Chunck', lw=10)
+            ax[0].plot(self.chunck.timeFF+self.chunck.t0, self.chunck.FF*1e-3, 'g-', label='Chunck', lw=4)
+            ax[2].plot(self.chunck.timeFF+self.chunck.t0, self.chunck.FF*1e-3, 'g-', label='Chunck', lw=8)
         
         ax[2].pcolormesh(self.syllable.tu+self.syllable.t0, self.syllable.fu*1e-3, self.syllable.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True) 
-        ax[2].plot(self.syllable.time_inter+self.syllable.t0, self.syllable.freq_amp_smooth*1e-3, 'b-', lw=5, label='Smoothed and Interpolated\nto {0}=fs'.format(self.syllable.fs))
-        ax[2].plot(self.syllable.time_ampl+self.syllable.t0, self.syllable.freq_amp*1e-3, 'r+', label='sampled FF', ms=3)
+        #ax[2].plot(self.syllable.timeFF+self.syllable.t0, self.syllable.FF*1e-3, 'b-', lw=5, label='Smoothed and Interpolated\nto {0}=fs'.format(self.syllable.fs))
+        ax[2].plot(self.syllable.timeFF+self.syllable.t0, self.syllable.FF*1e-3, 'r+', label='FF', ms=10)
         ax[2].set_ylim((2, 11)); 
-        ax[2].set_xlim((self.syllable.time_inter[0]-0.001+self.syllable.t0, self.syllable.time_inter[-1]+0.001+self.syllable.t0));
+        ax[2].set_xlim((self.syllable.timeFF[0]-0.001+self.syllable.t0, self.syllable.timeFF[-1]+0.001+self.syllable.t0));
         ax[2].legend(loc='upper right')
         ax[2].set_xlabel('t (s)'); ax[2].set_ylabel('f (khz)')
         ax[2].set_title('Single Syllable Spectrum, No {}'.format(self.no_syllable))

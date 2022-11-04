@@ -15,6 +15,7 @@ from random import uniform
 from numpy.polynomial import Polynomial
 from multiprocessing import Pool
 from IPython.display import display
+from librosa import yin, pyin
 
 #from scipy.interpolate import UnivariateSpline
 
@@ -65,7 +66,7 @@ def Windows(s, t, fs, window_time=0.05, overlap=1):
     t_windowed = np.lib.stride_tricks.sliding_window_view(t, window_new)[::floor(overlap*window_new)]
     return s_windowed, t_windowed
 
-def SpectralContent(segment, fs):
+def SpectralContent(segment, fs,  window_time=0.001):
     """"
     Calculate the spectral content for a signal, a ratio between the fundamenta frequency (FF) and the mean switching frequency (msf) frequency
     INPUT:
@@ -78,94 +79,13 @@ def SpectralContent(segment, fs):
     """
     fourier = np.abs(np.fft.rfft(segment))
     freqs   = np.fft.rfftfreq(len(segment), d=1/fs)
-    maximos = peakutils.indexes(fourier, thres=0.2, min_dist=5)
+    maximos = peakutils.indexes(fourier, thres=0.2, min_dist=20)
     
     f_msf = np.sum(freqs*fourier)/np.sum(fourier)
     amp   = max(segment)-min(segment)
     max1  = np.max(fourier) #max amplitud fourier
     
     if len(maximos)>0 and max1>0.5:  f_aff = freqs[maximos[0]]
-    else:                          f_aff = -1e6 # to penalize the bad outputs #np.argmax(fourier)
+    else:                           f_aff = -1e6 # to penalize the bad outputs #np.argmax(fourier)
     
     return f_msf, f_aff, max1, len(maximos)#amp
-
-def FFandSCI(s, time, fs, t0, window_time=0.001, overlap=1):
-    """
-    Compute the fundamental frequency (FF) and spectral content index (SCI) using chuncks
-    INPUT:
-        s    = signal 
-        time = time vector of the signal
-        t0   = initial time for the signal
-        window_time =
-    OUTPUT:
-        SCI          = sound content index array
-        time_ampl    = time array sampled by chuncks
-        freq_amp     = frequency array sampled by chuncks
-        Ampl_freq    = amplitud frequency array sampled by chuncks
-        freq_amp_int = frequency array with same size as signal input
-        tim_inter    = time array with same size as signal input
-    """
-    s, t = Windows(s, time, fs, window_time=window_time, overlap=overlap)
-    t_c =np.copy(t)
-    t_c[-1,-1] = time[-1]
-    
-    SCI,      time_ampl = np.zeros(np.shape(s)[0]), np.zeros(np.shape(s)[0])
-    freq_amp, Ampl_freq = np.zeros(np.shape(s)[0]), np.zeros(np.shape(s)[0])
-    TotalHarm = 0
-    
-    for i in range(s.shape[0]):
-        f_msf, f_aff, amp, NoHarm = SpectralContent(s[i], fs) 
-        
-        SCI[i]       = f_msf/f_aff
-        time_ampl[i] = t_c[i,0] #window_length*i # left point
-        freq_amp[i]  = f_aff  #max1/window_time
-        Ampl_freq[i] = amp    #np.amax(amplitud_freq)
-        TotalHarm   += NoHarm
-    
-    time_ampl[-1] = t[-1,-1]
-    #time_ampl += t0
-    
-    TotalHarm = int(TotalHarm/s.shape[0])
-    
-    tim_inter       = np.linspace(time_ampl[0], time_ampl[-1], time.size)  # time interpolated
-    #time_ampl1 = time_ampl.reshape((-1,1)) # functions to interpolate
-    
-    model = LinearRegression().fit(time_ampl.reshape((-1,1)), freq_amp)
-    
-    inte_freq_amp   = interp1d(time_ampl, freq_amp) # = model.coef_*tim_inter+model.intercept_
-    inte_Amp_freq   = interp1d(time_ampl, Ampl_freq) 
-    # interpolate and smooth
-    freq_amp_int = savgol_filter(inte_freq_amp(tim_inter), window_length=13, polyorder=3)
-    Ampl_freq    = savgol_filter(inte_Amp_freq(tim_inter), window_length=13, polyorder=3)
-    #print(np.shape(tim_inter), np.shape(freq_amp_int), np.shape(Ampl_freq))
-    
-    return SCI, time_ampl, freq_amp, Ampl_freq, freq_amp_int, tim_inter, TotalHarm
-
-
-
-def FF(s, fs, time, window_time=0.001, overlap=0.1):
-    s, t = Windows(s, time, fs, window_time=window_time, overlap=overlap)
-    t_c = np.copy(t)
-    t_c[-1,-1] = time[-1]
-    
-    FF     = np.zeros(s.shape[0])
-    timeFF = np.zeros(s.shape[0])
-    SCI    = np.zeros(s.shape[0])
-    
-    for i in range(s.shape[0]):
-        f_msf, f_aff, amp, NoHarm = SpectralContent(s[i], fs) 
-        
-        SCI[i]       = f_msf/f_aff
-        timeFF[i]    = t_c[i,0] #window_length*i # left point
-        #freq_amp[i]  = f_aff  
-        
-    timeFF += window_time/2
-    
-    FF_fun  = interp1d(timeFF, FF, fill_value='extrapolate')
-    SCI_fun = interp1d(timeFF, SCI, fill_value='extrapolate')
-    
-    timeFF = np.concatenate([[time[0]],timeFF,[time[-1]]])
-    FF = np.concatenate([[FF_fun(time[0])],FF,[FF_fun(time[-1])]])
-    SCI = np.concatenate([[SCI_fun(time[0])],SCI,[SCI_fun(time[-1])]])
-    
-    return timeFF, FF, SCI

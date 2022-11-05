@@ -1,0 +1,8 @@
+peakutils
+lmfit
+numpy
+matplotlib 
+pandas
+scipy
+sklearn
+IPython

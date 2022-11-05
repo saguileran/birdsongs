@@ -1,4 +1,2 @@
-# ignore all wavs and pdfs
-*.wav
-*.pdf
-__pycache__/
+__pycache__
+.ipynb_checkpoints

@@ -57,9 +57,12 @@ class Song(Syllable):
         self.no_syllables = len(self.syllables)
         
         
-    def Syllables(self):
+    def Syllables(self, min_length=64, stepsize=1):
         supra      = np.where(self.envelope > self.umbral)[0]
-        syllables  = consecutive(supra, min_length=100)
+        candidates = np.split(supra, np.where(np.diff(supra) != stepsize)[0]+1)
+        syllables = [x for x in candidates if len(x) > min_length]
+        
+        #syllables  = consecutive(supra, min_length=100)
         return [ss for ss in syllables if len(ss) > self.NN/5] # remove short syllables
     
     def Syllables2(self):
@@ -165,7 +168,7 @@ class Song(Syllable):
         
         ax[2].pcolormesh(self.syllable.tu+self.syllable.t0, self.syllable.fu*1e-3, self.syllable.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True) 
         #ax[2].plot(self.syllable.timeFF+self.syllable.t0, self.syllable.FF*1e-3, 'b-', lw=5, label='Smoothed and Interpolated\nto {0}=fs'.format(self.syllable.fs))
-        ax[2].plot(self.syllable.timeFF+self.syllable.t0, self.syllable.FF*1e-3, 'r+', label='FF', ms=10)
+        ax[2].plot(self.syllable.timeFF+self.syllable.t0, self.syllable.FF*1e-3, 'b+', label='FF', ms=10)
         ax[2].set_ylim((2, 11)); 
         ax[2].set_xlim((self.syllable.timeFF[0]-0.001+self.syllable.t0, self.syllable.timeFF[-1]+0.001+self.syllable.t0));
         ax[2].legend(loc='upper right')

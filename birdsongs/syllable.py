@@ -29,21 +29,11 @@ class Syllable(object):
         Sxx_dB_noNoise, noise_profile, _ = sound.remove_background(Sxx_dB, gauss_std=25, gauss_win=50, llambda=self.llambda)
 
         self.fu  = fn
-        self.tu  = np.linspace(0, self.time[-1], Sxx_power.shape[1]) #tn #*self.time[-1]/tn[-1]
+        self.tu  = np.linspace(0, self.time[-1], Sxx_power.shape[1]) 
         self.Sxx = sound.smooth(Sxx_dB_noNoise, std=0.5)
         self.Sxx_dB = util.power2dB(self.Sxx) +96
         
-        S = -35         # Sensbility microphone-35dBV (SM4) / -18dBV (Audiomoth)
-        G = 26          # Amplification gain (26dB (SM4 preamplifier))
-
-        ## acoustic indices in spectral domain
-        # df_spec_ind, df_spec_ind_per_bin = features.all_spectral_alpha_indices(self.Sxx_dB,self.tu,self.fu, 
-        #                             R_compatible = 'seewave', gain = G, sensitivity = S, verbose = False,
-        #                             flim_low = [0,2000], flim_mid = [2000,12000], flim_hi  = [12,20000], 
-        #                             mask_param1 = 6, mask_param2=0.5, display = False)
-        # self.df_spec_ind = df_spec_ind
         
-
         self.envelope = sound.envelope(self.s, Nt=self.Nt) 
         t_env = np.arange(0,len(self.envelope),1)*len(self.s)/self.fs/len(self.envelope)
         t_env[-1] = self.time[-1] 
@@ -56,11 +46,9 @@ class Syllable(object):
 
         #f0 = pyin(self.s, fmin=1000, fmax=15000, sr=self.fs, frame_length=128, win_length=None, hop_length=None, n_thresholds=100, beta_parameters=(2, 18), boltzmann_parameter=2, resolution=0.1, max_transition_rate=35.92, switch_prob=0.01, no_trough_prob=0.01, fill_na=nan, center=True, pad_mode='constant')
         f0 = yin(self.s, fmin=1000, fmax=15000, sr=self.fs, frame_length=128, win_length=None, hop_length=None, trough_threshold=1, center=False, pad_mode='constant')
+        
         self.timeFF = np.linspace(0,self.time[-1],f0.size)
-        
         self.FF = f0
-        #self.timeFF = timeFF
-        
         self.SCI = self.FF#SCI
         self.NoHarm = 1# NoHarm
     
@@ -148,6 +136,7 @@ class Syllable(object):
         # pre processing synthetic data
         out = sound.normalize(out, max_amp=1)
         self.synth_env = sound.envelope(out, Nt=self.Nt) 
+        
         t_env = np.arange(0,len(self.synth_env),1)*len(out)/self.fs/len(self.synth_env)
         t_env[-1] = self.time[-1] 
         fun_s = interp1d(t_env, self.synth_env)
@@ -157,6 +146,10 @@ class Syllable(object):
         self.out_amp           = np.zeros_like(out)
         not_zero               = np.where(self.synth_env > 0.005)
         self.out_amp[not_zero] = out[not_zero] * self.envelope[not_zero] / self.synth_env[not_zero]
+        print(self.no_overlap,  self.NN)
+        
+        syllable_synth =  Syllable(self.out_amp, self.fs, self.t0,  Nt=self.Nt, llambda=self.llambda, NN=self.NN)
+        
         
         self.out_amp = sound.normalize(self.out_amp, max_amp=1.0)
         
@@ -167,9 +160,12 @@ class Syllable(object):
         t_env[-1] = self.time[-1] 
         fun_s = interp1d(t_env, self.s_amp_env)
         self.s_amp_env = fun_s(self.time)
-              
+        self.Delta_env = np.abs(self.s_amp_env-self.envelope)
+        
+        
         Sxx_power, tn, fn, ext = sound.spectrogram (self.out_amp, self.fs, nperseg=self.NN, noverlap=self.no_overlap, mode='psd')  
         Sxx_dB = util.power2dB(Sxx_power) + 96
+        
         Sxx_dB_noNoise, noise_profile, _ = sound.remove_background(Sxx_dB, 
                 gauss_std=25, gauss_win=50, llambda=self.llambda//3)
 
@@ -178,15 +174,7 @@ class Syllable(object):
         self.Sxx_out = sound.smooth(Sxx_dB_noNoise, std=0.5)
         self.Sxx_dB_out = util.power2dB(self.Sxx) +96
         
-        S = -35         # Sensbility microphone-35dBV (SM4) / -18dBV (Audiomoth)
-        G = 26          # Amplification gain (26dB (SM4 preamplifier))
-
-        
-        # df_spec_ind, df_spec_ind_per_bin = features.all_spectral_alpha_indices(self.Sxx_out,self.tu_out,self.fu_out, 
-        #                             R_compatible = 'seewave', gain = G, sensitivity = S, verbose = False,
-        #                             flim_low = [0,2000], flim_mid = [2000,12000], flim_hi  = [12,20000], 
-        #                             mask_param1 = 6, mask_param2=0.5, display = False)
-        # self.df_spec_ind = df_spec_ind
+        self.DeltaSxx = np.abs(self.Sxx_out-self.Sxx)/np.max(self.Sxx_out-self.Sxx)
         
         
         self.time_out = np.linspace(0, len(self.out_amp)/self.fs, len(self.out_amp))
@@ -200,6 +188,8 @@ class Syllable(object):
         self.SCI_out    = self.FF_out#timeFF_out #SCI_out
         self.NoHarm_out = 1#NoHarm_out
         self.time_out   = np.linspace(0, self.tu_out[-1], len(self.out_amp)) 
+        
+        return syllable_synth
     
     def WriteAudio(self):
         wavfile.write('{}/synth4_amp_{}_{}.wav'.format(self.paths.examples,self.no_syllable), self.fs, np.asarray(self.out_amp,  dtype=np.float32))
@@ -217,9 +207,11 @@ class Syllable(object):
         
         self.deltaSCI    = deltaSCI     #/np.max(deltaSCI)
         self.deltaFF     = 1e-4*deltaFF #/np.max(deltaFF)
-        self.scoreSCI    = np.sum(self.deltaSCI)#/self.deltaSCI.size
-        self.scoreFF     = np.sum(abs(self.deltaFF))/self.deltaFF.size
         self.DeltaNoHarm = deltaNoHarm*10**(deltaNoHarm-2)
+        #self.scoreSCI    = np.norm(self.deltaSCI)#/self.deltaSCI.size
+        self.scoreFF     = np.linalg.norm(np.abs(self.deltaFF),ord=1)/self.deltaFF.size
+        self.scoreEnv    = np.linalg.norm(self.Delta_env,ord=1)/self.Delta_env.size
+        self.scoreSxx    = np.linalg.norm(self.DeltaSxx, ord=np.inf)
     
     def residualSCI(self, p):
         self.Solve(p)
@@ -231,7 +223,7 @@ class Syllable(object):
     
     def residualFFandSCI(self, p):
         self.Solve(p)
-        return self.scoreFF+self.scoreSCI+self.DeltaNoHarm
+        return self.scoreFF#+self.scoreSCI+self.DeltaNoHarm
     
     # ----------- OPTIMIZATION FUNCTIONS --------------
     def OptimalGamma(self, method_kwargs):
@@ -313,12 +305,14 @@ class Syllable(object):
         Delta_tu   = self.tu[-1] - self.tu[0]
         Delta_tu_s = 1#tu_s[-1] - tu_s[0]
 
-        ax[0][1].pcolormesh(self.tu, self.fu*1e-3, self.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)
-        ax[0][1].plot(self.timeFF, self.FF*1e-3, 'bo-', label='Smoothed and Interpolated\nto {0} fs'.format(self.fs), lw=2)
+        pcm = ax[0][1].pcolormesh(self.tu, self.fu*1e-3, self.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)#, vmin=10, vmax=70)
+        fig.colorbar(pcm, ax=ax[0,1], location='right', label='Power')
+        ax[0][1].plot(self.timeFF, self.FF*1e-3, 'bo-', lw=2)
         ax[0][1].set_title('Real'); ax[0][1].set_ylabel('f (khz)'); ax[0][1].set_ylim(0, 20);
 
-        ax[1][1].pcolormesh(self.tu_out, self.fu_out*1e-3, self.Sxx_out, cmap=plt.get_cmap('Greys'), rasterized=True, label='output normalizado amplitud')
-        ax[1][1].plot(self.timeFF_out, self.FF_out*1e-3, 'go-', label='Smoothed and Interpolated\nto {0} fs'.format(self.fs), lw=2)
+        pcm = ax[1][1].pcolormesh(self.tu_out, self.fu_out*1e-3, self.Sxx_out, cmap=plt.get_cmap('Greys'), rasterized=True)#, vmin=10, vmax=70)
+        fig.colorbar(pcm, ax=ax[1,1], location='right', label='Power')
+        ax[1][1].plot(self.timeFF_out, self.FF_out*1e-3, 'go-', lw=2)
         ax[1][1].set_title('Synthetic') 
         ax[1][1].set_ylim(0, 20);   ax[1][1].set_xlim(min(self.time_out), max(self.time_out))
         ax[1][1].set_xlabel('t (s)'); ax[1][1].set_ylabel('f (khz)');
@@ -379,43 +373,55 @@ class Syllable(object):
         plt.show()
 
     def Plot(self, flag=0):
-        fig, ax = plt.subplots(2, 2, figsize=(14, 7), gridspec_kw={'width_ratios': [3, 2]},sharex=True)
-        fig.subplots_adjust(top=0.85);   #fig.tight_layout(pad=3.0)
+        fig, ax = plt.subplots(3, 2, figsize=(16, 11), gridspec_kw={'width_ratios': [2, 2]}, sharex=True)
+        fig.subplots_adjust(top=0.9, wspace=0.25, hspace=0.3);   #fig.tight_layout(pad=3.0)
         
-        ax[0][0].pcolormesh(self.tu, self.fu*1e-3, self.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)
+        pcm = ax[0][0].pcolormesh(self.tu, self.fu*1e-3, self.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)#, vmin=10, vmax=70)
+        fig.colorbar(pcm, ax=ax[0,0], location='left', label='Power', pad=0.15)
         ax[0][0].plot(self.timeFF, self.FF*1e-3, 'bo-', label='Real',ms=10)
         ax[0][0].plot(self.timeFF_out, self.FF_out*1e-3, 'go-', label='Synthetic', ms=6)
         #ax[0][0].plot(self.time_ampl, self.freq_amp*1e-3, 'r+', label='sampled ff', ms=5)
-        ax[0][0].legend()#title="Fundamenta Frequency")
+        ax[0][0].legend(); ax[0][0].set_ylim((1, 15)); #title="Fundamenta Frequency")
         ax[0][0].set_ylim((1, 15)); ax[0][0].set_xlim((self.tu[0], self.tu[-1]))
         ax[0][0].set_ylabel('f (khz)'); #ax[0][0].set_xlabel('time (s)');     
         ax[0][0].set_title('Fundamental Frequency (FF)')
 
-        ax[0][1].plot(self.timeFF, self.SCI, 'o', ms=3, label='Real mean {0:.2f}'.format(np.mean(self.SCI)))
-        ax[0][1].plot(self.timeFF_out, self.SCI_out, 'o', ms=3, label='Synth mean {0:.2f}'.format(np.mean(self.SCI_out)))
-        if flag: 
-            m,  b  = np.polyfit(self.timeFF, self.SCI, 1)
-            mo, bo = np.polyfit(self.timeFF_out, self.SCI_out, 1)
-            ax[0][1].plot(self.timeFF, m*self.timeFF+b, 'b-', label='m={0:.2f}, b={1:.2f} '.format(m,b))
-            ax[0][1].plot(self.timeFF, mo*self.timeFF+bo, 'r-', label='m={0:.2f}, b={1:.2f} '.format(mo,bo))
-        ax[0][1].legend()
-        ax[0][1].set_ylabel('SCI (adimensionless)'); #ax[0][1].set_xlabel('time (s)'); 
-        ax[0][1].set_title('Spectral Content Index (SCI)')
+
+        pcm = ax[1][0].pcolormesh(self.tu, self.fu*1e-3, self.DeltaSxx, cmap=plt.get_cmap('Greys'), rasterized=True)#, vmin=0, vmax=1)
+        fig.colorbar(pcm, ax=ax[1,0], location='left', label='Power', pad=0.15)
+        #ax[1][0].plot(self.timeFF, self.deltaSCI, "-o", color="k", label='Σ R(SCI) = {:.4f}'.format(self.scoreSCI))
+        ax[1][0].set_ylabel('f (khz) (s)'); ax[1][0].set_xlabel('t (s) (s)'); 
+        ax[1][0].set_ylim((1, 15)); ax[1][0].set_title('Sxx Error (ΔSxx)')
+        ax[1,0].sharex(ax[0,0])
+
+        ax[2][0].plot(self.timeFF, self.deltaFF, "-o", color="k", label='Σ ΔFF= {:.4f}'.format(self.scoreFF)); ax[1][1].set_ylim((0,15e3))
+        ax[2][0].set_xlabel('time (s)'); ax[2][0].set_ylabel('f (kHz)'); ax[2][0].legend()
+        ax[2][0].set_title('Fundamental Frequency Error (ΔFF)'); ax[2][0].set_ylim((0,1))
+
+        ax[0,1].plot(self.time,     self.s,        label='real',     c='b')
+        ax[0,1].plot(self.time,     self.envelope, label='real_env', c='k')
+        ax[0,1].plot(self.time_out, self.out_amp,  label='syn_env',  c='g')
+        ax[0,1].plot(self.time_out, self.s_amp_env,label='synth',    c='g')
+        ax[0,1].legend(); ax[0][1].set_ylabel("Amplitud (a.u.)")
+        ax[0,1].set_title("Sound Waves")
         
-        ax[1][0].plot(self.timeFF, self.deltaFF, "-o", color="k", label='Σ R(FF)/len(s)= {:.4f}'.format(self.scoreFF))
-        ax[1][0].set_xlabel('time (s)'); ax[1][0].set_ylabel('Error (\\times 10^{4}$Hz)'); ax[1][0].legend()
-        ax[1][0].set_title('Fundamental Frequency Error (ΔFF)'); ax[1][0].set_ylim((0,1))
+        ax[1,1].plot(self.time, self.Delta_env, 'ko-', label='Σ Δenv = {:.4f}'.format(self.scoreEnv))
+        ax[1,1].set_xlabel("t (s)"); ax[1,1].set_ylabel("Amplitud (a.u.)"); 
+        ax[1,1].set_title("Envelope Difference (Δ env)"); 
+        ax[1,1].set_ylim((0,1)); ax[1,1].legend()
+        #ax[1,1].sharex(ax[0,1])
         
-        ax[1][1].plot(self.timeFF, self.deltaSCI, "-o", color="k", label='Σ R(SCI)/len(s) = {:.4f}'.format(self.scoreSCI))
-        ax[1][1].set_xlabel('time (s)'); ax[1][1].set_ylabel('Error (adimensionless)'); ax[1][1].legend(); ax[1][1].set_ylim((0,1))
-        ax[1][1].set_title('Spectral Content Index Error (ΔSCI)')
+        
+        ax[2,1].plot(self.time, np.abs(self.envelope-self.s_amp_env))
+        ax[2,1].set_xlabel("t (s)"); ax[2,1].set_ylabel("Amplitud (a.u.)");
+        ax[2,1].set_ylim((-1,1))
         
         fig.suptitle("Scored Variables", fontsize=20)#, family='fantasy')
         plt.show()
     
     def PlotVs(self, xlim=(0,0.025)):
         fig, ax = plt.subplots(3, 1, figsize=(12, 9))
-        fig.subplots_adjust(wspace=0.4, hspace=0.4)
+        fig.subplots_adjust(wspace=0.35, hspace=0.4)
 
         time = self.time[:self.Vs.shape[0]]
         

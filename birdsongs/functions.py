@@ -14,8 +14,9 @@ from sklearn.linear_model import LinearRegression
 from random import uniform
 from numpy.polynomial import Polynomial
 from multiprocessing import Pool
-from IPython.display import display
-from librosa import yin, pyin, feature
+from IPython.display import display as Display
+from librosa import yin, pyin, feature, display, onset, times_like, stft
+import librosa 
 
 #from scipy.interpolate import UnivariateSpline
 
@@ -36,28 +37,3 @@ def rk4(f, v, dt):
     k3 = f(v + dt/2.0*k2)
     k4 = f(v + dt*k3)
     return v + dt*(2.0*(k2+k3)+k1+k4)/6.0
-    
-
-def SpectralContent(segment, fs,  window_time=0.001):
-    """"
-    Calculate the spectral content for a signal, a ratio between the fundamenta frequency (FF) and the mean switching frequency (msf) frequency
-    INPUT:
-        segment = signal to calculate its spectral content 
-        fs      = smaple rate of audio
-    OUTPUT:
-        f_msf = mean switching frequency
-        f_aff = fundamenta frequency
-        max1  = amplitud fundamental frequency = amp
-    """
-    fourier = np.abs(np.fft.rfft(segment))
-    freqs   = np.fft.rfftfreq(len(segment), d=1/fs)
-    maximos = peakutils.indexes(fourier, thres=0.2, min_dist=20)
-    
-    f_msf = np.sum(freqs*fourier)/np.sum(fourier)
-    amp   = max(segment)-min(segment)
-    max1  = np.max(fourier) #max amplitud fourier
-    
-    if len(maximos)>0 and max1>0.5:  f_aff = freqs[maximos[0]]
-    else:                           f_aff = -1e6 # to penalize the bad outputs #np.argmax(fourier)
-    
-    return f_msf, f_aff, max1, len(maximos)#amp

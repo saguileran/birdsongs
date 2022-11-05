@@ -69,7 +69,7 @@ class Song(Syllable):
         im_bin = rois.create_mask(Sxx_dB_blurred, bin_std=1.5, bin_per=0.5, mode='relative')
     
     
-    def Syllable(self, no_syllable, window_time=0.01, Nt=200, llambda=1.5):
+    def Syllable(self, no_syllable, Nt=200, llambda=1.5):
         self.no_syllable   = no_syllable
         ss                 = self.syllables[self.no_syllable-1]  # syllable indexes 
         syllable           = self.s[ss[0]:ss[-1]]       # audios syllable
@@ -77,7 +77,7 @@ class Song(Syllable):
         self.time_syllable = self.time[ss[0]:ss[-1]]
         self.t0            = self.time_syllable[0]
         
-        self.syllable      = Syllable(self.syll_complet, self.fs, self.time[ss[0]], window_time=window_time, Nt=Nt, llambda=llambda)
+        self.syllable      = Syllable(self.syll_complet, self.fs, self.time[ss[0]], Nt=Nt, llambda=llambda)
         
         self.syllable.no_syllable = self.no_syllable
         self.syllable.no_file     = self.no_file
@@ -88,7 +88,7 @@ class Song(Syllable):
         
         return self.syllable
     
-    def Chunck(self, no_chunck, window_time=0.005, Nt=514, llambda=1.5, len_win=0.01, NN=64):
+    def Chunck(self, no_chunck, Nt=514, llambda=1.5, NN=64):
         self.no_chunck     = no_chunck
         chuncks = sound.wave2frames(self.syll_complet,  Nt=Nt)
         times   = sound.wave2frames(self.time_syllable, Nt=Nt)

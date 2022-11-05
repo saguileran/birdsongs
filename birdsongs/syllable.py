@@ -392,12 +392,12 @@ class Syllable(object):
 
     def Plot(self, flag=False):       
         fig = plt.figure(constrained_layout=True, figsize=(30, 12))
-        gs  = fig.add_gridspec(nrows=4, ncols=5, hspace=0.2)
+        gs  = fig.add_gridspec(nrows=4, ncols=5, wspace=0.05, hspace=0.2)
         
         # ----- FF ---------------
         ax1 = fig.add_subplot(gs[0:2, :3])
         pcm = ax1.pcolormesh(self.tu, self.fu*1e-3, self.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)#, vmin=10, vmax=70)
-        plt.colorbar(pcm, ax=ax1, location='left', label='Power', pad=0.05)
+        plt.colorbar(pcm, ax=ax1, location='left', label='Power', pad=0.025)
         ax1.plot(self.timeFF, self.FF*1e-3, 'bo-', label='Real',ms=15)
         ax1.plot(self.synth.timeFF, self.synth.FF*1e-3, 'go-', label='Synthetic', ms=12)
         ax1.legend(); ax1.set_ylim((1, 15)); 
@@ -421,7 +421,7 @@ class Syllable(object):
         
         ax4 = fig.add_subplot(gs[3, 0])
         pcm = ax4.pcolormesh(self.synth.tu, self.synth.fu*1e-3, self.synth.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)#, vmin=10, vmax=70)
-        plt.colorbar(pcm, ax=ax4, location='left', label='Power', pad=0.0)
+        plt.colorbar(pcm, ax=ax4, location='left', label='Power', pad=0.05)
         ax4.plot(self.synth.timeFF, self.synth.FF*1e-3, 'go-', label='synthetic', ms=6)
         ax4.set_xlim((self.tu[0], self.tu[-1])); ax4.set_ylim((1, 15)); 
         ax4.set_ylabel('f (khz)'); ax4.set_xlabel('time (s)');     
@@ -431,7 +431,7 @@ class Syllable(object):
         # ------------------ Mel spectgrograms
         ax5 = fig.add_subplot(gs[2, 2])
         pcm = ax5.pcolormesh(self.FF_time, self.freq*1e-3, self.FF_coef, rasterized=True) #cmap=plt.get_cmap('Greys'))#, vmin=10, vmax=70)
-        plt.colorbar(pcm, ax=ax5, location='left', label='Power', pad=0.0)
+        plt.colorbar(pcm, ax=ax5, location='left', label='Power', pad=-0.05)
         ax5.set_xlim((self.tu[0], self.tu[-1])); ax5.set_ylim((1, 15)); 
         ax5.set_ylabel('f (khz)'); #ax5.set_xlabel('time (s)');     
         ax5.set_title('Mel-Spectrogram Frequency Real (FF-R)')
@@ -439,7 +439,7 @@ class Syllable(object):
         
         ax6 = fig.add_subplot(gs[3, 2])
         pcm = ax6.pcolormesh(self.synth.FF_time, self.synth.freq*1e-3, self.synth.FF_coef, rasterized=True)# cmap=plt.get_cmap('Greys'))#, vmin=10, vmax=70)
-        fig.colorbar(pcm, ax=ax6, location='left', label='Power', pad=0.0)
+        fig.colorbar(pcm, ax=ax6, location='left', label='Power', pad=-0.05)
         ax6.set_xlim((self.tu[0], self.tu[-1])); ax5.set_ylim((1, 15)); 
         ax6.set_ylabel('f (khz)'); ax6.set_xlabel('time (s)');     
         ax6.set_title('Mel-Spectrogram Frequency Synth (FF-S)')
@@ -448,7 +448,7 @@ class Syllable(object):
         # ------------------ Delta Sxx - Mell
         ax7 = fig.add_subplot(gs[2, 1])
         pcm = ax7.pcolormesh(self.tu, self.fu*1e-3, self.deltaSxx, cmap=plt.get_cmap('Greys'), rasterized=True)#, vmin=0, vmax=1)
-        plt.colorbar(pcm, ax=ax7, location='left', label='Power', pad=0.0)
+        plt.colorbar(pcm, ax=ax7, location='left', label='Power', pad=-0.05)
         #ax[1][0].plot(self.timeFF, self.deltaSCI, "-o", color="k", label='Σ R(SCI) = {:.4f}'.format(self.scoreSCI))
         ax7.set_ylabel('f (khz) (s)'); ax7.set_xlabel('t (s) (s)'); 
         ax7.set_ylim((1, 15)); ax7.set_title('Sxx Error (ΔSxx)')
@@ -456,7 +456,7 @@ class Syllable(object):
         
         ax8 = fig.add_subplot(gs[3, 1])
         pcm = ax8.pcolormesh(self.FF_time, self.freq*1e-3, self.deltaMel,  rasterized=True)# cmap=plt.get_cmap('Greys'),, vmin=0, vmax=1)
-        plt.colorbar(pcm, ax=ax8, location='left', label='Power', pad=0.0)
+        plt.colorbar(pcm, ax=ax8, location='left', label='Power', pad=-0.05)
         ax8.set_ylabel('f (khz) (s)'); ax8.set_xlabel('t (s) (s)'); 
         ax8.set_ylim((1, 15)); ax8.set_title('Mel Normalized Error (ΔMel)')
         

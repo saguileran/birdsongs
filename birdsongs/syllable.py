@@ -447,7 +447,7 @@ class Syllable(object):
         
         # ------------------ Delta Sxx - Mell
         ax7 = fig.add_subplot(gs[2, 1])
-        pcm = ax7.pcolormesh(self.tu, self.fu*1e-3, self.deltaSxx, cmap=plt.get_cmap('Greys_r'), rasterized=True)#, vmin=0, vmax=1)
+        pcm = ax7.pcolormesh(self.tu, self.fu*1e-3, self.deltaSxx, cmap=plt.get_cmap('Greys'), rasterized=True)#, vmin=0, vmax=1)
         plt.colorbar(pcm, ax=ax7, location='left', label='Power', pad=0.0)
         #ax[1][0].plot(self.timeFF, self.deltaSCI, "-o", color="k", label='Σ R(SCI) = {:.4f}'.format(self.scoreSCI))
         ax7.set_ylabel('f (khz) (s)'); ax7.set_xlabel('t (s) (s)'); 

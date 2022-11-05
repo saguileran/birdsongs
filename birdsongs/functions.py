@@ -15,7 +15,8 @@ from random import uniform
 from numpy.polynomial import Polynomial
 from multiprocessing import Pool
 from IPython.display import display as Display
-from librosa import yin, pyin, feature, display, onset, times_like, stft
+from numpy.linalg import norm as Norm
+from librosa import yin, pyin, feature, display, onset, times_like, stft, fft_frequencies
 import librosa 
 
 #from scipy.interpolate import UnivariateSpline

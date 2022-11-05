@@ -85,13 +85,13 @@ class Song(Syllable):
         
         return self.syllable
     
-    def Chunck(self, no_chunck, window_time=0.005, Nt=20, llambda=1.5, len_win=0.01):
+    def Chunck(self, no_chunck, window_time=0.005, Nt=514, llambda=1.5, len_win=0.01, NN=64):
         self.no_chunck     = no_chunck
-        chuncks = sound.wave2frames(self.syll_complet,  Nt=512)
-        times   = sound.wave2frames(self.time_syllable, Nt=512)
+        chuncks = sound.wave2frames(self.syll_complet,  Nt=Nt)
+        times   = sound.wave2frames(self.time_syllable, Nt=Nt)
         
         
-        self.chunck        = Syllable(chuncks[:,self.no_chunck-1], self.fs, times[self.no_chunck-1,0], NN=256, llambda=llambda, Nt=5)
+        self.chunck        = Syllable(chuncks[:,self.no_chunck-1], self.fs, times[self.no_chunck-1,0], NN=64, llambda=llambda, Nt=5)
         
         self.chunck.no_syllable = self.no_chunck
         self.chunck.no_file     = self.no_file
@@ -158,10 +158,10 @@ class Song(Syllable):
         ax[1].set_xlabel('t (s)'); ax[1].set_ylabel('Amplitud normalaized');
         ax[1].sharex(ax[0])
 
-        if flag==1:
+        if flag:
             #ax[2].pcolormesh(self.chunck.tu, self.chunck.fu, self.chunck.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)
-            ax[0].plot(self.chunck.timeFF+self.chunck.t0, self.chunck.FF*1e-3, 'g-', label='Chunck', lw=4)
-            ax[2].plot(self.chunck.timeFF+self.chunck.t0, self.chunck.FF*1e-3, 'g-', label='Chunck', lw=8)
+            ax[0].plot(self.chunck.timeFF+self.chunck.t0, self.chunck.FF*1e-3, 'g-', label='Chunck', lw=5)
+            ax[2].plot(self.chunck.timeFF+self.chunck.t0, self.chunck.FF*1e-3, 'g-', label='Chunck', lw=12)
         
         ax[2].pcolormesh(self.syllable.tu+self.syllable.t0, self.syllable.fu*1e-3, self.syllable.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True) 
         #ax[2].plot(self.syllable.timeFF+self.syllable.t0, self.syllable.FF*1e-3, 'b-', lw=5, label='Smoothed and Interpolated\nto {0}=fs'.format(self.syllable.fs))

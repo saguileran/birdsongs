@@ -24,7 +24,6 @@ class Syllable(object):
         self.time       = np.linspace(0, len(self.s)/self.fs, len(self.s))
         self.window_time   = window_time # 0.005 # 0.01
         
-        print(self.no_overlap, self.NN, self.no_overlap<self.NN)
         Sxx_power, tn, fn, ext = sound.spectrogram (self.s, self.fs, nperseg=self.NN, noverlap=self.no_overlap, mode='psd')  
         Sxx_dB = util.power2dB(Sxx_power) + 96
         Sxx_dB_noNoise, noise_profile, _ = sound.remove_background(Sxx_dB, gauss_std=25, gauss_win=50, llambda=self.llambda)
@@ -33,6 +32,16 @@ class Syllable(object):
         self.tu  = np.linspace(0, self.time[-1], Sxx_power.shape[1]) #tn #*self.time[-1]/tn[-1]
         self.Sxx = sound.smooth(Sxx_dB_noNoise, std=0.5)
         self.Sxx_dB = util.power2dB(self.Sxx) +96
+        
+        S = -35         # Sensbility microphone-35dBV (SM4) / -18dBV (Audiomoth)
+        G = 26          # Amplification gain (26dB (SM4 preamplifier))
+
+        ## acoustic indices in spectral domain
+        # df_spec_ind, df_spec_ind_per_bin = features.all_spectral_alpha_indices(self.Sxx_dB,self.tu,self.fu, 
+        #                             R_compatible = 'seewave', gain = G, sensitivity = S, verbose = False,
+        #                             flim_low = [0,2000], flim_mid = [2000,12000], flim_hi  = [12,20000], 
+        #                             mask_param1 = 6, mask_param2=0.5, display = False)
+        # self.df_spec_ind = df_spec_ind
         
 
         self.envelope = sound.envelope(self.s, Nt=self.Nt) 
@@ -152,6 +161,8 @@ class Syllable(object):
         self.out_amp = sound.normalize(self.out_amp, max_amp=1.0)
         
         self.s_amp_env = sound.envelope(self.out_amp, Nt=self.Nt) 
+        ## acoustic indices in spectral domain
+        
         t_env = np.arange(0,len(self.s_amp_env),1)*len(self.out_amp)/self.fs/len(self.s_amp_env)
         t_env[-1] = self.time[-1] 
         fun_s = interp1d(t_env, self.s_amp_env)
@@ -166,6 +177,16 @@ class Syllable(object):
         self.tu_out  = np.linspace(0, self.time[-1], Sxx_power.shape[1]) #tn#*self.time[-1]/tn[-1]
         self.Sxx_out = sound.smooth(Sxx_dB_noNoise, std=0.5)
         self.Sxx_dB_out = util.power2dB(self.Sxx) +96
+        
+        S = -35         # Sensbility microphone-35dBV (SM4) / -18dBV (Audiomoth)
+        G = 26          # Amplification gain (26dB (SM4 preamplifier))
+
+        
+        # df_spec_ind, df_spec_ind_per_bin = features.all_spectral_alpha_indices(self.Sxx_out,self.tu_out,self.fu_out, 
+        #                             R_compatible = 'seewave', gain = G, sensitivity = S, verbose = False,
+        #                             flim_low = [0,2000], flim_mid = [2000,12000], flim_hi  = [12,20000], 
+        #                             mask_param1 = 6, mask_param2=0.5, display = False)
+        # self.df_spec_ind = df_spec_ind
         
         
         self.time_out = np.linspace(0, len(self.out_amp)/self.fs, len(self.out_amp))

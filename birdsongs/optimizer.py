@@ -10,7 +10,8 @@ class Optimizer(Syllable):
         
     def residualSCI(self, p):
         syllable_synth = self.obj.Solve(p)
-        return syllable_synth.scoreSCI + syllable_synth.scoreFF
+        return syllable_synth.scoreSCI +  syllable_synth.scoreFF
+    # return scoreSxx + syllable_synth.scoreMfccs + syllable_synth.scoreMel # scoreCorrelation #scoreSCI 
     
     def residualFF(self, p):
         syllable_synth = self.obj.Solve(p)
@@ -51,11 +52,13 @@ class Optimizer(Syllable):
     def CompleteSolution(self):
         gm = self.opt_gamma
         start = time.time()
+        
+        self.obj.p = lmfit.Parameters()
         # add params:   (NAME   VALUE    VARY    MIN  MAX  EXPR BRUTE_STEP)
-        self.obj.p.add_many(('a0',   0.11, True ,   0, 0.25,  None, 0.01), 
-                            ('a1',   0.05, True,   -2,    2,  None, 0.1),  
-                            ('b0',   -0.1, True,   -1,  0.5,  None, 0.03),  
-                            ('b1',      1, True,  0.2,    2,  None, 0.04), 
+        self.obj.p.add_many(('a0',   0.11, True ,   0, 0.25,  None, None),#0.01), 
+                            ('a1',   0.05, True,   -2,    2,  None, None),#0.1),  
+                            ('b0',   -0.1, True,   -1,  0.5,  None, None),#0.03),  
+                            ('b1',      1, True,  0.2,    2,  None, None),#0.04), 
                             ('gamma', gm,  False,  1e4,  1e5, None, 1000),
                             ('b2',     0., False, None, None, None, None), 
                             ('a2',     0., False, None, None, None, None))

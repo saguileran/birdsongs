@@ -60,6 +60,9 @@ class Syllable(object):
         mfccs = feature.mfcc(y=self.s, sr=self.fs, S=self.Sxx, n_mfcc=256,
                              dct_type=2, norm='ortho', lifter=0)
         
+        # pitches, magnitudes = librosa.piptrack(y=obj.s, sr=obj.fs, S=obj.Sxx, n_fft=obj.NN, hop_length=obj.NN//2,
+        #                        fmin=obj.flim[0], fmax=obj.flim[1], threshold=0.01, win_length=None, 
+        #                        center=obj.center, pad_mode='constant', ref=None)
 #         zcr           = feature.zero_crossing_rate(self.s, frame_length=self.NN, hop_length=self.NN//2, center=self.center) #features.zero_crossing_rate(self.s, self.fs)
         
 #         [rolloff]     = feature.spectral_rolloff(y=self.s, sr=self.fs, S=self.Sxx, n_fft=self.NN, hop_length=self.NN//2, win_length=None, 
@@ -121,8 +124,8 @@ class Syllable(object):
         poly = Polynomial.fit(self.timeFF, self.FF, deg=10)
         x, y = poly.linspace(np.size(self.s))
         
-        self.beta  = b[0] + b[1]*(1e-4*y) + b[2]*(1e-4*y)**2
-        self.alpha = np.dot(a, t_par);  # self.beta = np.dot(b, t_par)
+        #self.beta  = b[0] + b[1]*(1e-4*y) + b[2]*(1e-4*y)**2
+        self.alpha = np.dot(a, t_par);  self.beta = np.dot(b, t_par)
     
     def MotorGestures(self, oversamp=20, prct_noise=0):
         N_total = len(self.s)
@@ -271,18 +274,17 @@ class Syllable(object):
             #print(Norm(x*y,ord=1), Norm(x,ord=2), Norm(y,ord=2), r)
             
             synth.correlation[i] = np.sqrt(1-r)
-            synth.Df[i]          = 0.5*Norm(x*np.log2(x/y)+y*np.log2(y/x), ord=1)
+            #synth.Df[i]          = 0.5*Norm(x*np.log2(x/y)+y*np.log2(y/x), ord=1)
             synth.Df[np.where(np.isnan(synth.Df))]=-1
             synth.SKL[i]         = 0.5*Norm(np.abs(x-y), ord=1)
         
             #synth.Df[np.argwhere(np.isnan(synth.Df))]=-10
         
         synth.correlation /= synth.correlation.max()
-        #synth.Df          /= synth.Df.max()
         synth.SKL         /= synth.SKL.max()
         
         synth.scoreCorrelation = Norm(synth.correlation, ord=self.ord)/synth.correlation.size
-        synth.scoreDF          = Norm(synth.Df, ord=self.ord)/synth.Df.size
         synth.scoreSKL         = Norm(synth.SKL, ord=self.ord)/synth.SKL.size
+        #synth.scoreDF          = Norm(synth.Df, ord=self.ord)/synth.Df.size
         
         return synth

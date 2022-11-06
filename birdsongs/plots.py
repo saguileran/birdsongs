@@ -166,7 +166,7 @@ class Ploter(object):
 
         ax2 = fig.add_subplot(gs[0:2, 3:])
         
-        ax2.plot(obj_synth.timeFF,  obj_synth.deltaFF ,      "*-", color="k",  label=r' $||ΔFF||_{}$= {:.4f}, mean={:.4f}'.format(obj.ord, obj_synth.scoreFF, obj_synth.deltaFF_mean)); 
+        ax2.plot(obj_synth.timeFF,  obj_synth.deltaFF ,      "*-", color="k",  ms=12, lw=3, label=r' $||ΔFF||_{}$= {:.4f}, mean={:.4f}'.format(obj.ord, obj_synth.scoreFF, obj_synth.deltaFF_mean)); 
         ax2.plot(obj_synth.FF_time, obj_synth.deltaRMS,      "-p", color="r",  label=r' $|| ΔF_{{ rms }}||_{}$= {:.4f}, mean={:.4f}'.format(obj.ord,  obj_synth.scoreRMS, obj_synth.scoreRMS_mean)); 
         ax2.plot(obj.FF_time,       obj_synth.deltaCentroid,  "-o", color="y", label=r'$ || \Delta F_{{ centroid }}||_{}$ = {:.4f}, mean={:.4f}'.format(obj.ord, obj_synth.scoreCentroid, obj_synth.scoreCentroid_mean)); 
         ax2.plot(obj.FF_time,       obj_synth.deltaF_msf,     "D-", color="purple", label=r'$ || \Delta F_{{ msf }}||_{}$ = {:.4f}, mean={:.4f}'.format(obj.ord, obj_synth.scoreF_msf, obj_synth.scoreF_msf_mean)); 
@@ -264,7 +264,7 @@ class Ploter(object):
         ax12.plot(obj_synth.FF_time, obj_synth.deltaSCI, 'ko-', label=r'$||SCI||_{}$={:.4f}, mean={:.3f}'.format(obj.ord, obj_synth.scoreSCI, obj_synth.deltaSCI_mean))
         
         ax12.plot(obj.FF_time, obj_synth.correlation, 'p-', label=r'$||cor||_{}$={:.3f}, mean={:.3f} '.format(obj.ord, obj_synth.scoreCorrelation, obj_synth.correlation.mean()))
-        ax12.plot(obj.FF_time, obj_synth.Df, 'H-', label=r'$||DF||_{}$={:.3f}, mean={:.3f} '.format(obj.ord, obj_synth.scoreDF, obj_synth.Df.mean()))
+        #ax12.plot(obj.FF_time, obj_synth.Df, 'H-', label=r'$||DF||_{}$={:.3f}, mean={:.3f} '.format(obj.ord, obj_synth.scoreDF, obj_synth.Df.mean()))
         ax12.plot(obj.FF_time, obj_synth.SKL, 's-', color="tomato", label=r'$||SKL||_{}$={:.3f}, mean={:.3f} '.format(obj.ord, obj_synth.scoreSKL, obj_synth.SKL.mean()))
         
         ax12.set_xlabel("t (s)"); ax12.set_ylabel("ΔSCI (adimensionless)"); 

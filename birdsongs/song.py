@@ -1,5 +1,5 @@
 from .syllable import *
-Pool() # crea pool to parallel programming for optimization
+from .functions import *
 
 class Song(Syllable):
     """
@@ -83,6 +83,7 @@ class Song(Syllable):
         self.syllable.no_file     = self.no_file
         self.syllable.p           = self.p
         self.syllable.paths       = self.paths
+        self.syllable.obj         = "syll"
         
         self.SylInd.append([[no_syllable], [ss]])
         
@@ -100,6 +101,7 @@ class Song(Syllable):
         self.chunck.no_file     = self.no_file
         self.chunck.p           = self.p
         self.chunck.paths       = self.paths
+        self.chunck.obj         = "chc"
         
         
         
@@ -133,51 +135,3 @@ class Song(Syllable):
         self.s_synth = np.empty_like(self.s)
         for i in range(self.syllables.size):
             self.s_synth[self.SylInd[i][1]] = self.syllables[i]
-        
-    # -------------------- PLOT --------------    
-    def Plot(self, chunck_on=False, save=False): 
-        fig, ax = plt.subplots(3, 1, figsize=(12, 9))
-        fig.subplots_adjust(hspace=0.4, wspace=0.4)
-        #fig.tight_layout(pad=3.0)
-        
-    
-        ax[0].pcolormesh(self.tu, self.fu/1000, self.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)
-        
-        ax[0].plot(self.syllable.timeFF+self.syllable.t0, self.syllable.FF*1e-3, 'bo', label='FF'.format(self.syllable.fs), lw=1)
-        #ax[0].plot(self.syllable.timeFF+self.syllable.t0, self.syllable.FF*1e-3, 'r+', label='sampled FF', ms=2)
-        for i in range(len(self.syllables)):#for ss in self.syllables:   
-            ax[0].plot([self.time[self.syllables[i][0]], self.time[self.syllables[i][-1]]], [0, 0], 'k', lw=5)
-            ax[0].text((self.time[self.syllables[i][-1]]-self.time[self.syllables[i][0]])/2, 0.5, str(i))
-        
-        ax[0].set_ylim(0, 12.000); ax[0].set_xlim(min(self.time), max(self.time));
-        ax[0].set_title("Complete Song Spectrum"); 
-        ax[0].set_ylabel('f (kHz)'); #ax[0].set_xlabel('t (s)'); 
-
-        ax[1].plot(self.time, self.s/np.max(self.s),'k', label='audio')
-        ax[1].plot(self.time, np.ones(len(self.time))*self.umbral, '--', label='umbral')
-        ax[1].plot(self.time, self.envelope, label='envelope')
-        ax[1].legend(loc='upper right')#loc=1, title='Data')
-        ax[1].set_title("Complete Song Sound Wave")
-        ax[1].set_xlabel('t (s)'); ax[1].set_ylabel('Amplitud normalaized');
-        ax[1].sharex(ax[0])
-
-        if chunck_on:
-            #ax[2].pcolormesh(self.chunck.tu, self.chunck.fu, self.chunck.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)
-            ax[0].plot(self.chunck.timeFF+self.chunck.t0, self.chunck.FF*1e-3, 'g-', label='Chunck', lw=5)
-            ax[2].plot(self.chunck.timeFF+self.chunck.t0, self.chunck.FF*1e-3, 'g-', label='Chunck', lw=12)
-        
-        ax[2].pcolormesh(self.syllable.tu+self.syllable.t0, self.syllable.fu*1e-3, self.syllable.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True) 
-        #ax[2].plot(self.syllable.timeFF+self.syllable.t0, self.syllable.FF*1e-3, 'b-', lw=5, label='Smoothed and Interpolated\nto {0}=fs'.format(self.syllable.fs))
-        ax[2].plot(self.syllable.timeFF+self.syllable.t0, self.syllable.FF*1e-3, 'b+', label='FF', ms=10)
-        ax[2].set_ylim((2, 11)); 
-        ax[2].set_xlim((self.syllable.timeFF[0]-0.001+self.syllable.t0, self.syllable.timeFF[-1]+0.001+self.syllable.t0));
-        ax[2].legend(loc='upper right')
-        ax[2].set_xlabel('t (s)'); ax[2].set_ylabel('f (khz)')
-        ax[2].set_title('Single Syllable Spectrum, No {}'.format(self.no_syllable))
-        
-        ax[0].legend(loc='upper right')
-        fig.suptitle('Audio: {}'.format(self.file_name[39:]), fontsize=20)#, family='fantasy')
-        plt.show()
-        
-        
-        if save: fig.savefig(self.paths.results+"AllSongAndSyllable-{}-{}.png".format(self.no_file,self.no_syllable))

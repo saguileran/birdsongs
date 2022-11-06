@@ -1,14 +1,10 @@
-os
-glob
 peakutils
 lmfit
-time
 numpy
 matplotlib 
 pandas
-math
 scipy
-random
-multiprocessing
 sklearn
-#signal_envelope
+IPython
+librosa
+maad

@@ -6,3 +6,5 @@ pandas
 scipy
 sklearn
 IPython
+librosa
+maad

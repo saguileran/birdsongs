@@ -166,10 +166,10 @@ class Ploter(object):
 
         ax2 = fig.add_subplot(gs[0:2, 3:])
         
-        ax2.plot(obj_synth.timeFF,  obj_synth.deltaFF ,      "*-", color="k",  label=r' $||ΔFF||_{}$= {:.4f}, mean:{:.4f}'.format(obj.ord, obj_synth.scoreFF, obj_synth.deltaFF_mean)); 
-        ax2.plot(obj_synth.FF_time, obj_synth.deltaRMS,      "-p", color="r",  label=r' $|| ΔF_{{ rms }}||_{}$= {:.4f}, mean:{:.4f}'.format(obj.ord,  obj_synth.scoreRMS, obj_synth.scoreRMS_mean)); 
-        ax2.plot(obj.FF_time,       obj_synth.deltaCentroid,  "-o", color="y", label=r'$ || \Delta F_{{ centroid }}||_{}$ = {:.4f}, mean:{:.4f}'.format(obj.ord, obj_synth.scoreCentroid, obj_synth.scoreCentroid_mean)); 
-        ax2.plot(obj.FF_time,       obj_synth.deltaF_msf,     "D-", color="purple", label=r'$ || \Delta F_{{ msf }}||_{}$ = {:.4f}, mean:{:.4f}'.format(obj.ord, obj_synth.scoreF_msf, obj_synth.scoreF_msf_mean)); 
+        ax2.plot(obj_synth.timeFF,  obj_synth.deltaFF ,      "*-", color="k",  label=r' $||ΔFF||_{}$= {:.4f}, mean={:.4f}'.format(obj.ord, obj_synth.scoreFF, obj_synth.deltaFF_mean)); 
+        ax2.plot(obj_synth.FF_time, obj_synth.deltaRMS,      "-p", color="r",  label=r' $|| ΔF_{{ rms }}||_{}$= {:.4f}, mean={:.4f}'.format(obj.ord,  obj_synth.scoreRMS, obj_synth.scoreRMS_mean)); 
+        ax2.plot(obj.FF_time,       obj_synth.deltaCentroid,  "-o", color="y", label=r'$ || \Delta F_{{ centroid }}||_{}$ = {:.4f}, mean={:.4f}'.format(obj.ord, obj_synth.scoreCentroid, obj_synth.scoreCentroid_mean)); 
+        ax2.plot(obj.FF_time,       obj_synth.deltaF_msf,     "D-", color="purple", label=r'$ || \Delta F_{{ msf }}||_{}$ = {:.4f}, mean={:.4f}'.format(obj.ord, obj_synth.scoreF_msf, obj_synth.scoreF_msf_mean)); 
         
         
         ax2.plot(obj_synth.FF_time, obj_synth.rms*1e-3, 'p-', color="darkred", label=r'$F_{rms}$ synth', ms=12)
@@ -241,7 +241,7 @@ class Ploter(object):
         ax9.set_title("Sound Waves")
 
         ax10 = fig.add_subplot(gs[3, 3])
-        ax10.plot(obj_synth.time, obj_synth.deltaEnv, 'ko-', label=r' $||env||_{}$ = {:.4f}, mean:{:.4f}'.format(obj.ord, obj_synth.scoreEnv, obj_synth.deltaEnv_mean))
+        ax10.plot(obj_synth.time, obj_synth.deltaEnv, 'ko-', label=r' $||env||_{}$ = {:.4f}, mean={:.4f}'.format(obj.ord, obj_synth.scoreEnv, obj_synth.deltaEnv_mean))
         ax10.set_xlabel("t (s)"); ax10.set_ylabel("Amplitud (a.u.)"); 
         ax10.set_title("Envelope Difference (Δ env)"); 
         ax10.set_ylim((0,1)); ax10.legend()
@@ -250,8 +250,10 @@ class Ploter(object):
 
         # ------------------ SIC
         ax11 = fig.add_subplot(gs[2, 4])
-        ax11.plot(obj.FF_time, obj.SCI, 'go-', label='real,   mean:{:.2f}'.format(obj.SCI.mean()))
-        ax11.plot(obj.FF_time, obj_synth.SCI, 'bo-', label='synth, mean:{:.2f} '.format(obj_synth.SCI.mean()))
+        ax11.plot(obj.FF_time, obj.SCI, 'go-', label='SCI real,   mean={:.2f}'.format(obj.SCI.mean()))
+        ax11.plot(obj.FF_time, obj_synth.SCI, 'bo-', label='SCI synth, mean={:.2f} '.format(obj_synth.SCI.mean()))
+        
+        
         ax11.set_xlabel("t (s)"); ax11.set_ylabel("SCI (adimensionless)"); 
         ax11.set_title("Spectral Content Index (SCI)"); 
         ax11.set_ylim((0,5)); ax11.legend()
@@ -259,9 +261,14 @@ class Ploter(object):
 
 
         ax12 = fig.add_subplot(gs[3, 4])
-        ax12.plot(obj_synth.FF_time, obj_synth.deltaSCI, 'ko-', label=r'$||SCI||_{}$={:.4f}, mean:{:.4f}'.format(obj.ord, obj_synth.scoreSCI, obj_synth.deltaSCI_mean))
+        ax12.plot(obj_synth.FF_time, obj_synth.deltaSCI, 'ko-', label=r'$||SCI||_{}$={:.4f}, mean={:.3f}'.format(obj.ord, obj_synth.scoreSCI, obj_synth.deltaSCI_mean))
+        
+        ax12.plot(obj.FF_time, obj_synth.correlation, 'p-', label=r'$||cor||_{}$={:.3f}, mean={:.3f} '.format(obj.ord, obj_synth.scoreCorrelation, obj_synth.correlation.mean()))
+        ax12.plot(obj.FF_time, obj_synth.Df, 'H-', label=r'$||DF||_{}$={:.3f}, mean={:.3f} '.format(obj.ord, obj_synth.scoreDF, obj_synth.Df.mean()))
+        ax12.plot(obj.FF_time, obj_synth.SKL, 's-', color="tomato", label=r'$||SKL||_{}$={:.3f}, mean={:.3f} '.format(obj.ord, obj_synth.scoreSKL, obj_synth.SKL.mean()))
+        
         ax12.set_xlabel("t (s)"); ax12.set_ylabel("ΔSCI (adimensionless)"); 
-        ax12.set_title("Spectral Content Index Error (ΔSCI)"); 
+        ax12.set_title("SCI Error and Acoustic Dissimilarity (ΔSCI & ADI)"); 
         if obj_synth.deltaSCI.max()>1: ax12.set_ylim((0,5)); 
         else:                     ax12.set_ylim((0,1)); 
         ax12.legend()

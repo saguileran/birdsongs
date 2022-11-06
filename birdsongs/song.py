@@ -78,11 +78,11 @@ class Song(Syllable):
         
         self.syllable      = Syllable(self.syll_complet, self.fs, self.time[ss[0]], Nt=Nt, llambda=llambda)
         
-        self.syllable.no_syllable = self.no_syllable
-        self.syllable.no_file     = self.no_file
-        self.syllable.p           = self.p
-        self.syllable.paths       = self.paths
-        self.syllable.id          = "syllable"
+        self.syllable.no_syllable  = self.no_syllable
+        self.syllable.no_file      = self.no_file
+        self.syllable.p            = self.p
+        self.syllable.paths        = self.paths
+        self.syllable.id           = "syllable"
         
         self.SylInd.append([[no_syllable], [ss]])
         
@@ -97,11 +97,11 @@ class Song(Syllable):
         
         self.chunck        = Syllable(self.chuncks[:,self.no_chunck-1], self.fs, self.times_chun[self.no_chunck-1,0], NN=NN, llambda=llambda, Nt=Nt)
         
-        self.chunck.no_syllable = self.no_chunck
-        self.chunck.no_file     = self.no_file
-        self.chunck.p           = self.p
-        self.chunck.paths       = self.paths
-        self.chunck.id          = "chunck"
+        self.chunck.no_syllable  = self.no_chunck
+        self.chunck.no_file      = self.no_file
+        self.chunck.p            = self.p
+        self.chunck.paths        = self.paths
+        self.chunck.id           = "chunck"
         
         return self.chunck
     
@@ -120,16 +120,6 @@ class Song(Syllable):
                 self.syllable.PlotSynth()
                 self.syllable.Plot(0)
 
-    def AllGammas(self, method_kwargs):
-        self.Gammas = np.zeros(self.no_syllables)
-        for i in range(1,self.no_syllables+1):
-            syllable       = self.Syllable(i)
-            syllable_synth = syllable.Solve(self.p)
-            
-            syllable_synth.OptimalGamma(method_kwargs)
-            self.Gammas[i-1] = syllable_synth.p["gamma"].value
-        return np.mean(self.Gammas)
-            
     def SyntheticSyllable(self):
         self.s_synth = np.empty_like(self.s)
         for i in range(self.syllables.size):

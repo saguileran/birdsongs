@@ -41,14 +41,13 @@ class Syllable(object):
         energy =  Norm(self.s,ord=2)/self.s.size
         Ht     = features.temporal_entropy (self.s, compatibility='seewave', mode='fast', Nt=self.NN)
         Hf, _  = features.frequency_entropy(Sxx_power, compatibility='seewave')
-        #EAS, ECU, ECV, EPS, EPS_KURT, EPS_SKEW = features.spectral_entropy(Sxx_power, fn, flim=self.flim) 
+        EAS, ECU, ECV, EPS, EPS_KURT, EPS_SKEW = features.spectral_entropy(Sxx_power, fn, flim=self.flim) 
         
         
         # ----------------------- vector features
         self.freq    = fft_frequencies(sr=self.fs, n_fft=self.NN) 
         self.FF_coef = np.abs(stft(y=self.s, n_fft=self.NN, hop_length=self.NN//2, win_length=None, 
                      center=self.center, dtype=None, pad_mode='constant'))
-        #self.FF_coef /= np.max(self.FF_coef)
         self.f_msf = np.array([Norm(self.FF_coef[:,i]*self.freq, 1)/Norm(self.FF_coef[:,i], 1) for i in range(self.FF_coef.shape[1])])
         
         self.FF_time = np.linspace(0,self.time[-1], self.FF_coef.shape[1]) #times_like(self.FF_coef, sr=self.fs, hop_length=self.NN//2, n_fft=self.NN)
@@ -58,6 +57,9 @@ class Syllable(object):
                                              win_length=None, center=self.center, pad_mode='constant')
         [rms]         = feature.rms(y=self.s, S=self.Sxx, frame_length=self.NN, hop_length=self.NN//2, 
                           center=self.center, pad_mode='constant')
+        mfccs = feature.mfcc(y=self.s, sr=self.fs, S=self.Sxx, n_mfcc=256,
+                             dct_type=2, norm='ortho', lifter=0)
+        
 #         zcr           = feature.zero_crossing_rate(self.s, frame_length=self.NN, hop_length=self.NN//2, center=self.center) #features.zero_crossing_rate(self.s, self.fs)
         
 #         [rolloff]     = feature.spectral_rolloff(y=self.s, sr=self.fs, S=self.Sxx, n_fft=self.NN, hop_length=self.NN//2, win_length=None, 
@@ -75,17 +77,16 @@ class Syllable(object):
 #                                              hop_length=self.NN//2, win_length=None, center=self.center, 
 #                                              pad_mode='constant', freq=None, fmin=self.flim[0], n_bands=4,
 #                                              quantile=0.02, linear=False)
-        mfccs = feature.mfcc(y=self.s, sr=self.fs, S=self.Sxx, n_mfcc=20,
-                             dct_type=2, norm='ortho', lifter=0)
         # s_mel = feature.melspectrogram(y=self.s, sr=self.fs, S=self.Sxx, n_fft=self.NN, 
         #                                hop_length=self.NN//2, win_length=None, center=self.center, 
         #                                pad_mode='constant', power=2.0, n_mels=126
         #                                fmin=self.flim[0], fmax=self.flim[1])
         
-        self.energy = energy
-        self.Ht = Ht
-        self.Hf = Hf
-        #self.entropyes = [EAS, ECU, ECV, EPS, EPS_KURT, EPS_SKEW]
+        #self.energy = energy
+        #self.Ht = Ht
+        #self.Hf = Hf
+        self.features  = [energy, Ht, Hf]
+        self.entropies = [EAS, ECU, ECV, EPS, EPS_KURT, EPS_SKEW]
         
         self.centroid = centroid
         self.rms = rms
@@ -98,7 +99,6 @@ class Syllable(object):
 #         self.FFT_coef = FFT_coef
 #         self.times_on = times_on
 #         self.contrast = contrast
-#         self.mfccs    = mfccs
 #         self.s_mel    = s_mel
         
         
@@ -205,7 +205,6 @@ class Syllable(object):
         synth.id          = "synth"
         synth.Vs          = self.Vs
         
-        
         return synth
         
     def Enve(self, out):
@@ -229,16 +228,18 @@ class Syllable(object):
         #deltaNoHarm = np.abs(synth.NoHarm_out-self.NoHarm).astype(float)
         deltaSxx    = np.abs(synth.Sxx_dB-self.Sxx_dB)
         deltaMel    = np.abs(synth.FF_coef-self.FF_coef)
+        deltaMfccs  = np.abs(synth.mfccs-self.mfccs)
         
         synth.deltaFmsf     = np.abs(synth.f_msf-self.f_msf)
         synth.deltaSCI      = np.abs(synth.SCI-self.SCI)
         synth.deltaEnv      = np.abs(synth.envelope-self.envelope)
         synth.deltaFF       = 1e-3*np.abs(synth.FF-self.FF) #/np.max(deltaFF)
-        synth.deltaSxx      = deltaSxx/np.max(deltaSxx)
-        synth.deltaMel      = deltaMel/np.max(deltaMel)
         synth.deltaRMS      = np.abs(synth.rms-self.rms)
         synth.deltaCentroid = 1e-3*np.abs(synth.centroid-self.centroid)
         synth.deltaF_msf    = 1e-3*np.abs(synth.f_msf-self.f_msf)
+        synth.deltaSxx      = deltaSxx/np.max(deltaSxx)
+        synth.deltaMel      = deltaMel/np.max(deltaMel)
+        synth.deltaMfccs    = deltaMfccs/np.max(deltaMfccs)
         
         #self.DeltaNoHarm = deltaNoHarm*10**(deltaNoHarm-2)
             
@@ -249,8 +250,9 @@ class Syllable(object):
         synth.scoreCentroid = Norm(synth.deltaCentroid, ord=self.ord)/synth.deltaCentroid.size
         synth.scoreF_msf    = Norm(synth.deltaF_msf, ord=self.ord)/synth.deltaF_msf.size
         
-        synth.scoreSxx    = Norm(synth.deltaSxx, ord=np.inf)/synth.deltaSxx.size
-        synth.scoreMel    = Norm(synth.deltaMel, ord=np.inf)/synth.deltaSxx.size
+        synth.scoreSxx      = Norm(synth.deltaSxx, ord=np.inf)/synth.deltaSxx.size
+        synth.scoreMel      = Norm(synth.deltaMel, ord=np.inf)/synth.deltaSxx.size
+        synth.scoreMfccs    = Norm(synth.deltaMfccs, ord=np.inf)/synth.deltaMfccs.size
         
         synth.deltaSCI_mean      = synth.deltaSCI.mean()
         synth.deltaFF_mean       = synth.deltaFF.mean()
@@ -259,77 +261,28 @@ class Syllable(object):
         synth.deltaEnv_mean      = synth.deltaEnv.mean()
         synth.scoreF_msf_mean    = synth.deltaF_msf.mean()
         
+        # -------         acoustic dissimilarity
+        synth.correlation = np.zeros_like(self.FF_time)
+        synth.Df          = np.zeros_like(self.FF_time)
+        synth.SKL         = np.zeros_like(self.FF_time)
+        for i in range(synth.mfccs.shape[1]):
+            x, y = self.mfccs[:,i], synth.mfccs[:,i]
+            r = Norm(x*y,ord=1)/(Norm(x,ord=2)*Norm(y,ord=2))
+            #print(Norm(x*y,ord=1), Norm(x,ord=2), Norm(y,ord=2), r)
+            
+            synth.correlation[i] = np.sqrt(1-r)
+            synth.Df[i]          = 0.5*Norm(x*np.log2(x/y)+y*np.log2(y/x), ord=1)
+            synth.Df[np.where(np.isnan(synth.Df))]=-1
+            synth.SKL[i]         = 0.5*Norm(np.abs(x-y), ord=1)
+        
+            #synth.Df[np.argwhere(np.isnan(synth.Df))]=-10
+        
+        synth.correlation /= synth.correlation.max()
+        #synth.Df          /= synth.Df.max()
+        synth.SKL         /= synth.SKL.max()
+        
+        synth.scoreCorrelation = Norm(synth.correlation, ord=self.ord)/synth.correlation.size
+        synth.scoreDF          = Norm(synth.Df, ord=self.ord)/synth.Df.size
+        synth.scoreSKL         = Norm(synth.SKL, ord=self.ord)/synth.SKL.size
+        
         return synth
-        
-    def residualSCI(self, p):
-        syllable_synth = self.Solve(p)
-        return syllable_synth.scoreSCI
-    
-    def residualFF(self, p):
-        
-        syllable_synth = self.Solve(p)
-        return syllable_synth.scoreFF
-    
-    def residualFFandSCI(self, p):
-        syllable_synth = self.Solve(p)
-        return syllable_synth.scoreSCI+syllable_synth.scoreFF
-    
-    # ----------- OPTIMIZATION FUNCTIONS --------------
-    def OptimalGamma(self, method_kwargs):
-        kwargs = {k: method_kwargs[k] for k in set(list(method_kwargs.keys())) - set(["method"])}
-    
-        start = time.time()
-        self.p["gamma"].set(vary=True)
-        mi    = lmfit.minimize(self.residualSCI, self.p, nan_policy='omit', method=method_kwargs["method"], **kwargs) 
-        self.p["gamma"].set(value=mi.params["gamma"].value, vary=False)
-        end   = time.time()
-        print("γ* =  {0:.0f}, t={1:.4f} min".format(self.p["gamma"].value, (end-start)/60))
-        return mi.params["gamma"].value
-    
-    def OptimalBs(self, method_kwargs):
-        kwargs = {k: method_kwargs[k] for k in set(list(method_kwargs.keys())) - set(["method"])}
-        # ---------------- b0--------------------
-        start0 = time.time()
-        self.p["b0"].set(vary=True)
-        mi0    = lmfit.minimize(self.residualFF, self.p, nan_policy='omit', method=method_kwargs["method"], **kwargs) 
-        self.p["b0"].set(vary=False, value=mi0.params["b0"].value)
-        end0   = time.time()
-        print("b_0*={0:.4f}, t={1:.4f} min".format(self.p["b0"].value, (end0-start0)/60))
-        # ---------------- b1--------------------
-        start1 = time.time()
-        self.p["b1"].set(vary=True)
-        mi1    = lmfit.minimize(self.residualFF, self.p, nan_policy='omit', method=method_kwargs["method"], **kwargs) 
-        self.p["b1"].set(vary=False, value=mi1.params["b1"].value)
-        end1   = time.time()
-        print("b_1*={0:.4f}, t={1:.4f} min".format(self.p["b1"].value, (end1-start1)/60))
-        #return self.p["b0"].value, self.p["b1"].value #end0-start0, end1-start1
-    
-    def OptimalParams(self, method_kwargs):
-        self.Solve(self.p)  # solve first syllable
-        
-        kwargs["Ns"] = 51;   self.OptimalGamma(method_kwargs)
-        kwargs["Ns"] = 21;   self.OptimalBs(method_kwargs)
-        self.WriteAudio()
-    
-    # Solve the minimization problem at once
-    def CompleteSolution(self, opt_gamma, kwargs):
-        start = time.time()
-        # add params:   (NAME   VALUE    VARY    MIN  MAX  EXPR BRUTE_STEP)
-        self.p.add_many(('a0',   0.11,         True ,   0, 0.25,  None, 0.01), 
-                        ('a1',   0.05,         True,   -2,    2,  None, 0.1),  
-                        ('b0',   -0.1,         True,   -1,  0.5,  None, 0.03),  
-                        ('b1',      1,         True,  0.2,    2,  None, 0.04), 
-                        ('gamma', opt_gamma,   False,  1e4,  1e5, None, 1000),
-                        ('b2',     0.,         False, None, None, None, None), 
-                        ('a2',     0.,         False, None, None, None, None))
-        mi    = lmfit.minimize(self.residualFFandSCI, self.p, nan_policy='omit', **kwargs) 
-        self.p["a0"].set(   vary=False, value=mi.params["a0"].value)
-        self.p["a1"].set(   vary=False, value=mi.params["a1"].value)
-        self.p["b0"].set(   vary=False, value=mi.params["b0"].value)
-        self.p["b1"].set(   vary=False, value=mi.params["b1"].value)
-        self.p["gamma"].set(vary=False, value=mi.params["gamma"].value)
-        
-        self.Solve(self.p)
-        end = time.time()
-        
-        print("Time of execution = {0:.4f}".format(end-start))

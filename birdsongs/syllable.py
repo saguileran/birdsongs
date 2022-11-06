@@ -9,7 +9,7 @@ class Syllable(object):
         fs = sampling rate
         t0 = initial time of the syllable
     """
-    def __init__(self, s, fs, t0, Nt=200, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4)):
+    def __init__(self, s, fs, t0, Nt=200, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4), center=False):
         self.t0 = t0
         self.Nt = Nt
         self.NN = NN
@@ -34,7 +34,7 @@ class Syllable(object):
         # -------------------------------------------------------------------
         # ------------- ACOUSTIC FEATURES -----------------------------------
         # -------------------------------------------------------------------
-        self.center = False
+        self.center = center
         # ----------------------- scalar features
         energy =  Norm(self.s,ord=2)/self.s.size
         Ht     = features.temporal_entropy (self.s, compatibility='seewave', mode='fast', Nt=self.NN)
@@ -44,11 +44,11 @@ class Syllable(object):
         # ----------------------- vector features
         self.freq    = fft_frequencies(sr=self.fs, n_fft=self.NN) 
         self.FF_coef = np.abs(stft(y=self.s, n_fft=self.NN, hop_length=self.NN//2, win_length=None, 
-                     center=True, dtype=None, pad_mode='constant'))
+                     center=self.center, dtype=None, pad_mode='constant'))
         self.FF_coef /= np.max(self.FF_coef)
         self.FF_time = np.linspace(0,self.time[-1], self.FF_coef.shape[1]) #times_like(self.FF_coef, sr=self.fs, hop_length=self.NN//2, n_fft=self.NN)
         
-        centroid      = feature.spectral_centroid(y=self.s, sr=self.fs, S=self.Sxx_dB, n_fft=self.NN, 
+        [centroid]      = feature.spectral_centroid(y=self.s, sr=self.fs, S=self.Sxx_dB, n_fft=self.NN, 
                                                   hop_length=self.NN//2, freq=None, 
                                              win_length=None, center=self.center, pad_mode='constant')
         [rms]         = feature.rms(y=self.s, S=self.Sxx, frame_length=self.NN, hop_length=self.NN//2, 
@@ -206,7 +206,7 @@ class Syllable(object):
         wavfile.write('{}/song_{}_{}.wav'.format(self.paths.examples,self.no_syllable),       self.fs, np.asarray(self.s,     dtype=np.float32))
     
     # -------------- --------------
-    def Solve(self, p):
+    def Solve(self, p, ord=1):
         self.p = p
         self.AlphaBeta()
         self.MotorGestures() # solve the problem and define the synthetic syllable
@@ -214,21 +214,27 @@ class Syllable(object):
         #deltaFF     = 
         #deltaSCI    = np.abs(self.synth.SCI-self.SCI)
         #deltaNoHarm = np.abs(self.synth.NoHarm_out-self.NoHarm).astype(float)
-        deltaSxx    = np.abs(self.synth.Sxx-self.Sxx)
+        deltaSxx    = np.abs(self.synth.Sxx_dB-self.Sxx_dB)
         deltaMel    = np.abs(self.synth.FF_coef-self.FF_coef)
         
         self.deltaEnv   = np.abs(self.synth.envelope-self.envelope)
-        self.deltaFF     = 1e-4*np.abs(self.synth.FF-self.FF) #/np.max(deltaFF)
+        self.deltaFF    = 1e-3*np.abs(self.synth.FF-self.FF) #/np.max(deltaFF)
         #self.deltaSCI    = deltaSCI     #/np.max(deltaSCI)
         #self.DeltaNoHarm = deltaNoHarm*10**(deltaNoHarm-2)
         self.deltaSxx    = deltaSxx/np.max(deltaSxx)
         self.deltaMel    = deltaMel/np.max(deltaMel)
+        self.deltaRMS    = np.abs(self.rms-self.synth.rms)
+        self.deltaCentroid = 1e-3*np.abs(self.centroid-self.synth.centroid)
             
         #self.scoreSCI    = np.norm(self.deltaSCI)#/self.deltaSCI.size
-        self.scoreFF     = Norm(np.abs(self.deltaFF),ord=1)/self.deltaFF.size
-        self.scoreEnv    = Norm(self.deltaEnv,ord=1)/self.deltaEnv.size
+        self.scoreFF     = Norm(self.deltaFF,  ord=ord)/self.deltaFF.size
+        self.scoreEnv    = Norm(self.deltaEnv, ord=ord)/self.deltaEnv.size
+        self.scoreRMS    = Norm(self.deltaRMS, ord=ord)/self.deltaRMS.size
+        self.scoreCentroid    = Norm(self.deltaCentroid, ord=ord)/self.deltaCentroid.size
+        
         self.scoreSxx    = Norm(self.deltaSxx, ord=np.inf)#/self.DeltaSxx.size
         self.scoreMel    = Norm(self.deltaMel, ord=np.inf)#/self.DeltaSxx.size
+        
         
         
     def residualSCI(self, p):
@@ -323,20 +329,20 @@ class Syllable(object):
         Delta_tu   = self.tu[-1] - self.tu[0]
         Delta_tu_s = 1#tu_s[-1] - tu_s[0]
 
-        pcm = ax[0][1].pcolormesh(self.tu, self.fu*1e-3, self.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)#, vmin=10, vmax=70)
-        fig.colorbar(pcm, ax=ax[0,1], location='right', label='Power')
+        pcm = ax[0][1].pcolormesh(self.tu, self.fu*1e-3, self.Sxx_dB, cmap=plt.get_cmap('Greys'), rasterized=True)#, vmin=10, vmax=70)
+        fig.colorbar(pcm, ax=ax[0,1], location='right', label='Power (dB)')
         ax[0][1].plot(self.timeFF, self.FF*1e-3, 'bo-', lw=2)
         ax[0][1].set_title('Real'); ax[0][1].set_ylabel('f (khz)'); ax[0][1].set_ylim(0, 20);
 
-        pcm = ax[1][1].pcolormesh(self.synth.tu, self.synth.fu*1e-3, self.synth.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)#, vmin=10, vmax=70)
-        fig.colorbar(pcm, ax=ax[1,1], location='right', label='Power')
+        pcm = ax[1][1].pcolormesh(self.synth.tu, self.synth.fu*1e-3, self.synth.Sxx_dB, cmap=plt.get_cmap('Greys_r'), rasterized=True)#, vmin=10, vmax=70)
+        fig.colorbar(pcm, ax=ax[1,1], location='right', label='Power (dB)')
         ax[1][1].plot(self.synth.timeFF, self.synth.FF*1e-3, 'go-', lw=2)
         ax[1][1].set_title('Synthetic') 
         ax[1][1].set_ylim(0, 20);   ax[1][1].set_xlim(min(self.synth.time), max(self.synth.time))
         ax[1][1].set_xlabel('t (s)'); ax[1][1].set_ylabel('f (khz)');
 
         #fig.tight_layout(); 
-        fig.suptitle('Sound Waves and Spectrograms', fontsize=20)#, family='fantasy');
+        fig.suptitle('Sound Waves and Spectrograms', fontsize=20)
         plt.show()
         
     def PlotAlphaBeta(self, xlim=(-0.05,.2), ylim=(-0.2,0.9)):
@@ -347,7 +353,7 @@ class Syllable(object):
         ax3 = fig.add_subplot(gs[:, 1])
 
         fig.suptitle("GridSpec")
-        fig.tight_layout(pad=3.0)        #fig.subplots_adjust(top=0.85)
+        fig.tight_layout(pad=3.0) #fig.subplots_adjust(top=0.85)
         
         viridis = cm.get_cmap('Blues')
         c       = viridis(np.linspace(0.3, 1, np.size(self.time)))
@@ -390,38 +396,43 @@ class Syllable(object):
         fig.suptitle("Air-Sac Pressure (α) and Labial Tension (β) Parameters", fontsize=20)#, family='fantasy')
         plt.show()
 
-    def Plot(self, flag=False):       
-        fig = plt.figure(constrained_layout=True, figsize=(30, 12))
+    def Plot(self, flag=False, cmp="afmhot_r"):       
+        fig = plt.figure(constrained_layout=False, figsize=(30, 12))
         gs  = fig.add_gridspec(nrows=4, ncols=5, wspace=0.05, hspace=0.2)
-        
+        vmin, vmax = self.Sxx_dB.min(), self.Sxx_dB.max()
         # ----- FF ---------------
         ax1 = fig.add_subplot(gs[0:2, :3])
-        pcm = ax1.pcolormesh(self.tu, self.fu*1e-3, self.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)#, vmin=10, vmax=70)
-        plt.colorbar(pcm, ax=ax1, location='left', label='Power', pad=0.025)
+        pcm = ax1.pcolormesh(self.tu, self.fu*1e-3, self.Sxx_dB, cmap=plt.get_cmap(cmp), rasterized=True, vmin=vmin, vmax=vmax)
+        plt.colorbar(pcm, ax=ax1, location='left', label='Power (dB)', pad=0.025)
         ax1.plot(self.timeFF, self.FF*1e-3, 'bo-', label='Real',ms=15)
         ax1.plot(self.synth.timeFF, self.synth.FF*1e-3, 'go-', label='Synthetic', ms=12)
         ax1.legend(); ax1.set_ylim((1, 15)); 
-        ax1.set_ylim((1, 15)); ax1.set_xlim((self.tu[0], self.tu[-1]))
+        ax1.set_xlim((self.tu[0], self.tu[-1]))
         ax1.set_ylabel('f (khz)'); #ax1.set_xlabel('time (s)');     
         ax1.set_title('Spectrogram - Fundamental Frequency (FF)')
         
         ax2 = fig.add_subplot(gs[0:2, 3:])
-        ax2.plot(self.timeFF, self.deltaFF, "-o", color="k", label='Σ ΔFF= {:.4f}'.format(self.scoreFF)); ax2.set_ylim((0,15e3))
+        ax2.plot(self.timeFF, self.deltaFF, "-o", color="k", label=r' $||ΔFF||_1$= {:.4f}'.format(self.scoreFF)); 
+        ax2.plot(self.FF_time, self.deltaRMS, "-o", color="r", label=r' $|| ΔF_{{ rms }}||_1$= {:.4f}'.format(self.scoreRMS)); 
+        ax2.plot(self.FF_time, self.deltaCentroid, "-o", color="y", label=r'$ || \Delta F_{{ centroid }}||_1$ = {:.4f}'.format(self.scoreCentroid)); 
         ax2.set_xlabel('time (s)'); ax2.set_ylabel('f (kHz)'); ax2.legend()
-        ax2.set_title('Fundamental Frequency Error (ΔFF)'); ax2.set_ylim((0,1))
+        ax2.set_title('Fundamental Frequency Error (ΔFF)'); 
+        if self.deltaRMS.max() > 1: ax2.set_ylim((-0.5,7))
+        else:                       ax2.set_ylim((-0.1,1))
+        
         
         # ------------------ spectgrograms
         ax3 = fig.add_subplot(gs[2, 0])
-        pcm = ax3.pcolormesh(self.tu, self.fu*1e-3, self.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)#, vmin=10, vmax=70)
-        plt.colorbar(pcm, ax=ax3, location='left', label='Power', pad=0.05)
-        ax3.plot(self.timeFF, self.FF*1e-3, 'bo-', label='Real', ms=10)
+        pcm = ax3.pcolormesh(self.tu, self.fu*1e-3, self.Sxx_dB, cmap=plt.get_cmap(cmp), rasterized=True, vmin=vmin, vmax=vmax)
+        plt.colorbar(pcm, ax=ax3, location='left', label='Power (dB)', pad=0.05)
+        ax3.plot(self.timeFF, self.FF*1e-3, 'b*-', label='Real', ms=10)
         ax3.set_ylim((1, 15)); ax3.set_xlim((self.tu[0], self.tu[-1]))
         ax3.set_ylabel('f (khz)');    
         ax3.set_title('Spectrogram Real (FF-R)')
         
         ax4 = fig.add_subplot(gs[3, 0])
-        pcm = ax4.pcolormesh(self.synth.tu, self.synth.fu*1e-3, self.synth.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)#, vmin=10, vmax=70)
-        plt.colorbar(pcm, ax=ax4, location='left', label='Power', pad=0.05)
+        pcm = ax4.pcolormesh(self.synth.tu, self.synth.fu*1e-3, self.synth.Sxx_dB, cmap=plt.get_cmap(cmp), vmin=vmin, vmax=vmax)
+        plt.colorbar(pcm, ax=ax4, location='left', label='Power (dB)', pad=0.05)
         ax4.plot(self.synth.timeFF, self.synth.FF*1e-3, 'go-', label='synthetic', ms=6)
         ax4.set_xlim((self.tu[0], self.tu[-1])); ax4.set_ylim((1, 15)); 
         ax4.set_ylabel('f (khz)'); ax4.set_xlabel('time (s)');     
@@ -430,7 +441,7 @@ class Syllable(object):
         
         # ------------------ Mel spectgrograms
         ax5 = fig.add_subplot(gs[2, 2])
-        pcm = ax5.pcolormesh(self.FF_time, self.freq*1e-3, self.FF_coef, rasterized=True) #cmap=plt.get_cmap('Greys'))#, vmin=10, vmax=70)
+        pcm = ax5.pcolormesh(self.FF_time, self.freq*1e-3, self.FF_coef, rasterized=True, cmap=plt.get_cmap(cmp))#, vmin=10, vmax=70)
         plt.colorbar(pcm, ax=ax5, location='left', label='Power', pad=-0.05)
         ax5.set_xlim((self.tu[0], self.tu[-1])); ax5.set_ylim((1, 15)); 
         ax5.set_ylabel('f (khz)'); #ax5.set_xlabel('time (s)');     
@@ -438,7 +449,7 @@ class Syllable(object):
         #ax5.sharex(ax3)
         
         ax6 = fig.add_subplot(gs[3, 2])
-        pcm = ax6.pcolormesh(self.synth.FF_time, self.synth.freq*1e-3, self.synth.FF_coef, rasterized=True)# cmap=plt.get_cmap('Greys'))#, vmin=10, vmax=70)
+        pcm = ax6.pcolormesh(self.synth.FF_time, self.synth.freq*1e-3, self.synth.FF_coef, rasterized=True, cmap=plt.get_cmap(cmp))#, vmin=10, vmax=70)
         fig.colorbar(pcm, ax=ax6, location='left', label='Power', pad=-0.05)
         ax6.set_xlim((self.tu[0], self.tu[-1])); ax5.set_ylim((1, 15)); 
         ax6.set_ylabel('f (khz)'); ax6.set_xlabel('time (s)');     
@@ -447,16 +458,16 @@ class Syllable(object):
         
         # ------------------ Delta Sxx - Mell
         ax7 = fig.add_subplot(gs[2, 1])
-        pcm = ax7.pcolormesh(self.tu, self.fu*1e-3, self.deltaSxx, cmap=plt.get_cmap('Greys'), rasterized=True)#, vmin=0, vmax=1)
-        plt.colorbar(pcm, ax=ax7, location='left', label='Power', pad=-0.05)
+        pcm = ax7.pcolormesh(self.tu, self.fu*1e-3, self.deltaSxx, cmap=plt.get_cmap(cmp), rasterized=True)#, vmin=0, vmax=1)
+        plt.colorbar(pcm, ax=ax7, location='left', label='Power (adimensionless)', pad=-0.05)
         #ax[1][0].plot(self.timeFF, self.deltaSCI, "-o", color="k", label='Σ R(SCI) = {:.4f}'.format(self.scoreSCI))
         ax7.set_ylabel('f (khz) (s)'); ax7.set_xlabel('t (s) (s)'); 
         ax7.set_ylim((1, 15)); ax7.set_title('Sxx Error (ΔSxx)')
         #ax7.sharex(ax6)
         
         ax8 = fig.add_subplot(gs[3, 1])
-        pcm = ax8.pcolormesh(self.FF_time, self.freq*1e-3, self.deltaMel,  rasterized=True)# cmap=plt.get_cmap('Greys'),, vmin=0, vmax=1)
-        plt.colorbar(pcm, ax=ax8, location='left', label='Power', pad=-0.05)
+        pcm = ax8.pcolormesh(self.FF_time, self.freq*1e-3, self.deltaMel,  rasterized=True, cmap=plt.get_cmap(cmp))#,, vmin=0, vmax=1)
+        plt.colorbar(pcm, ax=ax8, location='left', label='Power (adimensionless)', pad=-0.05)
         ax8.set_ylabel('f (khz) (s)'); ax8.set_xlabel('t (s) (s)'); 
         ax8.set_ylim((1, 15)); ax8.set_title('Mel Normalized Error (ΔMel)')
         
@@ -482,7 +493,6 @@ class Syllable(object):
         ax12 = fig.add_subplot(gs[3, 4])
         
 
-        
         fig.suptitle("SCORES", fontsize=20)#, family='fantasy')
         plt.show()
         

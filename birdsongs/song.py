@@ -55,7 +55,7 @@ class Song(Syllable):
                         ('a2',     0.,   False, None, None, None, None))
         self.syllables    = [syl for syl in self.Syllables() if len(syl)>self.NN]
         self.no_syllables = len(self.syllables)
-        
+        print('The son has {} syllables'.format(len(self.syllables)))
         
     def Syllables(self, min_length=64, stepsize=1):
         supra      = np.where(self.envelope > self.umbral)[0]
@@ -135,7 +135,7 @@ class Song(Syllable):
             self.s_synth[self.SylInd[i][1]] = self.syllables[i]
         
     # -------------------- PLOT --------------    
-    def Plot(self, flag=0): 
+    def Plot(self, chunck_on=False, save=False): 
         fig, ax = plt.subplots(3, 1, figsize=(12, 9))
         fig.subplots_adjust(hspace=0.4, wspace=0.4)
         #fig.tight_layout(pad=3.0)
@@ -161,7 +161,7 @@ class Song(Syllable):
         ax[1].set_xlabel('t (s)'); ax[1].set_ylabel('Amplitud normalaized');
         ax[1].sharex(ax[0])
 
-        if flag:
+        if chunck_on:
             #ax[2].pcolormesh(self.chunck.tu, self.chunck.fu, self.chunck.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True)
             ax[0].plot(self.chunck.timeFF+self.chunck.t0, self.chunck.FF*1e-3, 'g-', label='Chunck', lw=5)
             ax[2].plot(self.chunck.timeFF+self.chunck.t0, self.chunck.FF*1e-3, 'g-', label='Chunck', lw=12)
@@ -178,4 +178,6 @@ class Song(Syllable):
         ax[0].legend(loc='upper right')
         fig.suptitle('Audio: {}'.format(self.file_name[39:]), fontsize=20)#, family='fantasy')
         plt.show()
-        print('Number of syllables {}'.format(len(self.syllables)))
+        
+        
+        if save: fig.savefig(self.paths.results+"AllSongAndSyllable-{}-{}.png".format(self.no_file,self.no_syllable))

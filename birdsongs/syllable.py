@@ -316,7 +316,7 @@ class Syllable(object):
     
     
     ## ----------------------- PLOT FUNCTIONS --------------------------
-    def PlotSynth(self):
+    def PlotSynth(self, save=False):
         
         fig, ax = plt.subplots(2, 2, figsize=(12, 5), sharex=True, sharey='col')
         fig.subplots_adjust(top=0.85)     
@@ -350,7 +350,9 @@ class Syllable(object):
         fig.suptitle('Sound Waves and Spectrograms', fontsize=20)
         plt.show()
         
-    def PlotAlphaBeta(self, xlim=(-0.05,.2), ylim=(-0.2,0.9)):
+        if save: fig.savefig(self.paths.results+"SoundAndSpectros-{}-{}.png".format(self.no_file,self.no_syllable))
+        
+    def PlotAlphaBeta(self, xlim=(-0.05,.2), ylim=(-0.2,0.9), save=False):
         fig = plt.figure(constrained_layout=True, figsize=(10, 6))
         gs  = GridSpec(2, 2, figure=fig)
         ax1 = fig.add_subplot(gs[0, 0])
@@ -400,8 +402,11 @@ class Syllable(object):
         ax3.set_xlim(xlim); ax3.set_ylim(ylim)
         fig.suptitle("Air-Sac Pressure (α) and Labial Tension (β) Parameters", fontsize=20)#, family='fantasy')
         plt.show()
+        
+        if save: fig.savefig(self.paths.results+"MotorGesturesParameters-{}-{}.png".format(self.no_file,self.no_syllable))
+        
 
-    def Plot(self, flag=False, cmp="afmhot_r"):       
+    def Plot(self, save=False, cmp="afmhot_r"):       
         fig = plt.figure(constrained_layout=False, figsize=(30, 12))
         gs  = fig.add_gridspec(nrows=4, ncols=5, wspace=0.05, hspace=0.2)
         vmin, vmax = self.Sxx_dB.min(), self.Sxx_dB.max()
@@ -413,7 +418,7 @@ class Syllable(object):
         ax1.plot(self.synth.timeFF, self.synth.FF*1e-3, 'go-', label='Synthetic', ms=12)
         ax1.legend(borderpad=0.6, labelspacing=0.7); ax1.set_ylim((1, 15)); 
         ax1.set_xlim((self.tu[0], self.tu[-1]))
-        ax1.set_ylabel('f (khz)'); #ax1.set_xlabel('time (s)');     
+        ax1.set_ylabel('f (khz)'); ax1.set_xlabel('time (s)');     
         ax1.set_title('Spectrogram - Fundamental Frequency (FF)')
         
         ax2 = fig.add_subplot(gs[0:2, 3:])
@@ -466,22 +471,22 @@ class Syllable(object):
         pcm = ax7.pcolormesh(self.tu, self.fu*1e-3, self.deltaSxx, cmap=plt.get_cmap(cmp), rasterized=True)#, vmin=0, vmax=1)
         plt.colorbar(pcm, ax=ax7, location='left', label='Power (adimensionless)', pad=-0.05)
         #ax[1][0].plot(self.timeFF, self.deltaSCI, "-o", color="k", label='Σ R(SCI) = {:.4f}'.format(self.scoreSCI))
-        ax7.set_ylabel('f (khz) (s)'); ax7.set_xlabel('t (s) (s)'); 
-        ax7.set_ylim((1, 15)); ax7.set_title('Sxx Error (ΔSxx)')
+        ax7.set_ylabel('f (khz) (s)'); ax7.set_xlabel(''); 
+        ax7.set_ylim((1, 15)); ax7.set_title('Power Spectrum Error (ΔSxx)')
         #ax7.sharex(ax6)
         
         ax8 = fig.add_subplot(gs[3, 1])
         pcm = ax8.pcolormesh(self.FF_time, self.freq*1e-3, self.deltaMel,  rasterized=True, cmap=plt.get_cmap(cmp))#,, vmin=0, vmax=1)
         plt.colorbar(pcm, ax=ax8, location='left', label='Power (adimensionless)', pad=-0.05)
-        ax8.set_ylabel('f (khz) (s)'); ax8.set_xlabel('t (s) (s)'); 
+        ax8.set_ylabel('f (khz) (s)'); ax8.set_xlabel('t (s)'); 
         ax8.set_ylim((1, 15)); ax8.set_title('Mel Normalized Error (ΔMel)')
         
         # ------------------ sound
         ax9 = fig.add_subplot(gs[2, 3])
-        ax9.plot(self.time,     self.s,        label='real',     c='b')
-        ax9.plot(self.time,     self.envelope, label='real_env', c='k')
-        ax9.plot(self.synth.time, self.synth.s,  label='syn_env',  c='g')
-        ax9.plot(self.synth.time, self.synth.envelope,label='synth',    c='g')
+        ax9.plot(self.time,       self.s,             c='b', label='real')
+        ax9.plot(self.time,       self.envelope,      c='k') #label='real_env',
+        ax9.plot(self.synth.time, self.synth.s,       c='g') #label='syn_env',
+        ax9.plot(self.synth.time, self.synth.envelope c='g', label='synth')
         ax9.legend(); ax9.set_ylabel("Amplitud (a.u.)")
         ax9.set_title("Sound Waves")
         
@@ -495,7 +500,7 @@ class Syllable(object):
         
         # ------------------ SIC
         ax11 = fig.add_subplot(gs[2, 4])
-        ax11.plot(self.FF_time, self.SCI, 'go-', label='real,   mean:{:.2f} real'.format(self.SCI.mean()))
+        ax11.plot(self.FF_time, self.SCI, 'go-', label='real,   mean:{:.2f}'.format(self.SCI.mean()))
         ax11.plot(self.FF_time, self.synth.SCI, 'bo-', label='synth, mean:{:.2f} '.format(self.synth.SCI.mean()))
         ax11.set_xlabel("t (s)"); ax11.set_ylabel("SCI (adimensionless)"); 
         ax11.set_title("Spectral Content Index (SCI)"); 
@@ -507,15 +512,19 @@ class Syllable(object):
         ax12.plot(self.FF_time, self.deltaSCI, 'ko-', label=r'$||SCI||_{}$={:.4f} '.format(self.ord, self.scoreSCI))
         ax12.set_xlabel("t (s)"); ax12.set_ylabel("ΔSCI (adimensionless)"); 
         ax12.set_title("Spectral Content Index Error (ΔSCI)"); 
-        ax12.set_ylim((0,5)); ax12.legend()
+        if self.deltaSCI.max()>1: ax12.set_ylim((0,5)); 
+        else:                     ax12.set_ylim((0,1)); 
+        ax12.legend()
         
         
 
         fig.suptitle("SCORES", fontsize=20)#, family='fantasy')
         plt.show()
         
+        if save: fig.savefig(self.paths.results+"ScoresVariables-{}-{}.png".format(self.no_file,self.no_syllable)) 
+        
     
-    def PlotVs(self, xlim=(0,0.025)):
+    def PlotVs(self, xlim=(0,0.025), save=False):
         fig, ax = plt.subplots(3, 1, figsize=(12, 9))
         fig.subplots_adjust(wspace=0.35, hspace=0.4)
 
@@ -539,3 +548,5 @@ class Syllable(object):
 
         fig.suptitle('Labial Parameters (vector $v$)', fontsize=20)
         plt.show()
+        
+        if save: fig.savefig(self.paths.results+"MotorGesturesVariables-{}-{}.png".format(self.no_file,self.no_syllable)) 

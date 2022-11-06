@@ -83,34 +83,33 @@ class Song(Syllable):
         self.syllable.no_file     = self.no_file
         self.syllable.p           = self.p
         self.syllable.paths       = self.paths
-        self.syllable.obj         = "syll"
+        self.syllable.id          = "syllable"
         
         self.SylInd.append([[no_syllable], [ss]])
         
+        self.chuncks    = sound.wave2frames(self.syll_complet,  Nt=Nt)
+        self.times_chun = sound.wave2frames(self.time_syllable, Nt=Nt)
+        self.no_chuncks = len(self.chuncks)
+        
         return self.syllable
     
-    def Chunck(self, no_chunck, Nt=514, llambda=1.5, NN=64):
+    def Chunck(self, no_chunck, Nt=5, llambda=1.5, NN=64):
         self.no_chunck     = no_chunck
-        chuncks = sound.wave2frames(self.syll_complet,  Nt=Nt)
-        times   = sound.wave2frames(self.time_syllable, Nt=Nt)
         
-        
-        self.chunck        = Syllable(chuncks[:,self.no_chunck-1], self.fs, times[self.no_chunck-1,0], NN=64, llambda=llambda, Nt=5)
+        self.chunck        = Syllable(self.chuncks[:,self.no_chunck-1], self.fs, self.times_chun[self.no_chunck-1,0], NN=NN, llambda=llambda, Nt=Nt)
         
         self.chunck.no_syllable = self.no_chunck
         self.chunck.no_file     = self.no_file
         self.chunck.p           = self.p
         self.chunck.paths       = self.paths
-        self.chunck.obj         = "chc"
-        
-        
+        self.chunck.id          = "chunck"
         
         return self.chunck
     
     # ------------- solver for some parameters -----------------
     def WholeSong(self, method_kwargs, plot=False, syll_max=0):
         self.OptGamma = self.AllGammas(method_kwargs)
-        self.p["gamma"].set(value=self.OptGamma)
+        self.p["gamma"].set(value=opt_gamma)
         if syll_max==0: syll_max=self.syllables.size+1
         for i in range(1,syll_max): # maxi+1):#
             syllable = self.Syllable(i)
@@ -125,10 +124,11 @@ class Song(Syllable):
     def AllGammas(self, method_kwargs):
         self.Gammas = np.zeros(self.no_syllables)
         for i in range(1,self.no_syllables+1):
-            syllable = self.Syllable(i)
-            syllable.Solve(self.p)
-            syllable.OptimalGamma(method_kwargs)
-            self.Gammas[i-1] = syllable.p["gamma"].value
+            syllable       = self.Syllable(i)
+            syllable_synth = syllable.Solve(self.p)
+            
+            syllable_synth.OptimalGamma(method_kwargs)
+            self.Gammas[i-1] = syllable_synth.p["gamma"].value
         return np.mean(self.Gammas)
             
     def SyntheticSyllable(self):

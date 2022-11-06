@@ -1,6 +1,4 @@
 from .functions import *
-# from .plots import *
-# from .paths import *
 
 class Syllable(object):
     """
@@ -126,11 +124,12 @@ class Syllable(object):
         self.beta  = b[0] + b[1]*(1e-4*y) + b[2]*(1e-4*y)**2
         self.alpha = np.dot(a, t_par);  # self.beta = np.dot(b, t_par)
     
-    def MotorGestures(self, sampling=44100, oversamp=20, prct_noise=0):
+    def MotorGestures(self, oversamp=20, prct_noise=0):
         N_total = len(self.s)
 
         #sampling and necessary constants
-        sampling, oversamp = sampling, oversamp
+        sampling  = self.fs
+        oversamp  = oversamp
         out_size  = int(N_total)
         dt        = 1./(oversamp*sampling)
         tmax      = out_size*oversamp
@@ -181,26 +180,32 @@ class Syllable(object):
             A1       = amplitud + prct_noise*noise
 
             if taux == oversamp and n_out<self.fs-1:
-                out[n_out]   = RB*v[4]*10   # out =  
-                n_out       += 1
-                self.Vs.append(v);
+                out[n_out]   = RB*v[4]*10  
+                n_out       += 1;  self.Vs.append(v);
                 
-                beta      = self.beta[n_out]     + prct_noise*noise
-                amplitud  = self.envelope[n_out] + prct_noise*noise
-                alpha     = self.alpha[n_out]
-                taux      = 0
+                alpha, beta = self.alpha[n_out], self.beta[n_out] 
+                amplitud    = self.envelope[n_out]
+                taux       = 0
             t += 1;   taux += 1;
+        
         self.Vs = np.array(self.Vs)
-
         # pre processing synthetic data
-        out = sound.normalize(out, max_amp=1)
-        self.synth_env = self.Enve(out)
-        self.out_amp           = np.zeros_like(out)
-        not_zero               = np.where(self.synth_env > 0.005)
-        self.out_amp[not_zero] = out[not_zero] * self.envelope[not_zero] / self.synth_env[not_zero]
+        out               = sound.normalize(out, max_amp=1)
+        synth_env         = self.Enve(out)
+        out_amp           = np.zeros_like(out)
+        not_zero          = np.where(synth_env > 0.005)
+        out_amp[not_zero] = out[not_zero] * self.envelope[not_zero] / synth_env[not_zero]
         
+        self.synth = Syllable(out_amp, self.fs, self.t0,  Nt=self.Nt, llambda=self.llambda, NN=self.NN)
         
-        self.synth = Syllable(self.out_amp, self.fs, self.t0,  Nt=self.Nt, llambda=self.llambda, NN=self.NN)
+        self.synth.no_syllable = self.no_syllable
+        self.synth.no_file     = self.no_file
+        self.synth.p           = self.p
+        self.synth.paths       = self.paths
+        self.synth.id          = "synth"
+        self.synth.Vs          = self.Vs
+        
+        return self.synth
         
     def Enve(self, out):
         synth_env = sound.envelope(out, Nt=self.Nt) 
@@ -211,53 +216,58 @@ class Syllable(object):
         
         
     def WriteAudio(self):
-        sound.write('{}/synth4_amp_{}_{}.wav'.format(self.paths.examples,self.no_syllable), self.fs, np.asarray(self.out_amp,  dtype=np.float32))
-        sound.write('{}/song_{}_{}.wav'.format(self.paths.examples,self.no_syllable),       self.fs, np.asarray(self.s,     dtype=np.float32))
-    
+        sound.write('{}/File{}-{}-{}.wav'.format(self.paths.examples,self.no_file, self.id,self.no_syllable), self.fs, np.asarray(self.s,  dtype=np.float32))
+        
     # -------------- --------------
     def Solve(self, p, orde=2):
-        self.ord = orde
-        self.p = p
+        #Display(p)
+        self.ord = orde; self.p = p
         self.AlphaBeta()
-        self.MotorGestures() # solve the problem and define the synthetic syllable
+        synth = self.MotorGestures() # solve the problem and define the synthetic syllable
         
         #deltaNoHarm = np.abs(self.synth.NoHarm_out-self.NoHarm).astype(float)
-        deltaSxx    = np.abs(self.synth.Sxx_dB-self.Sxx_dB)
-        deltaMel    = np.abs(self.synth.FF_coef-self.FF_coef)
+        deltaSxx    = np.abs(synth.Sxx_dB-self.Sxx_dB)
+        deltaMel    = np.abs(synth.FF_coef-self.FF_coef)
         
-        self.deltaFmsf  = np.abs(self.synth.f_msf-self.f_msf)
-        self.deltaSCI   = np.abs(self.synth.SCI-self.SCI)
-        self.deltaEnv   = np.abs(self.synth.envelope-self.envelope)
-        self.deltaFF    = 1e-3*np.abs(self.synth.FF-self.FF) #/np.max(deltaFF)
-        #self.deltaSCI    = deltaSCI     #/np.max(deltaSCI)
+        synth.deltaFmsf     = np.abs(synth.f_msf-self.f_msf)
+        synth.deltaSCI      = np.abs(synth.SCI-self.SCI)
+        synth.deltaEnv      = np.abs(synth.envelope-self.envelope)
+        synth.deltaFF       = 1e-3*np.abs(synth.FF-self.FF) #/np.max(deltaFF)
+        synth.deltaSxx      = deltaSxx/np.max(deltaSxx)
+        synth.deltaMel      = deltaMel/np.max(deltaMel)
+        synth.deltaRMS      = np.abs(synth.rms-self.rms)
+        synth.deltaCentroid = 1e-3*np.abs(synth.centroid-self.centroid)
         #self.DeltaNoHarm = deltaNoHarm*10**(deltaNoHarm-2)
-        self.deltaSxx      = deltaSxx/np.max(deltaSxx)
-        self.deltaMel      = deltaMel/np.max(deltaMel)
-        self.deltaRMS      = np.abs(self.rms-self.synth.rms)
-        self.deltaCentroid = 1e-3*np.abs(self.centroid-self.synth.centroid)
             
-        self.scoreSCI      = Norm(self.deltaSCI, ord=self.ord)#/self.deltaSCI.size
-        self.scoreFF       = Norm(self.deltaFF,  ord=self.ord)/self.deltaFF.size
-        self.scoreEnv      = Norm(self.deltaEnv, ord=self.ord)/self.deltaEnv.size
-        self.scoreRMS      = Norm(self.deltaRMS, ord=self.ord)/self.deltaRMS.size
-        self.scoreCentroid = Norm(self.deltaCentroid, ord=self.ord)/self.deltaCentroid.size
+        synth.scoreSCI      = Norm(synth.deltaSCI, ord=self.ord)/synth.deltaSCI.size
+        synth.scoreFF       = Norm(synth.deltaFF,  ord=self.ord)/synth.deltaFF.size
+        synth.scoreEnv      = Norm(synth.deltaEnv, ord=self.ord)/synth.deltaEnv.size
+        synth.scoreRMS      = Norm(synth.deltaRMS, ord=self.ord)/synth.deltaRMS.size
+        synth.scoreCentroid = Norm(synth.deltaCentroid, ord=self.ord)/synth.deltaCentroid.size
         
-        self.scoreSxx    = Norm(self.deltaSxx, ord=np.inf)#/self.DeltaSxx.size
-        self.scoreMel    = Norm(self.deltaMel, ord=np.inf)#/self.DeltaSxx.size
+        synth.scoreSxx    = Norm(synth.deltaSxx, ord=np.inf)/synth.deltaSxx.size
+        synth.scoreMel    = Norm(synth.deltaMel, ord=np.inf)/synth.deltaSxx.size
         
+        synth.deltaSCI_mean      = synth.deltaSCI.mean()
+        synth.deltaFF_mean       = synth.deltaFF.mean()
+        synth.scoreRMS_mean      = synth.scoreRMS.mean()
+        synth.scoreCentroid_mean = synth.scoreCentroid.mean()
+        synth.deltaEnv_mean      = synth.deltaEnv.mean()
         
+        return synth
         
     def residualSCI(self, p):
-        self.Solve(p)
-        return self.scoreSCI
+        syllable_synth = self.Solve(p)
+        return syllable_synth.scoreSCI
     
     def residualFF(self, p):
-        self.Solve(p)
-        return self.scoreFF
+        
+        syllable_synth = self.Solve(p)
+        return syllable_synth.scoreFF
     
     def residualFFandSCI(self, p):
-        self.Solve(p)
-        return self.scoreFF+self.scoreSCI#+self.DeltaNoHarm
+        syllable_synth = self.Solve(p)
+        return syllable_synth.scoreSCI+syllable_synth.scoreFF
     
     # ----------- OPTIMIZATION FUNCTIONS --------------
     def OptimalGamma(self, method_kwargs):
@@ -265,7 +275,7 @@ class Syllable(object):
     
         start = time.time()
         self.p["gamma"].set(vary=True)
-        mi    = lmfit.minimize(self.residualFFandSCI, self.p, nan_policy='omit', method=method_kwargs["method"], **kwargs) 
+        mi    = lmfit.minimize(self.residualSCI, self.p, nan_policy='omit', method=method_kwargs["method"], **kwargs) 
         self.p["gamma"].set(value=mi.params["gamma"].value, vary=False)
         end   = time.time()
         print("γ* =  {0:.0f}, t={1:.4f} min".format(self.p["gamma"].value, (end-start)/60))
@@ -297,16 +307,16 @@ class Syllable(object):
         self.WriteAudio()
     
     # Solve the minimization problem at once
-    def CompleteSolution(self, kwargs):
+    def CompleteSolution(self, opt_gamma, kwargs):
         start = time.time()
         # add params:   (NAME   VALUE    VARY    MIN  MAX  EXPR BRUTE_STEP)
-        self.p.add_many(('a0',   0.11,   True ,   0, 0.25,  None, 0.01), 
-                        ('a1',   0.05,   True,   -2,    2,  None, 0.1),  
-                        ('b0',   -0.1,   True,   -1,  0.5,  None, 0.03),  
-                        ('b1',      1,   True,  0.2,    2,  None, 0.04), 
-                        ('gamma', 4e4,   True,  1e4,  1e5,  None, 1000),
-                        ('b2',     0.,   False, None, None, None, None), 
-                        ('a2',     0.,   False, None, None, None, None))
+        self.p.add_many(('a0',   0.11,         True ,   0, 0.25,  None, 0.01), 
+                        ('a1',   0.05,         True,   -2,    2,  None, 0.1),  
+                        ('b0',   -0.1,         True,   -1,  0.5,  None, 0.03),  
+                        ('b1',      1,         True,  0.2,    2,  None, 0.04), 
+                        ('gamma', opt_gamma,   False,  1e4,  1e5, None, 1000),
+                        ('b2',     0.,         False, None, None, None, None), 
+                        ('a2',     0.,         False, None, None, None, None))
         mi    = lmfit.minimize(self.residualFFandSCI, self.p, nan_policy='omit', **kwargs) 
         self.p["a0"].set(   vary=False, value=mi.params["a0"].value)
         self.p["a1"].set(   vary=False, value=mi.params["a1"].value)

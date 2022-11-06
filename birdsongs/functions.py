@@ -42,4 +42,3 @@ def rk4(f, v, dt):
     k3 = f(v + dt/2.0*k2)
     k4 = f(v + dt*k3)
     return v + dt*(2.0*(k2+k3)+k1+k4)/6.0
-

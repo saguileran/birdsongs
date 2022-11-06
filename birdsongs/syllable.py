@@ -196,16 +196,17 @@ class Syllable(object):
         not_zero          = np.where(synth_env > 0.005)
         out_amp[not_zero] = out[not_zero] * self.envelope[not_zero] / synth_env[not_zero]
         
-        self.synth = Syllable(out_amp, self.fs, self.t0,  Nt=self.Nt, llambda=self.llambda, NN=self.NN)
+        synth = Syllable(out_amp, self.fs, self.t0,  Nt=self.Nt, llambda=self.llambda, NN=self.NN)
         
-        self.synth.no_syllable = self.no_syllable
-        self.synth.no_file     = self.no_file
-        self.synth.p           = self.p
-        self.synth.paths       = self.paths
-        self.synth.id          = "synth"
-        self.synth.Vs          = self.Vs
+        synth.no_syllable = self.no_syllable
+        synth.no_file     = self.no_file
+        synth.p           = self.p
+        synth.paths       = self.paths
+        synth.id          = "synth"
+        synth.Vs          = self.Vs
         
-        return self.synth
+        
+        return synth
         
     def Enve(self, out):
         synth_env = sound.envelope(out, Nt=self.Nt) 
@@ -225,7 +226,7 @@ class Syllable(object):
         self.AlphaBeta()
         synth = self.MotorGestures() # solve the problem and define the synthetic syllable
         
-        #deltaNoHarm = np.abs(self.synth.NoHarm_out-self.NoHarm).astype(float)
+        #deltaNoHarm = np.abs(synth.NoHarm_out-self.NoHarm).astype(float)
         deltaSxx    = np.abs(synth.Sxx_dB-self.Sxx_dB)
         deltaMel    = np.abs(synth.FF_coef-self.FF_coef)
         
@@ -237,6 +238,8 @@ class Syllable(object):
         synth.deltaMel      = deltaMel/np.max(deltaMel)
         synth.deltaRMS      = np.abs(synth.rms-self.rms)
         synth.deltaCentroid = 1e-3*np.abs(synth.centroid-self.centroid)
+        synth.deltaF_msf    = 1e-3*np.abs(synth.f_msf-self.f_msf)
+        
         #self.DeltaNoHarm = deltaNoHarm*10**(deltaNoHarm-2)
             
         synth.scoreSCI      = Norm(synth.deltaSCI, ord=self.ord)/synth.deltaSCI.size
@@ -244,6 +247,7 @@ class Syllable(object):
         synth.scoreEnv      = Norm(synth.deltaEnv, ord=self.ord)/synth.deltaEnv.size
         synth.scoreRMS      = Norm(synth.deltaRMS, ord=self.ord)/synth.deltaRMS.size
         synth.scoreCentroid = Norm(synth.deltaCentroid, ord=self.ord)/synth.deltaCentroid.size
+        synth.scoreF_msf    = Norm(synth.deltaF_msf, ord=self.ord)/synth.deltaF_msf.size
         
         synth.scoreSxx    = Norm(synth.deltaSxx, ord=np.inf)/synth.deltaSxx.size
         synth.scoreMel    = Norm(synth.deltaMel, ord=np.inf)/synth.deltaSxx.size
@@ -253,6 +257,7 @@ class Syllable(object):
         synth.scoreRMS_mean      = synth.scoreRMS.mean()
         synth.scoreCentroid_mean = synth.scoreCentroid.mean()
         synth.deltaEnv_mean      = synth.deltaEnv.mean()
+        synth.scoreF_msf_mean    = synth.deltaF_msf.mean()
         
         return synth
         

@@ -2,22 +2,23 @@ from .syllable import *
 from .functions import *
 
 class Solution(Syllable):
-    def __init__(self, no_syllable):
-        self.no_syllable = no_syllable
+    def __init__(self, obj):
+        self.obj       = obj
+        #self.obj_synth = obj_synth
         
     def residualSCI(self, p):
-        syllable       = Syllable(no_syllable.no_syllable)
-        syllable_synth = self.Solve(p)
+        syllable_synth = self.obj.Solve(p)
         return syllable_synth.scoreSCI
     
     def residualFF(self, p):
-        
-        syllable_synth = self.Solve(p)
+        syllable_synth = self.obj.Solve(p)
         return syllable_synth.scoreFF
     
-    def residualFFandSCI(self, p):
-        syllable_synth = self.Solve(p)
-        return syllable_synth.scoreSCI+syllable_synth.scoreFF
+    def residualIndexes(self, p):
+        syllable_synth = self.obj.Solve(p)
+        return syllable_synth.scoreSCI+ syllable_synth.scoreSCI
+    # syllable_synth.scoreSxx + syllable_synth.scoreMel
+    
     
     # ----------- OPTIMIZATION FUNCTIONS --------------
     def OptimalGamma(self, method_kwargs):

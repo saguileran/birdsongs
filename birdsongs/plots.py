@@ -149,21 +149,36 @@ class Ploter(object):
         ax1 = fig.add_subplot(gs[0:2, :3])
         pcm = ax1.pcolormesh(obj.tu, obj.fu*1e-3, obj.Sxx_dB, cmap=plt.get_cmap(cmp), rasterized=True, vmin=vmin, vmax=vmax)
         plt.colorbar(pcm, ax=ax1, location='left', label='Power (dB)', pad=0.025)
-        ax1.plot(obj.timeFF, obj.FF*1e-3, 'b*-', label='Real',ms=25)
-        ax1.plot(obj_synth.timeFF, obj_synth.FF*1e-3, 'go-', label='Synthetic', ms=12)
-        ax1.legend(borderpad=0.6, labelspacing=0.7); ax1.set_ylim((1, 15)); 
+        
+        ax1.plot(obj.FF_time,       obj.f_msf*1e-3,       'D-', color="skyblue", label=r'$FF_{msf}$ real',ms=12)
+        ax1.plot(obj_synth.FF_time, obj_synth.f_msf*1e-3, 'X-', color="lightgreen",label=r'$FF_{msf}$ synt', ms=12)
+        
+        ax1.plot(obj.timeFF,        obj.FF*1e-3,       'b*-', label=r'FF real',ms=25)
+        ax1.plot(obj_synth.timeFF,  obj_synth.FF*1e-3, 'go-', label=r'FF synt', ms=12)
+        
+        ax1.plot(obj_synth.FF_time, obj_synth.centroid*1e-3, 'p-', color="olive",  label=r'$F_{cent}$ synth', ms=12)
+        ax1.plot(obj.FF_time,       obj.centroid*1e-3,       '+-', color="yellow", label=r'$F_{cent}$ real', ms=12)
+        
+        ax1.legend(borderpad=0.6, labelspacing=0.7, title="Feature"); ax1.set_ylim((1, 20)); 
         ax1.set_xlim((obj.tu[0], obj.tu[-1]))
         ax1.set_ylabel('f (khz)'); ax1.set_xlabel('time (s)');     
         ax1.set_title('Spectrogram - Fundamental Frequency (FF)')
 
         ax2 = fig.add_subplot(gs[0:2, 3:])
-        ax2.plot(obj_synth.timeFF, obj_synth.deltaFF, "-o", color="k", label=r' $||ΔFF||_{}$= {:.4f}, mean:{:.4f}'.format(obj.ord, obj_synth.scoreFF, obj_synth.deltaFF_mean)); 
-        ax2.plot(obj_synth.FF_time, obj_synth.deltaRMS, "-o", color="r", label=r' $|| ΔF_{{ rms }}||_{}$= {:.4f}, mean:{:.4f}'.format(obj.ord, obj_synth.scoreRMS, obj_synth.scoreRMS_mean)); 
-        ax2.plot(obj.FF_time, obj_synth.deltaCentroid, "-o", color="y", label=r'$ || \Delta F_{{ centroid }}||_{}$ = {:.4f}, mean:{:.4f}'.format(obj.ord, obj_synth.scoreCentroid, obj_synth.scoreCentroid_mean)); 
-        ax2.set_xlabel('time (s)'); ax2.set_ylabel('f (kHz)'); ax2.legend()
+        
+        ax2.plot(obj_synth.timeFF,  obj_synth.deltaFF ,      "*-", color="k",  label=r' $||ΔFF||_{}$= {:.4f}, mean:{:.4f}'.format(obj.ord, obj_synth.scoreFF, obj_synth.deltaFF_mean)); 
+        ax2.plot(obj_synth.FF_time, obj_synth.deltaRMS,      "-p", color="r",  label=r' $|| ΔF_{{ rms }}||_{}$= {:.4f}, mean:{:.4f}'.format(obj.ord,  obj_synth.scoreRMS, obj_synth.scoreRMS_mean)); 
+        ax2.plot(obj.FF_time,       obj_synth.deltaCentroid,  "-o", color="y", label=r'$ || \Delta F_{{ centroid }}||_{}$ = {:.4f}, mean:{:.4f}'.format(obj.ord, obj_synth.scoreCentroid, obj_synth.scoreCentroid_mean)); 
+        ax2.plot(obj.FF_time,       obj_synth.deltaF_msf,     "D-", color="purple", label=r'$ || \Delta F_{{ msf }}||_{}$ = {:.4f}, mean:{:.4f}'.format(obj.ord, obj_synth.scoreF_msf, obj_synth.scoreF_msf_mean)); 
+        
+        
+        ax2.plot(obj_synth.FF_time, obj_synth.rms*1e-3, 'p-', color="darkred", label=r'$F_{rms}$ synth', ms=12)
+        ax2.plot(obj.FF_time,       obj.rms*1e-3,       'rv-', label=r'$F_{rms}$ real', ms=12)
+        
+        ax2.set_xlabel('time (s)'); ax2.set_ylabel('f (kHz)'); ax2.legend(title="Features")
         ax2.set_title('Fundamental Frequency Error (ΔFF)'); 
         if obj_synth.deltaRMS.max() > 1: ax2.set_ylim((-0.5,7))
-        else:                       ax2.set_ylim((-0.1,1))
+        else:                            ax2.set_ylim((-0.1,1))
 
 
         # ------------------ spectgrograms

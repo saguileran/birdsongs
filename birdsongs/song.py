@@ -62,14 +62,13 @@ class Song(Syllable):
         candidates = np.split(supra, np.where(np.diff(supra) != stepsize)[0]+1)
         syllables = [x for x in candidates if len(x) > min_length]
         
-        #syllables  = consecutive(supra, min_length=100)
         return [ss for ss in syllables if len(ss) > self.NN/5] # remove short syllables
     
     def Syllables2(self):
         im_bin = rois.create_mask(Sxx_dB_blurred, bin_std=1.5, bin_per=0.5, mode='relative')
     
     
-    def Syllable(self, no_syllable, Nt=200, llambda=1.5):
+    def Syllable(self, no_syllable, Nt=200, llambda=1.5, NN=256):
         self.no_syllable   = no_syllable
         ss                 = self.syllables[self.no_syllable-1]  # syllable indexes 
         syllable           = self.s[ss[0]:ss[-1]]       # audios syllable
@@ -93,7 +92,7 @@ class Song(Syllable):
         
         return self.syllable
     
-    def Chunck(self, no_chunck, Nt=5, llambda=1.5, NN=64):
+    def Chunck(self, no_chunck, Nt=5, llambda=1.5, NN=16):
         self.no_chunck     = no_chunck
         
         self.chunck        = Syllable(self.chuncks[:,self.no_chunck-1], self.fs, self.times_chun[self.no_chunck-1,0], NN=NN, llambda=llambda, Nt=Nt)

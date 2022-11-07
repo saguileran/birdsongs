@@ -177,7 +177,7 @@ class Ploter(object):
         
         ax2.set_xlabel('time (s)'); ax2.set_ylabel('f (kHz)'); ax2.legend(title="Features")
         ax2.set_title('Fundamental Frequency Error (ΔFF)'); 
-        if obj_synth.deltaRMS.max() > 1: ax2.set_ylim((-0.5,7))
+        if obj_synth.deltaFF.max() > 1: ax2.set_ylim((-0.5,7))
         else:                            ax2.set_ylim((-0.1,1))
 
 

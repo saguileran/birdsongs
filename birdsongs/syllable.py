@@ -57,7 +57,7 @@ class Syllable(object):
                                              win_length=None, center=self.center, pad_mode='constant')
         [rms]         = feature.rms(y=self.s, S=self.Sxx, frame_length=self.NN, hop_length=self.NN//2, 
                           center=self.center, pad_mode='constant')
-        mfccs = feature.mfcc(y=self.s, sr=self.fs, S=self.Sxx, n_mfcc=256,
+        mfccs = feature.mfcc(y=self.s, sr=self.fs, S=self.Sxx, n_mfcc=126,
                              dct_type=2, norm='ortho', lifter=0)
         
         # pitches, magnitudes = librosa.piptrack(y=obj.s, sr=obj.fs, S=obj.Sxx, n_fft=obj.NN, hop_length=obj.NN//2,
@@ -120,101 +120,95 @@ class Syllable(object):
         
         t_1   = np.linspace(0,self.T,len(self.s))   
         t_par = np.array([np.ones(t_1.size), t_1, t_1**2])
-        # approx alpha and beta as polynomials
-        poly = Polynomial.fit(self.timeFF, self.FF, deg=10)
-        x, y = poly.linspace(np.size(self.s))
         
-        #self.beta  = b[0] + b[1]*(1e-4*y) + b[2]*(1e-4*y)**2
-        self.alpha = np.dot(a, t_par);  self.beta = np.dot(b, t_par)
+        self.alpha = np.dot(a, t_par);  # lines (or parabolas)
+        
+        # define by same shape as fudamenta frequency
+        if "syllable" in self.id:
+            poly = Polynomial.fit(self.timeFF, self.FF, deg=10)
+            x, y = poly.linspace(np.size(self.s))
+            self.beta  = b[0] + b[1]*(1e-4*y) + b[2]*(1e-4*y)**2
+        # define beta as first order polynomial
+        elif "chunck" in self.id: 
+            self.beta = np.dot(b, t_par) # lines (or parabolas)
     
     def MotorGestures(self, oversamp=20, prct_noise=0):
-        N_total = len(self.s)
-
         #sampling and necessary constants
-        sampling  = self.fs
-        oversamp  = oversamp
-        out_size  = int(N_total)
-        dt        = 1./(oversamp*sampling)
-        tmax      = out_size*oversamp
+        out_size = int(self.s.size)
+        dt       = 1./(oversamp*self.fs)
+        tmax     = out_size*oversamp
 
         # vectors initialization
         out = np.zeros(out_size)
-        a   = np.zeros(tmax)
-        db  = np.zeros(tmax)
-
-        # counters 
-        n_out, tcount, taux, tiempot = 0, 0, 0, 0
-        forcing1, forcing2, A1 = 0., 0., 0
+        pi  = np.zeros(tmax)
+        pb  = np.zeros(tmax)
         
-        v = 1e-12*np.array([5, 10, 1, 10, 1]);  self.Vs = [v]
+        # initial derivative vector (ODEs)
+        v = 1e-12*np.array([5, 10, 1, 10, 1]);  self.Vs = [v]; # velocity
         
         BirdData = pd.read_csv(self.paths.auxdata+'CopetonData.csv')
-        c, ancho, largo, s1overCH, s1overLB, s1overLG, RB, r, rdis = BirdData['value']
+        c, ancho, largo, s1overCH, s1overLB, s1overLG, RB, r, RH = BirdData['value']
         
-        t = tau = int(largo/(c*dt)) #( + 0.0)
-        def dxdt_synth(v):
-            [x, y, i1, i2, i3], dv = v, np.zeros(5) #x, y, i1, i2, i3 = v[0], v[1], v[2], v[3], v[4]
+        gm, A = self.p["gamma"].value, self.envelope
+        t = tau = int(largo/(c*dt)) 
+        
+        # ------------- PARAMETERS -----------
+        # - Trachea:
+        #           r: reflection coeficient 
+        #           L: trachea length
+        #           c: speed of sound in media 
+        # - Beak, Glottis and OEC:
+        #           CH: OEC Compliance 
+        #           LB: Beak Inertance 
+        #           LG: Glottis Inertance  
+        #           RB: Beak Resistance
+        #           RH: OEC Resistence
+        
+        def ODEs(v, dv=np.zeros(5)):
+            [x, y, i1, i2, i3] = v  # x, y, i1, i2, i3 
             dv[0] = y
             dv[1] = - alpha*gm**2 - beta*gm**2*x - gm**2*x**3 - gm*x**2*y + gm**2*x**2 - gm*x*y
             dv[2] = i2
-            dv[3] = -s1overLG*s1overCH*i1 - rdis*(s1overLB+s1overLG)*i2 \
-                + i3*(s1overLG*s1overCH-rdis*RB*s1overLG*s1overLB) \
-                + s1overLG*forcing2 + rdis*s1overLG*s1overLB*forcing1
-            dv[4] = -(s1overLB/s1overLG)*i2 - RB*s1overLB*i3 + s1overLB*forcing1
-            return dv
-
-        gm, amplitud = self.p["gamma"].value, self.envelope[0]
-        alpha, beta  = self.alpha[0], self.beta[0]
+            dv[3] = -s1overLG*s1overCH*i1 - RH*(s1overLB+s1overLG)*i2 \
+                    + i3*(s1overLG*s1overCH-RH*RB*s1overLG*s1overLB) \
+                    + s1overLG*dpout + RH*s1overLG*s1overLB*pout
+            dv[4] = -(s1overLB/s1overLG)*i2 - RB*s1overLB*i3 + s1overLB*pout
+            return dv        
         
-        while t < tmax and v[1] > -5e6:
+        while t < tmax: # and v[1] > -5e6:  # labia velocity not too fast
+            j = t//oversamp
             # -------- trachea ---------------
-            dbold  = db[t]                              # forcing 1, before
-            a[t]   = (.50)*(1.01*A1*v[1]) + db[t-tau]   # a = Pin, pressure:v(t)y(t) + Pin(t-tau) # envelope*
-            db[t]  = -r*a[t-tau]                        # forcing 1, after: -rPin(t-tau)
-            ddb    = (db[t]-dbold)/dt                   # Derivada, dPout/dt=Delta forcing1/dt
-
-            #  -rPin(t-tau),  dPout/dt,   v(t)y(t) + Pin(t-tau)
-            forcing1, forcing2, PRESSURE = db[t], ddb, a[t] 
+            pbold = pb[t]                              # pressure back before
+            pi[t] = (.50*1.01*A[j])*v[1] + pb[t-tau]   # input pressure:v(t)y(t) + Pin(t-tau) 
+            pb[t] = -r*pi[t-tau]                       # pressure back after: -rPin(t-tau) 
             
-            tiempot += dt
-            v = rk4(dxdt_synth, v, dt);   
-
-            noise    = 0.21*(uniform(0, 1)-0.5)
-            A1       = amplitud + prct_noise*noise
-
-            if taux == oversamp and n_out<self.fs-1:
-                out[n_out]   = RB*v[4]*10  
-                n_out       += 1;  self.Vs.append(v);
-                
-                alpha, beta = self.alpha[n_out], self.beta[n_out] 
-                amplitud    = self.envelope[n_out]
-                taux       = 0
-            t += 1;   taux += 1;
+            pout, dpout = pb[t], (pb[t]-pbold)/dt      # pout, dpout/dt
+            alpha, beta = self.alpha[j], self.beta[j] 
+            v = rk4(ODEs, v, dt);   self.Vs.append(v)  # syrinx and OEC
+            
+            out[j]  = RB*v[4]*10                       # output signal (synthetic)
+            
+            t += 1;
         
         self.Vs = np.array(self.Vs)
-        # pre processing synthetic data
-        out               = sound.normalize(out, max_amp=1)
-        synth_env         = self.Enve(out)
-        out_amp           = np.zeros_like(out)
-        not_zero          = np.where(synth_env > 0.005)
-        out_amp[not_zero] = out[not_zero] * self.envelope[not_zero] / synth_env[not_zero]
         
-        synth = Syllable(out_amp, self.fs, self.t0,  Nt=self.Nt, llambda=self.llambda, NN=self.NN)
+        # define solution (synthetic syllable) as a Syllable object 
+        synth = Syllable(out, self.fs, self.t0,  Nt=self.Nt, llambda=self.llambda, NN=self.NN)
         
         synth.no_syllable = self.no_syllable
         synth.no_file     = self.no_file
         synth.p           = self.p
         synth.paths       = self.paths
-        synth.id          = "synth"
+        synth.id          = self.id+"-synth"
         synth.Vs          = self.Vs
         
         return synth
         
     def Enve(self, out):
-        synth_env = sound.envelope(out, Nt=self.Nt) 
-        t_env = np.arange(0,len(synth_env),1)*len(out)/self.fs/len(synth_env)
+        out_env = sound.envelope(out, Nt=self.Nt) 
+        t_env = np.arange(0,len(out_env),1)*len(out)/self.fs/len(out_env)
         t_env[-1] = self.time[-1] 
-        fun_s = interp1d(t_env, synth_env)
+        fun_s = interp1d(t_env, out_env)
         return fun_s(self.time)
         
         
@@ -223,8 +217,7 @@ class Syllable(object):
         
     # -------------- --------------
     def Solve(self, p, orde=2):
-        #Display(p)
-        self.ord = orde; self.p = p
+        self.ord = orde; self.p = p;
         self.AlphaBeta()
         synth = self.MotorGestures() # solve the problem and define the synthetic syllable
         
@@ -243,7 +236,6 @@ class Syllable(object):
         synth.deltaSxx      = deltaSxx/np.max(deltaSxx)
         synth.deltaMel      = deltaMel/np.max(deltaMel)
         synth.deltaMfccs    = deltaMfccs/np.max(deltaMfccs)
-        
         #self.DeltaNoHarm = deltaNoHarm*10**(deltaNoHarm-2)
             
         synth.scoreSCI      = Norm(synth.deltaSCI, ord=self.ord)/synth.deltaSCI.size

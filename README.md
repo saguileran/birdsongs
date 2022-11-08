@@ -1,8 +1,7 @@
 [Bird Songs](https://saguileran.github.io/birdsongs/)
 ==============
 
-
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/saguileran/birdsongs/birdsongs?labpath=BirdSongs.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/saguileran/birdsongs/main?labpath=BirdSongs.ipynb)
 
 This is my dissertation requiered to obtain a degree of physics at the National University of Colombia.
 

@@ -46,13 +46,13 @@ class Song(Syllable):
         
         self.p = lmfit.Parameters()
         # add params:   (NAME   VALUE    VARY    MIN  MAX  EXPR BRUTE_STEP)
-        self.p.add_many(('a0',   0.11,   False ,   0, 0.25, None, None), 
-                        ('a1',   0.05,   False,   -2,    2, None, None),  
-                        ('b0',   -0.1,   False,   -1,  0.5, None, None),  
-                        ('b1',      1,   False,  0.2,    2, None, None), 
-                        ('gamma', 4e4,   False,  1e4,  1e5, None, None),
-                        ('b2',     0.,   False, None, None, None, None), 
-                        ('a2',     0.,   False, None, None, None, None))
+        self.p.add_many(('a0', 0.11, False ,   0, 0.25, None, None), 
+                        ('a1', 0.05, False,   -2,    2, None, None),
+                        ('a2',   0., False,    0,    2, None, None),
+                        ('b0', -0.1, False,   -1,  0.5, None, None),  
+                        ('b1',    1, False,  0.2,    2, None, None), 
+                        ('b2',   0., False,    0,    2, None, None), 
+                        ('gm',  4e4, False,  1e4,  1e5, None, None))
         self.syllables    = [syl for syl in self.Syllables() if len(syl)>self.NN]
         self.no_syllables = len(self.syllables)
         print('The son has {} syllables'.format(len(self.syllables)))

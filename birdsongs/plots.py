@@ -17,6 +17,7 @@ class Ploter(object):
         ax[0].set_ylim(0, 12.000); ax[0].set_xlim(min(obj.time), max(obj.time));
         ax[0].set_title("Complete Song Spectrum"); 
         ax[0].set_ylabel('f (kHz)'); #ax[0].set_xlabel('t (s)'); 
+        
 
         ax[1].plot(obj.time, obj.s/np.max(obj.s),'k', label='audio')
         ax[1].plot(obj.time, np.ones(len(obj.time))*obj.umbral, '--', label='umbral')
@@ -27,21 +28,21 @@ class Ploter(object):
         ax[1].sharex(ax[0])
 
         if chunck_on and syllable_on:
-            ax[0].plot(obj.chunck.timeFF+obj.chunck.t0, obj.chunck.FF*1e-3, 'g-', label='Chunck', lw=5)
-            ax[2].plot(obj.chunck.timeFF+obj.chunck.t0, obj.chunck.FF*1e-3, 'g-', label='Chunck', lw=12)
+            ax[0].plot(obj.chunck.timeFF+obj.chunck.t0, obj.chunck.FF*1e-3, 'g-', label='Chunck', lw=10)
+            ax[2].plot(obj.chunck.timeFF+obj.chunck.t0, obj.chunck.FF*1e-3, 'g-', label='Chunck', lw=8)
 
         if syllable_on:
-            ax[0].plot(obj.syllable.timeFF+obj.syllable.t0, obj.syllable.FF*1e-3, 'bo', label='FF'.format(obj.syllable.fs), lw=1)
+            ax[0].plot(obj.syllable.timeFF+obj.syllable.t0, obj.syllable.FF*1e-3, 'bo', label='Syllable'.format(obj.syllable.fs), lw=1)
 
             ax[2].pcolormesh(obj.syllable.tu+obj.syllable.t0, obj.syllable.fu*1e-3, obj.syllable.Sxx, cmap=plt.get_cmap('Greys'), rasterized=True) 
-            ax[2].plot(obj.syllable.timeFF+obj.syllable.t0, obj.syllable.FF*1e-3, 'b+', label='FF', ms=10)
+            ax[2].plot(obj.syllable.timeFF+obj.syllable.t0, obj.syllable.FF*1e-3, 'b+', label='Syllable', ms=10)
             ax[2].set_ylim((2, 11)); 
             ax[2].set_xlim((obj.syllable.timeFF[0]-0.001+obj.syllable.t0, obj.syllable.timeFF[-1]+0.001+obj.syllable.t0));
-            ax[2].legend(loc='upper right')
+            ax[2].legend(loc='upper right', title="FF")
             ax[2].set_xlabel('t (s)'); ax[2].set_ylabel('f (khz)')
             ax[2].set_title('Single Syllable Spectrum, No {}'.format(obj.no_syllable))
 
-            ax[0].legend(loc='upper right')
+            ax[0].legend(loc='upper right', title="FF")
             
             path_save = obj.paths.results+"AllSongAndSyllable-{}-{}.png".format(obj.no_file,obj.no_syllable)
         else: path_save = obj.paths.results+"AllSongAndSyllable-{}.png".format(obj.no_file)
@@ -142,7 +143,7 @@ class Ploter(object):
 
 
     def Plot(self, obj, obj_synth, cmp="afmhot_r"):       
-        fig = plt.figure(constrained_layout=False, figsize=(30, 12))
+        fig = plt.figure(constrained_layout=False, figsize=(28, 12))
         gs  = fig.add_gridspec(nrows=4, ncols=5, wspace=0.05, hspace=0.2)
         vmin, vmax = obj.Sxx_dB.min(), obj.Sxx_dB.max()
         # ----- FF ---------------
@@ -177,7 +178,7 @@ class Ploter(object):
         
         ax2.set_xlabel('time (s)'); ax2.set_ylabel('f (kHz)'); ax2.legend(title="Features")
         ax2.set_title('Fundamental Frequency Error (ΔFF)'); 
-        if obj_synth.deltaFF.max() > 1: ax2.set_ylim((-0.5,7))
+        if obj_synth.deltaFF.max() > 1.2: ax2.set_ylim((-0.5,10))
         else:                            ax2.set_ylim((-0.1,1))
 
 
@@ -188,7 +189,7 @@ class Ploter(object):
         ax3.plot(obj.timeFF, obj.FF*1e-3, 'b*-', label='Real', ms=10)
         ax3.set_ylim((1, 15)); ax3.set_xlim((obj.tu[0], obj.tu[-1]))
         ax3.set_ylabel('f (khz)');    
-        ax3.set_title('Spectrogram Real (FF-R)')
+        ax3.set_title('Real Spectrogram and FF)')
 
         ax4 = fig.add_subplot(gs[3, 0])
         pcm = ax4.pcolormesh(obj_synth.tu, obj_synth.fu*1e-3, obj_synth.Sxx_dB, cmap=plt.get_cmap(cmp), vmin=vmin, vmax=vmax)
@@ -196,7 +197,7 @@ class Ploter(object):
         ax4.plot(obj_synth.timeFF, obj_synth.FF*1e-3, 'go-', label='synthetic', ms=6)
         ax4.set_xlim((obj.tu[0], obj.tu[-1])); ax4.set_ylim((1, 15)); 
         ax4.set_ylabel('f (khz)'); ax4.set_xlabel('time (s)');     
-        ax4.set_title('Spectrogram Synthetic (FF-S)')
+        ax4.set_title('Synthetic Spectrogram and FF')
         ax4.sharex(ax3)
 
         # ------------------ Mel spectgrograms
@@ -221,15 +222,14 @@ class Ploter(object):
         pcm = ax7.pcolormesh(obj_synth.tu, obj.fu*1e-3, obj_synth.deltaSxx, cmap=plt.get_cmap(cmp), rasterized=True)#, vmin=0, vmax=1)
         plt.colorbar(pcm, ax=ax7, location='left', label='Power (adimensionless)', pad=-0.05)
         #ax[1][0].plot(obj_synth.timeFF, obj_synth.deltaSCI, "-o", color="k", label='Σ R(SCI) = {:.4f}'.format(obj_synth.scoreSCI))
-        ax7.set_ylabel('f (khz) (s)'); ax7.set_xlabel(''); 
-        ax7.set_ylim((1, 15)); ax7.set_title('Power Spectrum Error (ΔSxx)')
-        #ax7.sharex(ax6)
+        ax7.set_ylabel('f (khz) (s)'); ax7.set_xlabel(''); ax7.set_ylim((1, 15)); 
+        ax7.set_title(r' Spectrum Error (ΔSxx), $||Sxx||_{}$={:.4f}'.format(obj.ord, obj_synth.scoreMfccs ))#ax7.sharex(ax6)
 
         ax8 = fig.add_subplot(gs[3, 1])
         pcm = ax8.pcolormesh(obj_synth.FF_time, obj_synth.freq*1e-3, obj_synth.deltaMel,  rasterized=True, cmap=plt.get_cmap(cmp))#,, vmin=0, vmax=1)
         plt.colorbar(pcm, ax=ax8, location='left', label='Power (adimensionless)', pad=-0.05)
-        ax8.set_ylabel('f (khz) (s)'); ax8.set_xlabel('t (s)'); 
-        ax8.set_ylim((1, 15)); ax8.set_title('Mel Normalized Error (ΔMel)')
+        ax8.set_ylabel('f (khz) (s)'); ax8.set_xlabel('t (s)');  ax8.set_ylim((1, 15)); 
+        ax8.set_title(r'Mel Normalized Error (ΔMel), $||Δmel||_{}$={:.4f}'.format(obj.ord, obj_synth.scoreMfccs ))
 
         # ------------------ sound
         ax9 = fig.add_subplot(gs[2, 3])
@@ -264,13 +264,13 @@ class Ploter(object):
         ax12.plot(obj_synth.FF_time, obj_synth.deltaSCI, 'ko-', label=r'$||SCI||_{}$={:.4f}, mean={:.3f}'.format(obj.ord, obj_synth.scoreSCI, obj_synth.deltaSCI_mean))
         
         ax12.plot(obj.FF_time, obj_synth.correlation, 'p-', label=r'$||cor||_{}$={:.3f}, mean={:.3f} '.format(obj.ord, obj_synth.scoreCorrelation, obj_synth.correlation.mean()))
-        #ax12.plot(obj.FF_time, obj_synth.Df, 'H-', label=r'$||DF||_{}$={:.3f}, mean={:.3f} '.format(obj.ord, obj_synth.scoreDF, obj_synth.Df.mean()))
+        ax12.plot(obj.FF_time, obj_synth.Df, 'H-', label=r'$||DF||_{}$={:.3f}, mean={:.3f} '.format(obj.ord, obj_synth.scoreDF, obj_synth.Df.mean()))
         ax12.plot(obj.FF_time, obj_synth.SKL, 's-', color="tomato", label=r'$||SKL||_{}$={:.3f}, mean={:.3f} '.format(obj.ord, obj_synth.scoreSKL, obj_synth.SKL.mean()))
         
         ax12.set_xlabel("t (s)"); ax12.set_ylabel("ΔSCI (adimensionless)"); 
         ax12.set_title("SCI Error and Acoustic Dissimilarity (ΔSCI & ADI)"); 
-        if obj_synth.deltaSCI.max()>1: ax12.set_ylim((0,5)); 
-        else:                     ax12.set_ylim((0,1)); 
+        if obj_synth.deltaSCI.max()>1.2: ax12.set_ylim((0,2)); 
+        else:                            ax12.set_ylim((0,1)); 
         ax12.legend()
 
 
@@ -286,18 +286,18 @@ class Ploter(object):
 
         time = obj.time[:obj.Vs.shape[0]]
 
-        ax[0].plot(time, obj.Vs[:,4], color='b')
+        ax[0].plot(obj.Vs[:,4], color='b')
         #ax[0].set_xlim((0,1e5))
         ax[0].set_xlabel("time (s)"); ax[0].set_ylabel("$P_{out}$");
         ax[0].set_title("Trachea Output Pressure")
 
-        ax[1].plot(time, obj.Vs[:,1], color='g') 
-        ax[1].set_xlim(xlim)
+        ax[1].plot(obj.Vs[:,1], color='g') 
+        #ax[1].set_xlim(xlim)
         ax[1].set_xlabel("time (s)"); ax[1].set_ylabel("$P_{in}$");
         ax[1].set_title("Trachea Input Pressure")
 
-        ax[2].plot(time, obj.Vs[:,0], color='r')
-        ax[2].set_xlim(xlim)
+        ax[2].plot(obj.Vs[:,0], color='r')
+        #ax[2].set_xlim(xlim)
         ax[2].set_xlabel("time (s)"); ax[2].set_ylabel("$x(t)$");
         ax[2].set_title("Labial position")
         ax[2].sharex(ax[1])

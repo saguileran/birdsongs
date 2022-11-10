@@ -51,7 +51,7 @@ class Song(Syllable):
                         ('a2',   0., False,    0,    2, None, None),
                         ('b0', -0.1, False,   -1,  0.5, None, None),  
                         ('b1',    1, False,  0.2,    2, None, None), 
-                        ('b2',   0., False,    0,    2, None, None), 
+                        ('b2',   0., False,    0,    3, None, None), 
                         ('gm',  4e4, False,  1e4,  1e5, None, None))
         self.syllables    = [syl for syl in self.Syllables() if len(syl)>self.NN]
         self.no_syllables = len(self.syllables)
@@ -68,7 +68,7 @@ class Song(Syllable):
         im_bin = rois.create_mask(Sxx_dB_blurred, bin_std=1.5, bin_per=0.5, mode='relative')
     
     
-    def Syllable(self, no_syllable, Nt=200, llambda=1.5, NN=256):
+    def Syllable(self, no_syllable, Nt=200, llambda=1.5, NN=512):
         self.no_syllable   = no_syllable
         ss                 = self.syllables[self.no_syllable-1]  # syllable indexes 
         syllable           = self.s[ss[0]:ss[-1]]       # audios syllable
@@ -77,7 +77,7 @@ class Song(Syllable):
         self.t0            = self.time_syllable[0]
         
         self.syllable      = Syllable(self.syll_complet, self.fs, self.time[ss[0]], Nt=Nt, llambda=llambda)
-        
+            
         self.syllable.no_syllable  = self.no_syllable
         self.syllable.no_file      = self.no_file
         self.syllable.p            = self.p
@@ -92,7 +92,7 @@ class Song(Syllable):
         
         return self.syllable
     
-    def Chunck(self, no_chunck, Nt=5, llambda=1.5, NN=16):
+    def Chunck(self, no_chunck, Nt=5, llambda=1.5, NN=64):
         self.no_chunck     = no_chunck
         
         self.chunck        = Syllable(self.chuncks[:,self.no_chunck-1], self.fs, self.times_chun[self.no_chunck-1,0], NN=NN, llambda=llambda, Nt=Nt)

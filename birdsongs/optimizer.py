@@ -4,6 +4,7 @@ from .functions import *
 class Optimizer(Syllable):
     def __init__(self, obj, method_kwargs):
         self.obj       = obj
+        self.obj0      = obj
         self.method    = method_kwargs["method"]
         del method_kwargs["method"]
         self.kwargs = method_kwargs
@@ -19,54 +20,59 @@ class Optimizer(Syllable):
     
     def residualIndexes(self, p):
         syllable_synth = self.obj.Solve(p)
-        return syllable_synth.scoreSCI
-    # syllable_synth.scoreSxx + syllable_synth.scoreCentroid
+        #self.entropies = [EAS, ECU, ECV, EPS, EPS_KURT, EPS_SKEW]
+        return syllable_synth.scoreACI_sum + syllable_synth.scoreBI + syllable_synth.entropies
     
     def residualCorrelation(self, p):
         syllable_synth = self.obj.Solve(p)
-        return np.mean(syllable_synth.correlation+syllable_synth.DF+syllable_synth.scoreSKL)
+        return syllable_synth.scoreFF -np.mean(syllable_synth.correlation+syllable_synth.Df+syllable_synth.scoreSKL)
 
     # -----------------------------------------------------------------------
     # ---------------- OPTIMAL PARAMETERS ------------------------------
-    def OptimalBs(self, synth):
-        if "syllable" in self.id:
-            # ---------------- b2--------------------
-            start0 = time.time()
+    def OptimalBs(self):
+        if "syllable" in self.obj.id:
+            # ---------------- b0 and b2 --------------------
+            start02 = time.time()
+            self.obj.p["b0"].set(vary=True)
             self.obj.p["b2"].set(vary=True)
-            mi2    = lmfit.minimize(synth.residualFF, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
-            self.obj.p["b2"].set(vary=False, value=mi2.params["b2"].value)
-            end2   = time.time()
-            print("b_2*={0:.4f}, t={1:.4f} min".format(self.obj.p["b2"].value, (end0-start0)/60))
-        # ---------------- b0--------------------
-        start0 = time.time()
-        self.obj.p["b0"].set(vary=True)
-        mi0    = lmfit.minimize(synth.residualFF, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
-        self.obj.p["b0"].set(vary=False, value=mi0.params["b0"].value)
-        end0   = time.time()
-        print("b_0*={0:.4f}, t={1:.4f} min".format(self.obj.p["b0"].value, (end0-start0)/60))
+            mi02    = lmfit.minimize(self.residualFF, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
+            self.obj.p["b0"].set(vary=False, value=mi02.params["b0"].value)
+            self.obj.p["b2"].set(vary=False, value=mi02.params["b2"].value)
+            end02   = time.time()
+            print("b_0*={:.4f},\nb_2*={:.4f}, t={:.4f} min".format(self.obj.p["b0"].value, self.obj.p["b2"].value, (end02-start02)/60))
+        elif "chunck" in self.obj.id:
+            # ---------------- b0--------------------
+            start0 = time.time()
+            self.obj.p["b0"].set(vary=True)
+            mi0    = lmfit.minimize(self.residualFF, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
+            self.obj.p["b0"].set(vary=False, value=mi0.params["b0"].value)
+            end0   = time.time()
+            print("b_0*={0:.4f}, t={1:.4f} min".format(self.obj.p["b0"].value, (end0-start0)/60))
         # ---------------- b1--------------------
         start1 = time.time()
         self.obj.p["b1"].set(vary=True)
-        mi1    = lmfit.minimize(synth.residualFF, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
+        mi1    = lmfit.minimize(self.residualFF, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
         self.obj.p["b1"].set(vary=False, value=mi1.params["b1"].value)
         end1   = time.time()
         print("b_1*={0:.4f}, t={1:.4f} min".format(self.obj.p["b1"].value, (end1-start1)/60))
         #return self.obj.p["b0"].value, self.obj.p["b1"].value #end0-start0, end1-start1
+        #return self.obj.p
         
-    def OptimalAs(self, synth):
+    def OptimalAs(self):
         # ---------------- a0--------------------
         start0 = time.time()
         self.obj.p["a0"].set(vary=True)
-        mi0    = lmfit.minimize(synth.residualCorrelation, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
+        mi0    = lmfit.minimize(self.residualCorrelation, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
         self.obj.p["a0"].set(vary=False, value=mi0.params["a0"].value)
         end0   = time.time()
         print("a_0*={0:.4f}, t={1:.4f} min".format(self.obj.p["a0"].value, (end0-start0)/60))
         # ---------------- a1--------------------
         start1 = time.time()
         self.obj.p["a1"].set(vary=True)
-        mi1    = lmfit.minimize(synth.residualCorrelation, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
+        mi1    = lmfit.minimize(self.residualCorrelation, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
         self.obj.p["a1"].set(vary=False, value=mi1.params["a1"].value)
         end1   = time.time()
+        
         print("a_1*={0:.4f}, t={1:.4f} min".format(self.obj.p["a1"].value, (end1-start1)/60))
         #return self.obj.p["b0"].value, self.obj.p["b1"].value #end0-start0, end1-start1
         
@@ -105,9 +111,9 @@ class Optimizer(Syllable):
                             ('a1', 0.05, True,   -2,    2,  None, None),#0.1),  
                             ('a2',   0., True,    0,    2,  None, None),
                             ('b0', -0.1, True,   -1,  0.5,  None, None),#0.03),  
-                            ('b1',   1, True,  0.2,     2,  None, None),#0.04), 
+                            ('b1',   1,  True,  0.2,     2,  None, None),#0.04), 
                             ('b2',   0., True,    0,    2,  None, None), 
-                            ('gm',   gm,  True,  1e4,  1e5, None, 2000))
+                            ('gm',   gm, True,  1e4,  1e5, None, 2000))
         mi    = lmfit.minimize(self.residualFFandSCI, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
         self.obj.p["a0"].set(vary=False, value=mi.params["a0"].value)
         self.obj.p["a1"].set(vary=False, value=mi.params["a1"].value)
@@ -125,11 +131,11 @@ class Optimizer(Syllable):
     def AllGammas(self, bird):
         Gammas = np.zeros(bird.no_syllables)
         for i in range(1,bird.no_syllables+1):
-            self.obj  = bird.Syllable(i)
+            self.obj    = bird.Syllable(i)
+            Gammas[i-1] = self.OptimalGamma()
             
-            Gammas[i-1]   = self.OptimalGamma()#Gammas[i-1] = opt_gamma # syllable_synth.p["gm"].value
-        
         self.optimal_gamma = np.mean(Gammas)
-        self.obj.p["gm"].set(value=self.optimal_gamma)
-        
-        return Gammas
+        self.Gammas = Gammas
+        self.obj    = self.obj0
+        self.obj.p["gm"].set(value=self.optimal_gamma, vary=False)
+        #return Gammas

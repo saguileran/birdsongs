@@ -89,6 +89,8 @@ class Ploter(object):
         if self.save: fig.savefig(obj.paths.results+"SoundAndSpectros-{}-{}-{}.png".format(obj.id,obj.no_file,obj.no_syllable))
 
     def PlotAlphaBeta(self, obj, xlim=(-0.05,.2), ylim=(-0.2,0.9)):
+        if obj.alpha.max()>0.2: xlim=(-0.05,1.1*obj.alpha.max())
+        if obj.beta.max()>0.9:  ylim=(-0.2,1.1*obj.beta.max())
         fig = plt.figure(constrained_layout=True, figsize=(10, 6))
         gs  = GridSpec(2, 2, figure=fig)
         ax1 = fig.add_subplot(gs[0, 0])

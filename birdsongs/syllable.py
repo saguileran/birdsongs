@@ -134,81 +134,62 @@ class Syllable(object):
         self.alpha = np.dot(a, t_par);  # lines (or parabolas)
         
         # define by same shape as fudamenta frequency
-        if "syllable" in self.id:
-            poly = Polynomial.fit(self.timeFF, self.FF, deg=10)
-            x, y = poly.linspace(np.size(self.s))
-            self.beta  = b[0] + b[1]*(1e-4*y) + b[2]*(1e-4*y)**2
-        # define beta as first second polynomial
-        elif "chunck" in self.id: 
-            b[0] = 0.3 #self.p["b0"].value
-            self.beta = np.dot(b, t_par) # lines (or parabolas)
+        if "syllable" in self.id: poly = Polynomial.fit(self.timeFF, self.FF, deg=10)
+        elif "chunck" in self.id: poly = Polynomial.fit(self.timeFF, self.FF, deg=1)
             
+        x, y = poly.linspace(np.size(self.s))
+        self.beta  = b[0] + b[1]*(1e-4*y) + b[2]*(1e-4*y)**2    
             
-    def MotorGestures(self, oversamp=20, prct_noise=0):
+    def MotorGestures(self, ovfs=20, prct_noise=0):  # ovfs:oversamp
         #sampling and necessary constants
-        out_size = int(self.s.size)
-        dt       = 1./(oversamp*self.fs)
-        tmax     = out_size*oversamp
-
+        dt   = 1./(ovfs*self.fs)
+        tmax = int(self.s.size)*ovfs
         # vectors initialization
-        out = np.zeros(out_size)
-        pi  = np.zeros(tmax)
-        pb  = np.zeros(tmax)
-        
-        # initial derivative vector (ODEs)
-        v = 1e-12*np.array([5, 10, 1, 10, 1]);  
-        
-        
-        BirdData = pd.read_csv(self.paths.auxdata+'CopetonData.csv')
-        c, ancho, largo, s1overCH, s1overLB, s1overLG, RB, r, RH = BirdData['value']
-        
-        gm, A = self.p["gm"].value, self.envelope
-        t = tau = int(largo/(c*dt)) 
-        
-        # ------------- PARAMETERS -----------
+        pi, pb = np.zeros(tmax), np.zeros(tmax)
+        out    = np.zeros(int(self.s.size))
+        # initial derivative vector (ODEs), it is not too relevant
+        v = 1e-4*np.array([1e2, 1e1, 1, 1, 1, 1]);  #1e-12*np.array([5, 10, 1, 1, 10, 1]);  
+        # ------------- BIRD PARAMETERS -----------
         # - Trachea:
-        #           r: reflection coeficient 
-        #           L: trachea length
-        #           c: speed of sound in media 
+        #           r: reflection coeficient    [adimensionelss]
+        #           L: trachea length           [m]
+        #           c: speed of sound in media  [m/s]
         # - Beak, Glottis and OEC:
-        #           CH: OEC Compliance 
-        #           LB: Beak Inertance 
-        #           LG: Glottis Inertance  
-        #           RB: Beak Resistance
-        #           RH: OEC Resistence
-        
-        def ODEs(v, dv=np.zeros(5)):
-            [x, y, i1, i2, i3] = v  # x, y, i1, i2, i3 
+        #           CH: OEC Compliance          [m^3/Pa]
+        #           MB: Beak Inertance          [Pa s^2/m^3 = kg/m^4]
+        #           MG: Glottis Inertance       [Pa s^2/m^3 = kg/m^4]
+        #           RB: Beak Resistance         [Pa s/m^3 = kg/m^4 s]
+        #           Rh: OEC Resistence          [Pa s/m^3 = kg/m^4 s]
+        BirdData = pd.read_csv(self.paths.auxdata+'ZonotrichiaData.csv')
+        c, L, r, Ch, MG, MB, RB, Rh = BirdData['value'] # #c, L, r, c, L1, L2, r2, rd 
+        t = tau = int(L/c/dt) 
+        # before the function calling, gm, alpha, beta, and A must be define
+        def ODEs(v, dv=np.zeros(6)):
+            [x, y, pout, i1, i2, i3] = v  # (x, y, pout, i1, i2, i3)'
             dv[0] = y
-            dv[1] = (-alpha-beta*x-x**3+x**2)*gm**2 - (x**2*y+x*y)*gm
-            dv[2] = i2
-            dv[3] = -s1overLG*s1overCH*i1 - RH*(s1overLB+s1overLG)*i2 \
-                    + i3*(s1overLG*s1overCH-RH*RB*s1overLG*s1overLB) \
-                    + s1overLG*dpout + RH*s1overLG*s1overLB*pout
-            dv[4] = -(s1overLB/s1overLG)*i2 - RB*s1overLB*i3 + s1overLB*pout
+            dv[1] = (-self.alpha[t//ovfs]-self.beta[t//ovfs]*x-x**3+x**2)*self.p["gm"].value**2 - (x**2*y+x*y)*self.p["gm"].value
+            # ------------------------- trachea ------------------------
+            pbold = pb[t]                                 # pressure back before
+            # Pin(t) = Ay(t)+pback(t-L/C) = envelope_Signal*v[1]+pb[t-tau]
+            pi[t] = (.5*self.envelope[t//ovfs])*dv[1] + pb[t-tau] 
+            pb[t] = -r*pi[t-tau]                          # pressure back after: -rPin(t-tau) 
+            pout  = (1-r)*pi[t-tau]                       # pout
+            # ---------------------------------------------------------------
+            dv[2] = (pb[t]-pbold)/dt                      # dpout
+            dv[3] = i2
+            dv[4] = -(1/Ch/MG)*i1 - Rh*(1/MB+1/MG)*i2 +(1/MG/Ch+Rh*RB/MG/MB)*i3 \
+                    +(1/MG)*dv[2] + (Rh*RB/MG/MB)*pout
+            dv[5] = -(MG/MB)*i2 - (Rh/MB)*i3 + (1/MB)*pout
             return dv        
         
         while t < tmax: # and v[1] > -5e6:  # labia velocity not too fast
-            j = t//oversamp
-            # -------- trachea ---------------
-            pbold = pb[t]                              # pressure back before
-            pi[t] = (.5*A[j])*v[1] + pb[t-tau]         # input pressure:v(t)y(t) + Pin(t-tau) 
-            pb[t] = -r*pi[t-tau]                       # pressure back after: -rPin(t-tau) 
-            
-            pout, dpout = (1-r)*pi[t-tau], (pb[t]-pbold)/dt      # pout, dpout/dt
-            #pout, dpout = pb[t], (pb[t]-pbold)/dt      # pout, dpout/dt
-            alpha, beta = self.alpha[j], self.beta[j] 
-            
-            v = rk4(ODEs, v, dt);                      # syrinx and OEC
-            self.Vs.append(v) # self.Vs[j,:] = v; #
-            out[j] = RB*v[4]                           # output signal (synthetic)
-            
+            v = rk4(ODEs, v, dt);  self.Vs.append(v)  # RK4 - step
+            out[t//ovfs] = RB*v[-1]               # output signal (synthetic)
             t += 1;
-        
         #self.Vs = np.array(self.Vs)
+        
         # define solution (synthetic syllable) as a Syllable object 
         synth = Syllable(out, self.fs, self.t0,  Nt=self.Nt, llambda=self.llambda, NN=self.NN)
-        
         synth.no_syllable = self.no_syllable
         synth.no_file     = self.no_file
         synth.p           = self.p
@@ -287,8 +268,8 @@ class Syllable(object):
         synth.SKL         /= synth.SKL.max()
         synth.Df          /= synth.Df.max()
         
-        synth.scoreCorrelation = Norm(synth.correlation, ord=self.ord)/synth.correlation.size
-        synth.scoreSKL         = Norm(synth.SKL, ord=self.ord)/synth.SKL.size
-        synth.scoreDF          = Norm(synth.Df, ord=self.ord)/synth.Df.size
+        synth.scoreCorrelation = Norm(synth.correlation, ord=self.ord)#/synth.correlation.size
+        synth.scoreSKL         = Norm(synth.SKL, ord=self.ord)#/synth.SKL.size
+        synth.scoreDF          = Norm(synth.Df, ord=self.ord)#/synth.Df.size
         
         return synth

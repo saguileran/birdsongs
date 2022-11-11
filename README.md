@@ -5,7 +5,7 @@
 
 This is my dissertation requiered to obtain a degree of physics at the National University of Colombia.
 
-## Requirments
+# Requirments
 
 syllables requires:
 
@@ -13,7 +13,7 @@ syllables requires:
 - lmfit
 - numpy
 - matplotlib 
-- - pandas
+- pandas
 - scipy
 - sklearn
 - IPython
@@ -21,7 +21,7 @@ syllables requires:
 - scikit-maad
 - sympy
 
-## Installation
+# Installation
 
 In order to use the code first clone the repository and enter to birdsongs folder
 
@@ -33,28 +33,28 @@ cd birdsongs
 you can verify the current branch with the command `git branch -a`. You have to be in `main` branch, to change the branch use the command `git checkout main`.
 
 
-## Overview
+# Overview
 
 
 
-## Objective
+# Objective
 
 Design, development, and evaluation of a physical model for generating synthetic birdsongs from recorded birdsongs
 
 
-## Contents of the Repository
+# Contents of the Repository
 
 This repository have the documentation, scripts, and results delelop to achive the proposed objective.
 
 The model used, Motor Gestures [1], have been developed by profesog G. Mindlin at the [Dynamical Systems Laboratory](http://www.lsd.df.uba.ar/) (in spanish LSD) of the university of Buenos Aires, Argentina. 
 
-### Physical Model 
+## Physical Model 
 
 Schematic visualization of the complete Motod Gestures model: syrinx, trachea, glotis, and OEC. 
 
-<p align="center"> <img src="./docs/img/model.png" width="600" title="model"></p>
+<p align="center"> <img src="./docs/img/model.png" width="700" title="model"></p>
 
-### Programming Object Oriented (POO)
+## Programming Object Oriented (POO)
 
 Taking advantege of the POO programming paradig, to avoid repeat long codes execution and easy reproducibility, five objects ared created:
 
@@ -66,17 +66,17 @@ Taking advantege of the POO programming paradig, to avoid repeat long codes exec
 
 In order to understand the diagram methodology, the following icons will be used. 
 
-<p align="center">  <img src="./docs/img/objects.png" width="400" alt="methodology"></p>
+<p align="center">  <img src="./docs/img/objects.png" width="500" alt="methodology"></p>
 
-### Methodology
+## Problem Solution and Implementation
 
 Using the previous objects defined, the optimization problem is solved by following the next diagram 
 
-<p align="center">  <img src="./docs/img/methodology.png" width="500" alt="methodology"></p>
+<p align="center">  <img src="./docs/img/methodology.png" width="600" alt="methodology"></p>
 
+# Results
 
-
-## References
+# References
 
 <div class="csl-entry">[1] Amador, A., Perl, Y. S., Mindlin, G. B., &#38; Margoliash, D. (2013). Elemental gesture dynamics are encoded by song premotor cortical neurons. <i>Nature 2013 495:7439</i>, <i>495</i>(7439), 59–64. <a href="https://doi.org/10.1038/nature11967">https://doi.org/10.1038/nature11967</a></div>
 <br>

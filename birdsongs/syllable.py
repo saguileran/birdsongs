@@ -8,7 +8,8 @@ class Syllable(object):
         fs = sampling rate
         t0 = initial time of the syllable
     """
-    def __init__(self, s, fs, t0, Nt=200, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4), center=False, n_mels=32):
+    def __init__(self, s, fs, t0, Nt=200, llambda=1.5, NN=1024, overlap=0.5, flim=(1.5e3,2e4), center=False, n_mels=32):
+        ## The bifurcation can be cahge modifying the self.f2 and self.f1 functions
         ## ------------- Bogdanov–Takens bifurcation ------------------
         self.beta_bif = np.linspace(-2.5, 1/3, 1000)  # mu2:beta,  mu1:alpha
         xs, ys, alpha, beta, gamma = sym.symbols('x y alpha beta gamma')
@@ -31,12 +32,11 @@ class Syllable(object):
         self.f2 = sym.lambdify([xs, ys, alpha, beta, gamma], self.f2)
         ## -------------------------------------------------------------------------------------
         
-        self.t0 = t0
-        self.Nt = Nt
-        self.NN = NN
-        self.fs = fs
-        self.n_mels = n_mels
-        
+        self.t0         = t0
+        self.Nt         = Nt
+        self.NN         = NN
+        self.fs         = fs
+        self.n_mels     = n_mels
         self.flim       = flim
         self.llambda    = llambda
         self.no_overlap = int(overlap*self.NN )
@@ -184,11 +184,11 @@ class Syllable(object):
         # ------------------------------ ODEs -----------------------------
         def ODEs(v):
             dv, [x, y, pout, i1, i2, i3] = np.zeros(6), v  # (x, y, pout, i1, i2, i3)'
-            
-            dv[0] = self.f1(x, y, self.alpha[t//ovfs], self.beta[t//ovfs], self.p["gm"].value)
-            dv[1] = self.f2(x, y, self.alpha[t//ovfs], self.beta[t//ovfs], self.p["gm"].value)
+            # ----------------- direct implementation of the EDOs -----------
             # dv[0] = y
             # dv[1] = (-self.alpha[t//ovfs]-self.beta[t//ovfs]*x-x**3+x**2)*self.p["gm"].value**2 - (x**2*y+x*y)*self.p["gm"].value
+            dv[0] = self.f1(x, y, self.alpha[t//ovfs], self.beta[t//ovfs], self.p["gm"].value)
+            dv[1] = self.f2(x, y, self.alpha[t//ovfs], self.beta[t//ovfs], self.p["gm"].value)
             # ------------------------- trachea ------------------------
             pbold = pb[t]                                 # pressure back before
             # Pin(t) = Ay(t)+pback(t-L/C) = envelope_Signal*v[1]+pb[t-L/C/dt]

@@ -39,7 +39,7 @@ class Syllable(object):
         self.n_mels     = n_mels
         self.flim       = flim
         self.llambda    = llambda
-        self.no_overlap = int(overlap*self.NN )
+        self.no_overlap = int(overlap*self.NN)
         
         self.s        = sound.normalize(s, max_amp=1.0)
         self.time     = np.linspace(0, len(self.s)/self.fs, len(self.s))

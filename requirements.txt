@@ -8,3 +8,4 @@ sklearn
 IPython
 librosa
 scikit-maad
+sympy

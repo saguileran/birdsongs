@@ -1,31 +1,80 @@
-[Bird Songs](https://saguileran.github.io/birdsongs/)
+[BirdSongs](https://saguileran.github.io/birdsongs/)
 ==============
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/saguileran/birdsongs/main?labpath=BirdSongs.ipynb)
 
 This is my dissertation requiered to obtain a degree of physics at the National University of Colombia.
 
-## Execution
+## Requirments
 
-First clone the repository and change the branch to `birdsongs` 
+syllables requires:
+
+- peakutils
+- lmfit
+- numpy
+- matplotlib 
+- - pandas
+- scipy
+- sklearn
+- IPython
+- librosa
+- scikit-maad
+- sympy
+
+## Installation
+
+In order to use the code first clone the repository and enter to birdsongs folder
 
 ```bat
 git clone https://github.com/saguileran/birdsongs.git
 cd birdsongs
-git checkout birdsongs
 ```
 
-you can verify the branches using the command `git branch -a`
+you can verify the current branch with the command `git branch -a`. You have to be in `main` branch, to change the branch use the command `git checkout main`.
 
-## Abstract
 
-## Introduction
+## Overview
 
-## Justification
 
-## Objectives
+
+## Objective
+
+Design, development, and evaluation of a physical model for generating synthetic birdsongs from recorded birdsongs
+
 
 ## Contents of the Repository
+
+This repository have the documentation, scripts, and results delelop to achive the proposed objective.
+
+The model used, Motor Gestures [1], have been developed by profesog G. Mindlin at the [Dynamical Systems Laboratory](http://www.lsd.df.uba.ar/) (in spanish LSD) of the university of Buenos Aires, Argentina. 
+
+### Physical Model 
+
+Schematic visualization of the complete Motod Gestures model: syrinx, trachea, glotis, and OEC. 
+
+<p align="center"> <img src="./docs/img/model.png" width="600" title="model"></p>
+
+### Programming Object Oriented (POO)
+
+Taking advantege of the POO programming paradig, to avoid repeat long codes execution and easy reproducibility, five objects ared created:
+
+- **Syllable**: define a object from audio syllable with its tempo and spectral features
+- **Optimizer**: define a object to optimize function from method and syllables
+- **Song**: define a object to read and split an audio song in syllables 
+- **Plot**: define a object to plot real and synthec syllables or songs
+- **Paths**: define a object to organize folders location
+
+In order to understand the diagram methodology, the following icons will be used. 
+
+<p align="center">  <img src="./docs/img/objects.png" width="400" alt="methodology"></p>
+
+### Methodology
+
+Using the previous objects defined, the optimization problem is solved by following the next diagram 
+
+<p align="center">  <img src="./docs/img/methodology.png" width="500" alt="methodology"></p>
+
+
 
 ## References
 
@@ -37,6 +86,7 @@ you can verify the branches using the command `git branch -a`
 
 <div class="csl-entry">[3] Ulloa, J. S., Haupert, S., Latorre, J. F., Aubin, T., &#38; Sueur, J. (2021). scikit-maad: An open-source and modular toolbox for quantitative soundscape analysis in Python. <i>Methods in Ecology and Evolution</i>, <i>12</i>(12), 2334–2340. https://doi.org/10.1111/2041-210X.13711</div>
 
+<div class="csl-entry">[3] Ulloa, J. S., Haupert, S., Latorre, J. F., Aubin, T., &#38; Sueur, J. (2021). scikit-maad: An open-source and modular toolbox for quantitative soundscape analysis in Python. <i>Methods in Ecology and Evolution</i>, <i>12</i>(12), 2334–2340. https://doi.org/10.1111/2041-210X.13711</div>
 
 
 ## Audios References

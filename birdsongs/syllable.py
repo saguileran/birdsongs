@@ -9,6 +9,28 @@ class Syllable(object):
         t0 = initial time of the syllable
     """
     def __init__(self, s, fs, t0, Nt=200, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4), center=False, n_mels=32):
+        ## ------------- Bogdanov–Takens bifurcation ------------------
+        self.beta_bif = np.linspace(-2.5, 1/3, 1000)  # mu2:beta,  mu1:alpha
+        xs, ys, alpha, beta, gamma = sym.symbols('x y alpha beta gamma')
+        # ---------------- Labia EDO's Bifurcation -----------------------
+        self.f1 = ys
+        self.f2 = (-alpha-beta*xs-xs**3+xs**2)*gamma**2 -(xs+1)*gamma*xs*ys
+        x01 = sym.solveset(self.f1, ys)+sym.solveset(self.f1, xs)  # find root f1
+        f2_x01 = self.f2.subs(ys,x01.args[0])                     # f2(root f1)
+        f  = sym.solveset(f2_x01, alpha)                         # root f2 at root f1, alpha=f(x,beta)
+        g  = alpha                                               # g(x) = alpha, above
+        df = f.args[0].diff(xs)                                   # f'(x)
+        dg = g.diff(xs)                                           # g'(x)
+        roots_bif = sym.solveset(df-dg, xs)                       # bifurcation roots sets (xmin, xmas)
+        self.mu1_curves = [] 
+        for ff in roots_bif.args:                                       # roots as arguments (expr)
+            x_root = np.array([float(ff.subs(beta, mu2)) for mu2 in self.beta_bif], dtype=float)    # root evaluatings beta
+            mu1    = np.array([f.subs([(beta,self.beta_bif[i]),(xs,x_root[i])]).args[0] for i in range(len(self.beta_bif))], dtype=float)
+            self.mu1_curves.append(mu1)
+        self.f1 = sym.lambdify([xs, ys, alpha, beta, gamma], self.f1)
+        self.f2 = sym.lambdify([xs, ys, alpha, beta, gamma], self.f2)
+        ## -------------------------------------------------------------------------------------
+        
         self.t0 = t0
         self.Nt = Nt
         self.NN = NN
@@ -138,18 +160,17 @@ class Syllable(object):
         elif "chunck" in self.id: poly = Polynomial.fit(self.timeFF, self.FF, deg=1)
             
         x, y = poly.linspace(np.size(self.s))
-        self.beta  = b[0] + b[1]*(1e-4*y) + b[2]*(1e-4*y)**2    
+        self.beta  = b[0] + b[1]*(1e-4*y) + b[2]*(1e-4*y)**2   
             
     def MotorGestures(self, ovfs=20, prct_noise=0):  # ovfs:oversamp
-        #sampling and necessary constants
-        dt   = 1./(ovfs*self.fs)
-        tmax = int(self.s.size)*ovfs
-        # vectors initialization
-        pi, pb = np.zeros(tmax), np.zeros(tmax)
-        out    = np.zeros(int(self.s.size))
-        # initial derivative vector (ODEs), it is not too relevant
-        v = 1e-4*np.array([1e2, 1e1, 1, 1, 1, 1]);  #1e-12*np.array([5, 10, 1, 1, 10, 1]);  
+        t, tmax, dt = 0, int(self.s.size)*ovfs, 1./(ovfs*self.fs) # t0, tmax, td
+        # pback and pin vectors initialization
+        pi, pb, out = np.zeros(tmax), np.zeros(tmax), np.zeros(int(self.s.size))
+        # initial vector ODEs (v0), it is not too relevant
+        v = 1e-4*np.array([1e2, 1e1, 1, 1, 1, 1]); 
         # ------------- BIRD PARAMETERS -----------
+        BirdData = pd.read_csv(self.paths.auxdata+'ZonotrichiaData.csv')
+        c, L, r, Ch, MG, MB, RB, Rh = BirdData['value'] # c, L, r, c, L1, L2, r2, rd 
         # - Trachea:
         #           r: reflection coeficient    [adimensionelss]
         #           L: trachea length           [m]
@@ -160,20 +181,20 @@ class Syllable(object):
         #           MG: Glottis Inertance       [Pa s^2/m^3 = kg/m^4]
         #           RB: Beak Resistance         [Pa s/m^3 = kg/m^4 s]
         #           Rh: OEC Resistence          [Pa s/m^3 = kg/m^4 s]
-        BirdData = pd.read_csv(self.paths.auxdata+'ZonotrichiaData.csv')
-        c, L, r, Ch, MG, MB, RB, Rh = BirdData['value'] # #c, L, r, c, L1, L2, r2, rd 
-        t = tau = int(L/c/dt) 
-        # before the function calling, gm, alpha, beta, and A must be define
-        def ODEs(v, dv=np.zeros(6)):
-            [x, y, pout, i1, i2, i3] = v  # (x, y, pout, i1, i2, i3)'
-            dv[0] = y
-            dv[1] = (-self.alpha[t//ovfs]-self.beta[t//ovfs]*x-x**3+x**2)*self.p["gm"].value**2 - (x**2*y+x*y)*self.p["gm"].value
+        # ------------------------------ ODEs -----------------------------
+        def ODEs(v):
+            dv, [x, y, pout, i1, i2, i3] = np.zeros(6), v  # (x, y, pout, i1, i2, i3)'
+            
+            dv[0] = self.f1(x, y, self.alpha[t//ovfs], self.beta[t//ovfs], self.p["gm"].value)
+            dv[1] = self.f2(x, y, self.alpha[t//ovfs], self.beta[t//ovfs], self.p["gm"].value)
+            # dv[0] = y
+            # dv[1] = (-self.alpha[t//ovfs]-self.beta[t//ovfs]*x-x**3+x**2)*self.p["gm"].value**2 - (x**2*y+x*y)*self.p["gm"].value
             # ------------------------- trachea ------------------------
             pbold = pb[t]                                 # pressure back before
-            # Pin(t) = Ay(t)+pback(t-L/C) = envelope_Signal*v[1]+pb[t-tau]
-            pi[t] = (.5*self.envelope[t//ovfs])*dv[1] + pb[t-tau] 
-            pb[t] = -r*pi[t-tau]                          # pressure back after: -rPin(t-tau) 
-            pout  = (1-r)*pi[t-tau]                       # pout
+            # Pin(t) = Ay(t)+pback(t-L/C) = envelope_Signal*v[1]+pb[t-L/C/dt]
+            pi[t] = (.5*self.envelope[t//ovfs])*dv[1] + pb[t-int(L/c/dt)] 
+            pb[t] = -r*pi[t-int(L/c/dt)]                          # pressure back after: -rPin(t-L/C) 
+            pout  = (1-r)*pi[t-int(L/c/dt)]                       # pout
             # ---------------------------------------------------------------
             dv[2] = (pb[t]-pbold)/dt                      # dpout
             dv[3] = i2
@@ -181,13 +202,13 @@ class Syllable(object):
                     +(1/MG)*dv[2] + (Rh*RB/MG/MB)*pout
             dv[5] = -(MG/MB)*i2 - (Rh/MB)*i3 + (1/MB)*pout
             return dv        
-        
+        # ----------------------- Solving EDOs ----------------------
         while t < tmax: # and v[1] > -5e6:  # labia velocity not too fast
             v = rk4(ODEs, v, dt);  self.Vs.append(v)  # RK4 - step
             out[t//ovfs] = RB*v[-1]               # output signal (synthetic)
             t += 1;
+        # ------------------------------------------------------------
         #self.Vs = np.array(self.Vs)
-        
         # define solution (synthetic syllable) as a Syllable object 
         synth = Syllable(out, self.fs, self.t0,  Nt=self.Nt, llambda=self.llambda, NN=self.NN)
         synth.no_syllable = self.no_syllable

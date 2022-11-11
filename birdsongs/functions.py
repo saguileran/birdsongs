@@ -1,6 +1,7 @@
 import peakutils, time #emcee,
 import numpy as np
 import pandas as pd
+import sympy as sym
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
@@ -12,6 +13,7 @@ from matplotlib.gridspec import GridSpec
 
 from scipy import signal
 from scipy.interpolate import interp1d
+from scipy.optimize import root
 from scipy.signal import argrelextrema, butter, savgol_filter, find_peaks #hilbert
 
 from sklearn.linear_model import LinearRegression

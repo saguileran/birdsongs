@@ -116,24 +116,17 @@ class Ploter(object):
         ax2.set_ylim(ylim);         ax2.sharex(ax1);        #ax[0].legend()
 
         # ------------- Bogdanov–Takens bifurcation ------------------
-        mu2 = np.linspace(-2.5, 1/3, 1000)
-        xmas = (1+np.sqrt(1-3*mu2))/3
-        xmen = (1-np.sqrt(1-3*mu2))/3
-        mu1_mas = -mu2*xmas - xmas**3 + xmas**2
-        mu1_men = -mu2*xmen - xmen**3 + xmen**2
-        #---------------------------------------------------------------
-
         ax3.scatter(obj.alpha, obj.beta, c=c, label="Parameters", marker="_")
         ax3.plot(-1/27, 1/3, 'ko')#, label="Cuspid Point"); 
         ax3.axvline(0, color='red', lw=1)#, label="Hopf Bifurcation")
-        ax3.plot(mu1_men, mu2, '-g', lw=1)#, label="Saddle-Noddle\nBifurcation"); 
+        ax3.plot(obj.mu1_curves[0], obj.beta_bif, '-g', lw=1)#, label="Saddle-Noddle\nBifurcation"); 
         ax3.text(-0.01,0.6, "Hopf",rotation=90, color="r")
         ax3.text(-0.04,0.39,"CP",  rotation=0,  color="k")
-        ax3.text(-0.03,0.2,  "SN",  rotation=0,  color="g")
+        ax3.text(-0.03,0.02,  "SN",  rotation=0,  color="g")
         ax3.text(0.1, 0.005, "SN",  rotation=0,  color="g")
 
-        ax3.plot(mu1_mas, mu2, '-g', lw=1)
-        ax3.fill_between(mu1_mas, mu2, 10, where=mu1_mas > 0, color='gray', alpha=0.25)#, label='BirdSongs')
+        ax3.plot(obj.mu1_curves[1], obj.beta_bif, '-g', lw=1)
+        ax3.fill_between(obj.mu1_curves[1], obj.beta_bif, 10, where=obj.mu1_curves[1] > 0, color='gray', alpha=0.25)#, label='BirdSongs')
         ax3.set_ylabel('Tension (a.u.)'); ax3.set_xlabel('Pressure (a.u.)')
         ax3.set_title('Parameter Space')
         ax3.legend()

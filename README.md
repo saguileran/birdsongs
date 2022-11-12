@@ -9,17 +9,17 @@ This is my dissertation requiered to obtain a degree of physics at the National 
 
 syllables requires:
 
-- peakutils
-- lmfit
 - numpy
 - matplotlib 
-- pandas
 - scipy
-- sklearn
-- IPython
+- peakutils
+- lmfit
 - librosa
 - scikit-maad
 - sympy
+- pandas
+- sklearn
+- IPython
 
 # Installation
 
@@ -40,6 +40,8 @@ you can verify the current branch with the command `git branch -a`. You have to 
 # Objective
 
 Design, development, and evaluation of a physical model for generating synthetic birdsongs from recorded birdsongs
+
+
 
 
 # Contents of the Repository

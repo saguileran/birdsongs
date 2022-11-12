@@ -1,4 +1,4 @@
-from .functions import *
+from .utils import *
 
 class Syllable(object):
     """
@@ -8,7 +8,7 @@ class Syllable(object):
         fs = sampling rate
         t0 = initial time of the syllable
     """
-    def __init__(self, s, fs, t0, Nt=200, llambda=1.5, NN=1024, overlap=0.5, flim=(1.5e3,2e4), center=False, n_mels=32):
+    def __init__(self, s, fs, t0, Nt=200, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4), center=False, n_mels=32, umbral_FF=1, tlim=None):
         ## The bifurcation can be cahge modifying the self.f2 and self.f1 functions
         ## ------------- Bogdanov–Takens bifurcation ------------------
         self.beta_bif = np.linspace(-2.5, 1/3, 1000)  # mu2:beta,  mu1:alpha
@@ -31,8 +31,17 @@ class Syllable(object):
         self.f1 = sym.lambdify([xs, ys, alpha, beta, gamma], self.f1)
         self.f2 = sym.lambdify([xs, ys, alpha, beta, gamma], self.f2)
         ## -------------------------------------------------------------------------------------
+        self.p = lmfit.Parameters()
+        # add params:   (NAME   VALUE    VARY    MIN  MAX  EXPR BRUTE_STEP)
+        self.p.add_many(('a0', 0.11, False ,   0, 0.25, None, None), 
+                        ('a1', 0.05, False,   -2,    2, None, None),
+                        ('a2',   0., False,    0,    2, None, None),
+                        ('b0', -0.1, False,   -1,  0.5, None, None),  
+                        ('b1',    1, False,  0.2,    2, None, None), 
+                        ('b2',   0., False,    0,    3, None, None), 
+                        ('gm',  4e4, False,  1e4,  1e5, None, None))
+        # -----------------------------------------------
         
-        self.t0         = t0
         self.Nt         = Nt
         self.NN         = NN
         self.fs         = fs
@@ -41,12 +50,26 @@ class Syllable(object):
         self.llambda    = llambda
         self.no_overlap = int(overlap*self.NN)
         
-        self.s        = sound.normalize(s, max_amp=1.0)
+        # ------ define syllable by time interval [tini, tend] --------
+        if tlim==None: 
+            self.s  = sound.normalize(s, max_amp=1.0)
+            self.t0 = t0
+        else:          
+            self.s  = sound.normalize(s[int(tlim[0]*fs):int(tlim[1]*fs)], max_amp=1.0)
+            self.t0 = t0+tlim[0]
+        
         self.time     = np.linspace(0, len(self.s)/self.fs, len(self.s))
         self.envelope = self.Enve(self.s)
         self.Vs       = [] # np.zeros((self.s.size, 5)); # velocity
         
-        Sxx_power, tn, fn, ext = sound.spectrogram (self.s, self.fs, nperseg=self.NN, noverlap=self.no_overlap, mode='psd')  
+        # Sxx_power, tn, fn, ext = sound.spectrogram (self.s, self.fs, nperseg=self.NN, noverlap=self.no_overlap, mode='psd')  
+        
+        Sxx_power, tn, fn, ext = sound.spectrogram(x=self.s, fs=self.fs, nperseg=self.NN,
+                                    noverlap=self.no_overlap, tlims=(self.time[0], self.time[-1]), mode='psd', flims=self.flim)  # (self.time[0], self.time[-1])
+        # # verbose=False, display=False, savefig=None)
+        
+        
+        
         Sxx_dB = util.power2dB(Sxx_power) + 96
         Sxx_dB_noNoise, noise_profile, _ = sound.remove_background(Sxx_dB, gauss_std=self.NN//10, gauss_win=self.NN//5, 
                                                                    llambda=self.llambda) # remove back ground noise 
@@ -141,7 +164,7 @@ class Syllable(object):
         #                boltzmann_parameter=2, resolution=0.1, max_transition_rate=35.92, switch_prob=0.01, 
         #                no_trough_prob=0.01, fill_na=0, center=self.center, pad_mode='constant')
         self.FF     = yin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=2*self.NN, 
-                          win_length=None, hop_length=self.NN//2, trough_threshold=1, center=self.center, pad_mode='constant')
+                          win_length=None, hop_length=self.NN//2, trough_threshold=umbral_FF, center=self.center, pad_mode='constant')
         self.timeFF = np.linspace(0,self.time[-1],self.FF.size)
         self.FF_fun = interp1d(self.timeFF, self.FF)
         self.SCI    = self.f_msf / self.FF_fun(self.FF_time)
@@ -210,13 +233,17 @@ class Syllable(object):
         # ------------------------------------------------------------
         #self.Vs = np.array(self.Vs)
         # define solution (synthetic syllable) as a Syllable object 
-        synth = Syllable(out, self.fs, self.t0,  Nt=self.Nt, llambda=self.llambda, NN=self.NN)
+        synth = Syllable(out, self.fs, self.t0, Nt=self.Nt, llambda=self.llambda, NN=self.NN, overlap=0.5, flim=self.flim, center=self.center)
         synth.no_syllable = self.no_syllable
         synth.no_file     = self.no_file
         synth.p           = self.p
         synth.paths       = self.paths
         synth.id          = self.id+"-synth"
         synth.Vs          = self.Vs
+        synth.alpha       = self.alpha
+        synth.beta        = self.beta
+        
+        delattr(self,"alpha"); delattr(self,"beta")
         
         return synth
         

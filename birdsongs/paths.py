@@ -6,8 +6,8 @@ class Paths(object):
         self.base     = "{}birdsongs\\".format(self.root) 
         self.auxdata  = '{}auxiliar_data\\'.format(self.base)
         self.results  = '{}results\\'.format(self.base) 
-        self.audios   = '{}audios\\'.format(self.root)
-        self.examples = '{}examples\\'.format(self.audios)
+        self.audios   = '{}audios\\'.format(self.root)     # wav folder
+        self.examples = '{}audios\\'.format(self.results)  # write audios folder
 
         if not os.path.exists(self.results):    os.makedirs(self.results)
         if not os.path.exists(self.examples):    os.makedirs(self.examples)

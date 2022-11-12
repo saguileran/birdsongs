@@ -1,5 +1,5 @@
 from .syllable import *
-from .functions import *
+from .utils import *
 
 class Optimizer(Syllable):
     def __init__(self, obj, method_kwargs):

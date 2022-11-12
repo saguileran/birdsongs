@@ -1,10 +1,11 @@
-peakutils
-lmfit
 numpy
 matplotlib 
-pandas
 scipy
+peakutils
+lmfit
+librosa
+scikit-maad
+sympy
+pandas
 sklearn
 IPython
-librosa
-maad

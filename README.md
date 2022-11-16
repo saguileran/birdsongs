@@ -10,7 +10,13 @@
 - [Installation](#Installation)
     - [Requirements](##Requirments)
     - [Downloading](##Downloading)
-- [Requirements](##Requirments)
+    - [Use](##Use)
+- [Overview](#Overview)
+- [Objective](#Objective)
+- [Contents of the Repository](#Contents of the Repository)
+- [Results](#Results)
+- [References](#References)
+- 
 ---
 
 # Installation

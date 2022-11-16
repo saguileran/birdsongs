@@ -13,10 +13,10 @@
     - [Use](##Use)
 - [Overview](#Overview)
 - [Objective](#Objective)
-- [Contents of the Repository](#Contents of the Repository)
+- [Contents of the Repository](#Contents_of_the_Repository)
 - [Results](#Results)
 - [References](#References)
-- [Audio References](##Audios References)
+- [Audios References](##Audios_References)
 ---
 
 # Installation

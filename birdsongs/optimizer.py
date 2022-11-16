@@ -1,4 +1,5 @@
 from .syllable import *
+from .song import *
 from .utils import *
 
 class Optimizer(Syllable):
@@ -29,12 +30,12 @@ class Optimizer(Syllable):
 
     # -----------------------------------------------------------------------
     # ---------------- OPTIMAL PARAMETERS ------------------------------
-    def OptimalBs(self):
+    def OptimalBs(self, obj):
+        self.obj = obj
         if "syllable" in self.obj.id:
             # ---------------- b0 and b2 --------------------
             start02 = time.time()
-            self.obj.p["b0"].set(vary=True)
-            self.obj.p["b2"].set(vary=True)
+            self.obj.p["b0"].set(vary=True);  obj.p["b2"].set(vary=True);
             mi02    = lmfit.minimize(self.residualFF, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
             self.obj.p["b0"].set(vary=False, value=mi02.params["b0"].value)
             self.obj.p["b2"].set(vary=False, value=mi02.params["b2"].value)
@@ -57,8 +58,10 @@ class Optimizer(Syllable):
         print("b_1*={0:.4f}, t={1:.4f} min".format(self.obj.p["b1"].value, (end1-start1)/60))
         #return self.obj.p["b0"].value, self.obj.p["b1"].value #end0-start0, end1-start1
         #return self.obj.p
+        obj = self.obj
         
-    def OptimalAs(self):
+    def OptimalAs(self, obj):
+        self.obj = obj
         # ---------------- a0--------------------
         start0 = time.time()
         self.obj.p["a0"].set(vary=True)
@@ -75,17 +78,21 @@ class Optimizer(Syllable):
         
         print("a_1*={0:.4f}, t={1:.4f} min".format(self.obj.p["a1"].value, (end1-start1)/60))
         #return self.obj.p["b0"].value, self.obj.p["b1"].value #end0-start0, end1-start1
+        obj = self.obj
         
-    def OptimalGamma(self):
+    def OptimalGamma(self, obj):
+        self.obj = obj
         start = time.time()
         self.obj.p["gm"].set(vary=True)
         mi    = lmfit.minimize(self.residualSCI, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
         self.obj.p["gm"].set(value=mi.params["gm"].value, vary=False)
         end   = time.time()
         print("γ* =  {0:.0f}, t={1:.4f} min".format(self.obj.p["gm"].value, (end-start)/60))
+        
+        obj = self.obj
         return mi.params["gm"].value
     
-    def OptimalParams(self, NsGamma=51, NsPar=21):
+    def OptimalParams1(self, NsGamma=51, NsPar=21):
         obj_synth = self.obj.Solve(self.obj.p)     #
         
         #self.kwargs["Ns"] = NsGamma;   
@@ -131,11 +138,46 @@ class Optimizer(Syllable):
     def AllGammas(self, bird):
         Gammas = np.zeros(bird.no_syllables)
         for i in range(1,bird.no_syllables+1):
-            self.obj    = bird.Syllable(i)
-            Gammas[i-1] = self.OptimalGamma()
+            obj         = bird.Syllable(i)
+            Gammas[i-1] = self.OptimalGamma(obj)
             
         self.optimal_gamma = np.mean(Gammas)
         self.Gammas = Gammas
         self.obj    = self.obj0
         self.obj.p["gm"].set(value=self.optimal_gamma, vary=False)
-        #return Gammas
+        return Gammas
+        
+    def OptimalParams(self, obj, Ns=21):         # optimal_gm
+        if self.method=="brute": self.kwargs["Ns"] = Ns     
+        
+        print("As")
+        self.OptimalAs(obj)    
+        print("Bs")
+        self.OptimalBs(obj)
+        print("end")
+        obj.p = self.obj.p
+        
+        #obj.p["gamma"].set(value=optimal_gm)
+        #obj_synth = obj.Solve(obj.p)     #
+        
+        #return obj.p
+    
+    def AllOptimals(self, bird):  # optimal for all syllables
+        s_synth_song = np.zeros_like(bird.s)   # synthetic song init
+        indexes = bird.Syllables()
+        self.AllGammas(bird)
+        Display(bird)
+        
+        for i in range(1,bird.no_syllables+1):
+            obj       = bird.Syllable(i)
+            print("Syllable: {}".format(i))
+            self.OptimalParams(obj=obj)
+            obj_synth = obj.Solve(obj.p)            
+            
+            s_synth_song[indexes[i-1]] = obj_synth.s
+            
+        self.bird_synth = Song(paths=bird.paths, no_file=bird.paths, sfs=[s_synth_song,bird.fs]) 
+        self.bird_synth.id += "synth"
+        #self.bird_synth.WriteAudio()
+        
+        return self.bird_synth

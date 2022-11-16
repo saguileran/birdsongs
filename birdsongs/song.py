@@ -9,79 +9,86 @@ class Song(Syllable):
         no_file = number of the file to analyze
         umbral = threshold to detect a syllable, less than one
     """
-    def __init__(self, paths, no_file, umbral=0.05, llambda=1.5, NN=512, overlap=0.5, umbral_FF=0.1, flim=(1.5e3,2e4), center=False):
+    def __init__(self, paths, no_file, sfs=None, umbral=0.05, llambda=1., NN=1024, overlap=0.5, umbral_FF=1, flim=(1.5e3,2e4), center=False):
         self.no_file = no_file
         self.paths   = paths
         self.llambda = llambda
         self.flim    = flim
         self.center  = center
         
-        self.file_name = self.paths.sound_files[self.no_file-1]
-        s, fs = sound.load(self.file_name)
-        if len(np.shape(s))>1 and s.shape[1]==2 :s = (s[:,1]+s[:,0])/2 # two channels to one
+        if sfs==None:
+            self.file_name = self.paths.sound_files[self.no_file-1]
+            s, fs = sound.load(self.file_name)
+            if len(np.shape(s))>1 and s.shape[1]==2 :s = (s[:,1]+s[:,0])/2 # two channels to one
+            self.id = "song"
+        else:
+            s, fs   = sfs
+            self.id = "song-synth"
         
-        self.NN       = NN 
-        self.no_overlap = int(overlap*self.NN) ##0.8 
+        self.NN         = NN
+        self.win_length = self.NN//2
+        self.hop_length = self.NN//4
+        self.center     = center
+        self.no_overlap = int(overlap*self.NN)
+        
         self.umbral   = umbral
         
         self.SylInd   = []
         self.fs       = fs
         self.s        = sound.normalize(s, max_amp=1.0)
-        self.time     = np.linspace(0, len(self.s)/self.fs, len(self.s))
-        self.id       = "song"
+        self.time_s   = np.linspace(0, len(self.s)/self.fs, len(self.s))
+        self.envelope = Enve(self.s, self.fs, Nt=500)
         
-        self.envelope = sound.envelope(self.s, Nt=500) 
-        t_env = np.arange(0,len(self.envelope),1)*len(self.s)/self.fs/len(self.envelope)
-        t_env[-1] = self.time[-1] 
-        fun_s = interp1d(t_env, self.envelope)
-        self.envelope = fun_s(self.time)
+        self.stft = librosa.stft(y=self.s, n_fft=self.NN, hop_length=self.hop_length, win_length=self.NN, window='hann',
+                                 center=self.center, dtype=None, pad_mode='constant')
         
+        freqs, times, mags = librosa.reassigned_spectrogram(self.s, sr=self.fs, S=self.stft, n_fft=self.NN,
+                                        hop_length=self.hop_length, win_length=self.win_length, window='hann', 
+                                        center=self.center, reassign_frequencies=True, reassign_times=True,
+                                        ref_power=1e-06, fill_nan=True, clip=True, dtype=None, pad_mode='constant')
         
-        Sxx_power, tn, fn, ext = sound.spectrogram (self.s, self.fs, nperseg=self.NN, noverlap=self.no_overlap, mode='psd', flims=flim)  
-        Sxx_dB = util.power2dB(Sxx_power) + 96
-        Sxx_dB_noNoise, noise_profile, _ = sound.remove_background(Sxx_dB, 
-                gauss_std=25, gauss_win=50, llambda=self.llambda)
-
-        self.FF = yin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=2*self.NN, 
-                win_length=None, hop_length=self.NN//2, trough_threshold=umbral_FF, 
-                 center=self.center, pad_mode='constant')
-        self.freq    = fft_frequencies(sr=self.fs, n_fft=self.NN)
-        self.timeFF = np.linspace(0,self.time[-1], self.FF.size) 
+        self.freqs   = freqs  
+        self.times   = times 
+        self.Sxx     = mags 
+        self.Sxx_dB  = librosa.amplitude_to_db(mags, ref=np.max)
+        self.freq    = librosa.fft_frequencies(sr=self.fs, n_fft=self.NN) 
+        self.time    = librosa.times_like(X=self.stft,sr=self.fs, hop_length=self.hop_length, n_fft=self.NN) #, axis=-1
+        self.time -= self.time[0]
         
-        self.fu  = fn
-        self.tu  = tn
-        self.Sxx = sound.smooth(Sxx_dB_noNoise, std=0.5)   
-        self.Sxx_dB = util.power2dB(self.Sxx)+96
+        self.FF     = yin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=self.NN, 
+                          win_length=self.win_length, hop_length=self.hop_length, trough_threshold=umbral_FF, center=self.center, pad_mode='constant')
         
-        self.syllables    = self.Syllables(method="freq")
+        self.syllables = self.Syllables(method="freq")
+        
         self.no_syllables = len(self.syllables)
         print('The son has {} syllables'.format(len(self.syllables)))
         
-    def Syllables(self, method="amplitud"):
+    def Syllables(self, method="freq"):
         if method=="amplitud":
             supra      = np.where(self.envelope > self.umbral)[0]
             candidates = np.split(supra, np.where(np.diff(supra) != 1)[0]+1)
-            syllables = [x for x in candidates if len(x) > 2*self.NN] 
+            syllables = [x for x in candidates if len(x) > self.NN] 
         
             return syllables 
         elif method=="freq":
             ss = np.where((self.FF < 15e3) & (self.FF>2e3)) # filter frequency
-        
-            ff_t   = self.timeFF[ss]                        # cleaning timeFF
+            ff_t   = self.time[ss]                        # cleaning timeFF
             FF_new = self.FF[ss]                            # cleaning FF
             FF_dif = np.abs(np.diff(FF_new))                # find where is it cutted
 
-    #         # alternative form with pandas
-    #         df = pd.DataFrame(data={"FF":bird.FF, "time":bird.timeFF})
-    #         q  = df["FF"].quantile(0.99)
-    #         df[df["FF"] < q]
-    #         q_low, q_hi = df["FF"].quantile(0.05), df["FF"].quantile(0.99)
-    #         df_filtered = df[(df["FF"] < q_hi) & (df["FF"] > q_low)]
+            # alternative form with pandas
+            # df = pd.DataFrame(data={"FF":self.FF, "time":self.time})
+            # q  = df["FF"].quantile(0.99)
+            # df[df["FF"] < q]
+            # q_low, q_hi = df["FF"].quantile(0.05), df["FF"].quantile(0.99)
+            # df_filtered = df[(df["FF"] < q_hi) & (df["FF"] > q_low)]
+            # plt.plot(self.FF, 'o');  plt.plot(df_filtered["FF"], 'o')
 
-    #         plt.plot(bird.FF, 'o')
-    #         plt.plot(df_filtered["FF"], 'o')
-
-            peaks, _ = find_peaks(FF_dif, distance=10, height=500)
+            # ff_t   = self.time[df_filtered["FF"].index]                        # cleaning timeFF
+            # FF_new = self.FF[f_filtered["FF"].index]                            # cleaning FF
+            # FF_dif = np.abs(np.diff(FF_new))
+            
+            peaks, _ = find_peaks(FF_dif, distance=10, height=500) # FF_dif
             syl = [np.arange(peaks[i]+1,peaks[i+1]) for i in range(len(peaks)-1)]
             syl = [np.arange(0,peaks[0])]+syl+[np.arange(peaks[-1]+1,len(ff_t))]
 
@@ -99,7 +106,7 @@ class Song(Syllable):
         self.no_syllable   = no_syllable
         ss                 = self.syllables[self.no_syllable-1]  # syllable indexes 
         self.syll_complet  = self.s[ss]       # audios syllable
-        self.time_syllable = self.time[ss]
+        self.time_syllable = self.time_s[ss]
         self.t0            = self.time_syllable[0]
         
         self.syllable      = Syllable(self.syll_complet, self.fs, self.t0, center=self.center, flim=self.flim, NN=NN)
@@ -131,6 +138,10 @@ class Song(Syllable):
         
         return self.chunck
     
+    def WriteAudio(self):
+        name = '{}/File{}-{}.wav'.format(self.paths.examples,self.no_file, self.id)
+        WriteAudio(name, fs=self.fs, s=self.s)
+    
     # ------------- solver for some parameters -----------------
     def WholeSong(self, method_kwargs, plot=False, syll_max=0):
         self.OptGamma = self.AllGammas(method_kwargs)
@@ -150,3 +161,5 @@ class Song(Syllable):
         self.s_synth = np.empty_like(self.s)
         for i in range(self.syllables.size):
             self.s_synth[self.SylInd[i][1]] = self.syllables[i]
+            
+    

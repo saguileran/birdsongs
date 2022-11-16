@@ -4,6 +4,7 @@ import pandas as pd
 import sympy as sym
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 
 from numpy.polynomial import Polynomial
 from numpy.linalg import norm as Norm
@@ -27,6 +28,8 @@ from librosa import yin, pyin, feature, display, onset, times_like, stft, fft_fr
 import librosa 
 from maad import *
 
+from IPython.display import Audio # reproduce audio 
+
 Pool() # crea pool to parallel programming for optimization
 
 def rk4(f, v, dt):
@@ -44,3 +47,17 @@ def rk4(f, v, dt):
     k3 = f(v + dt/2.0*k2)
     k4 = f(v + dt*k3)
     return v + dt*(2.0*(k2+k3)+k1+k4)/6.0
+
+def WriteAudio(name, fs, s):
+    sound.write(name, fs, np.asarray(s,  dtype=np.float32))
+    
+def Enve(out, fs, Nt):
+    time = np.linspace(0, len(out)/fs, len(out))
+    out_env = sound.envelope(out, Nt=Nt) 
+    t_env = np.arange(0,len(out_env),1)*len(out)/fs/len(out_env)
+    t_env[-1] = time[-1] 
+    fun_s = interp1d(t_env, out_env)
+    return fun_s(time)
+
+def AudioPlay(obj):
+    return Audio(data=obj.s, rate=obj.fs)

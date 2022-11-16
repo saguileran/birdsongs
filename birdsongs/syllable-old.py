@@ -8,7 +8,7 @@ class Syllable(object):
         fs = sampling rate
         t0 = initial time of the syllable
     """
-    def __init__(self, s, fs, t0, Nt=200, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4), center=False, n_mels=20, umbral_FF=1, tlim=None):
+    def __init__(self, s, fs, t0, Nt=200, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4), center=False, n_mels=32, umbral_FF=1, tlim=None):
         ## The bifurcation can be cahge modifying the self.f2 and self.f1 functions
         ## ------------- Bogdanov–Takens bifurcation ------------------
         self.beta_bif = np.linspace(-2.5, 1/3, 1000)  # mu2:beta,  mu1:alpha
@@ -42,15 +42,15 @@ class Syllable(object):
                         ('gm',  4e4, False,  1e4,  1e5, None, None))
         # -------------------------------------------------------------------        
         self.Nt         = Nt
-        self.fs         = fs
         self.NN         = NN
         self.win_length = self.NN
-        self.hop_length = self.NN//4
-        self.center     = center
-        self.no_overlap = int(overlap*self.NN)
+        self.hop_length = self.NN/4
+        self.fs         = fs
         self.n_mels     = n_mels
         self.flim       = flim
         self.llambda    = llambda
+        self.no_overlap = int(overlap*self.NN)
+        self.center = center
         
         # ------ define syllable by time interval [tini, tend] --------
         if tlim==None: 
@@ -59,91 +59,117 @@ class Syllable(object):
         else:          
             self.s  = sound.normalize(s[int(tlim[0]*fs):int(tlim[1]*fs)], max_amp=1.0)
             self.t0 = t0+tlim[0]
-        self.time_s   = np.linspace(0, len(self.s)/self.fs, len(self.s))
-        self.envelope = Enve(self.s, self.fs, self.Nt)
-        self.T        = self.s.size/self.fs
-        self.time0    = np.linspace(0, len(self.s)/self.fs, len(self.s))
+        
+        self.time     = np.linspace(0, len(self.s)/self.fs, len(self.s))
+        self.envelope = self.Enve(self.s)
         self.Vs       = [] # np.zeros((self.s.size, 5)); # velocity
         
-        # -------------------------------------------------------------------
-        # ------------- ACOUSTIC FEATURES -----------------------------------
-        # -------------------------------------------------------------------
-        self.stft = librosa.stft(y=self.s, n_fft=self.NN, hop_length=self.hop_length, win_length=self.NN, window='hann',
-                                 center=self.center, dtype=None, pad_mode='constant')
+        self.stft = librosa.stft(y=self.s, n_fft=self.NN, hop_length=self.NN/4, win_length=self.NN, window='hann',
+                                 center=self.center, dtype=None, pad_mode='constant', out=None)
         freqs, times, mags = librosa.reassigned_spectrogram(self.s, sr=self.fs, S=self.stft, n_fft=self.NN,
                                         hop_length=self.hop_length, win_length=self.win_length, window='hann', 
                                         center=self.center, reassign_frequencies=True, reassign_times=True,
                                         ref_power=1e-06, fill_nan=True, clip=True, dtype=None, pad_mode='constant')
         
-        self.freqs   = freqs  
-        self.times   = times 
-        self.Sxx     = mags 
-        self.Sxx_dB  = librosa.amplitude_to_db(mags, ref=np.max)
-        self.FF_coef = np.abs(self.stft)
-        self.freq = librosa.fft_frequencies(sr=self.fs, n_fft=self.NN) 
-        self.time = librosa.times_like(X=self.stft,sr=self.fs, hop_length=self.hop_length, n_fft=self.NN) #, axis=-1
-        self.time -= self.time[0]
+        self.fu     = freqs 
+        self.tu     = times 
+        self.Sxx    = mags 
+        self.Sxx_dB = librosa.amplitude_to_db(mags, ref=np.max)
+        # -------------------------------------------------------------------
+        # ------------- ACOUSTIC FEATURES -----------------------------------
+        # -------------------------------------------------------------------
+        #numbers: energy, Ht, Hf, EAS, ECU, ECV, EPS, EPS_KURT, EPS_SKEW
+        #vectors: rms, zcr, centroid, rolloff, rolloff_min, onset_env
+        #matrix: contrast, mfccs, FFT_coef, s_mel
+        
+#         # ----------------------- scalar 
+#         EAS, ECU, ECV, EPS, EPS_KURT, EPS_SKEW = features.spectral_entropy(self.Sxx, self.fu, flim=self.flim) 
+#         ACI_xx, ACI_per_bin, ACI_sum           = features.acoustic_complexity_index(self.Sxx)
+        
+#         energy =  Norm(self.s,ord=2)/self.s.size
+#         Ht     = features.temporal_entropy (self.s,    compatibility='seewave', mode='fast', Nt=self.NN)
+#         Hf, _  = features.frequency_entropy(self.Sxx, compatibility='seewave')
+        
+#         self.BI     = features.bioacoustics_index(self.Sxx, self.fu, flim=self.flim, R_compatible='seewave')
+        # ----------------------- vector ------------------------------
+        self.freq    = fft_frequencies(sr=self.fs, n_fft=self.NN) 
+        self.FF_coef = np.abs(stft(y=self.s, n_fft=self.NN, hop_length=self.NN//2, win_length=None, 
+                     center=self.center, dtype=None, pad_mode='constant'))
         
         self.f_msf   = np.array([Norm(self.FF_coef[:,i]*self.freq, 1)/Norm(self.FF_coef[:,i], 1) for i in range(self.FF_coef.shape[1])])        
+        self.FF_time = np.linspace(0,self.time[-1], self.FF_coef.shape[1]) #times_like(self.FF_coef, sr=self.fs, hop_length=self.NN//2, n_fft=self.NN)
         
-        self.centroid =  feature.spectral_centroid(y=self.s, sr=self.fs, S=np.abs(self.stft), n_fft=self.NN,
-                                            hop_length=self.hop_length, freq=self.freqs, win_length=self.win_length, 
-                                            window='hann',center=self.center, pad_mode='constant')[0]
-        self.mfccs = feature.mfcc(y=self.s, sr=self.fs, S=self.stft, n_mfcc=20, dct_type=2, norm='ortho', lifter=0)
-        self.rms   = feature.rms(y=self.s, S=self.stft, frame_length=self.NN, hop_length=self.hop_length,
-                                 center=self.center, pad_mode='constant')[0]
-        self.s_mel = feature.melspectrogram(y=self.fs, sr=self.fs, S=self.stft, n_fft=self.NN, hop_length=self.hop_length,
-                                            win_length=self.win_length, window='hann', center=self.center, pad_mode='constant', power=2.0)
-       
-        # pitches[..., f, t] contains instantaneous frequency at bin f, time t
-        # magnitudes[..., f, t] contains the corresponding magnitudes.
-        # Both pitches and magnitudes take value 0 at bins of non-maximal magnitude.
-        # pitches, magnitudes = librosa.piptrack(y=self.s, sr=self.fs, S=self.stft, n_fft=self.NN, hop_length=self.hop_length,
-        #                        fmin=self.flim[0], fmax=self.flim[1], threshold=0.01, win_length=self.win_length, 
+        self.centroid =  librosa.feature.spectral_centroid(y=self.s, sr=self.fs, S=None, n_fft=self.NN,
+                                hop_length=self.NN//2, freq=None, win_length=None, window='hann', center=self.center,
+                                                           pad_mode='constant')
+        self.mfccs = librosa.feature.mfcc(y=self.s, sr=self.fs, S=None, n_mfcc=20, dct_type=2, norm='ortho', lifter=0)
+        self.rms   = librosa.feature.rms(y=self.s, S=None, frame_length=self.NN, hop_length=self.NN//2, center=self.center, pad_mode='constant')
+                                          
+        # self.centroid = feature.spectral_centroid(y=self.s, sr=self.fs, S=self.Sxx_dB+96, n_fft=self.NN, 
+        #                                           hop_length=self.NN//2, freq=None, 
+        #                                     win_length=None, center=self.center, pad_mode='constant')[0]
+#         self.rms      = feature.rms(y=self.s, S=self.Sxx, frame_length=self.NN, hop_length=self.NN//2, 
+#                                     center=self.center, pad_mode='constant')[0]
+        
+#         self.mfccs    = feature.mfcc(y=self.s, sr=self.fs, S=self.Sxx, n_mfcc=126, dct_type=2, norm='ortho', lifter=0)
+        
+#         self.NOP    = features.number_of_peaks(self.Sxx, self.fu, mode='dB', min_peak_val=0.05, min_freq_dist=1e3, 
+#                                         slopes=(1, 1), prominence=0, display=False) # Number Of Peaks
+        
+        # # pitches[..., f, t] contains instantaneous frequency at bin f, time t
+        # # magnitudes[..., f, t] contains the corresponding magnitudes.
+        # # Both pitches and magnitudes take value 0 at bins of non-maximal magnitude.
+        # pitches, magnitudes = librosa.piptrack(y=self.s, sr=self.fs, S=self.Sxx, n_fft=self.NN, hop_length=self.NN//2,
+        #                        fmin=self.flim[0], fmax=self.flim[1], threshold=0.01, win_length=None, 
         #                        center=self.center, pad_mode='constant', ref=None)
-        # self.zcr = librosa.feature.zero_crossing_rate(y=self.s,frame_length=self.NN, hop_length=self.hop_length, center=self.center)
-        # self.rolloff     = feature.spectral_rolloff(y=self.s, sr=self.fs, S=self.stft, n_fft=self.NN, 
-        #                                             hop_length=self.hop_length, win_length=self.win_length, center=self.center,
-        #                                             pad_mode='constant', freq=self.freqs, roll_percent=0.6)[0]
-        # self.rolloff_min = feature.spectral_rolloff(y=self.s, sr=self.fs, S=self.stft, n_fft=self.NN, 
-        #                                          hop_length=self.hop_length, win_length=self.win_length, 
-        #                          center=self.center, pad_mode='constant', freq=self.freqs, roll_percent=0.2)[0]
-        # self.onset_env   = onset.onset_strength(y=self.s, sr=self.fs, S=self.stft, lag=1, max_size=1, fmax=self.flim[1],
-        #                                          ref=None, detrend=False, center=self.center, feature=None, aggregate=None)
+        # features.zero_crossing_rate(self.s, self.fs)
+#         self.zcr         = feature.zero_crossing_rate(self.s, frame_length=self.NN, hop_length=self.NN//2, 
+#                                                       center=self.center) 
+#         self.rolloff     = feature.spectral_rolloff(y=self.s, sr=self.fs, S=self.Sxx_dB, n_fft=self.NN, 
+#                                                     hop_length=self.NN//2, win_length=None, center=self.center,
+#                                                     pad_mode='constant', freq=None, roll_percent=0.6)[0]
+#         self.rolloff_min = feature.spectral_rolloff(y=self.s, sr=self.fs, S=self.Sxx_dB, n_fft=self.NN, 
+#                                                  hop_length=self.NN//2, win_length=None, 
+#                                  center=self.center, pad_mode='constant', freq=None, roll_percent=0.2)[0]
+#         self.onset_env   = onset.onset_strength(y=self.s, sr=self.fs, S=self.Sxx, lag=1, max_size=1, fmax=self.flim[1],
+#                                                  ref=None, detrend=False, center=self.center, feature=None, aggregate=None)
 
 #         # ----------------------- matrix  ----------------------------
-#         self.contrast = feature.spectral_contrast(y=self.s, sr=self.fs, S=self.stft, n_fft=self.NN, hop_length=self.hop_length, 
-#                                     win_length=self.win_length, center=self.center, pad_mode='constant', freq=self.freqs, 
-#                                     fmin=self.flim[0], n_bands=4,quantile=0.02, linear=False)
-#         self.s_mel    = feature.melspectrogram(y=self.s, sr=self.fs, S=self.stft, n_fft=self.NN, 
-#                                        hop_length=self.hop_length, win_length=self.win_length, center=self.center, 
-#                                        pad_mode='constant', power=2.0, n_mels=self.n_mels,
-#                                        fmin=self.flim[0], fmax=self.flim[1])
-#         self.s_sal    = librosa.salience(S=self.FF_coef, freqs=self.freqs, harmonics=[1, 2, 3, 4], weights=[1,1,1,1], 
-#                                          aggregate=None, filter_peaks=True, fill_value=0, kind='linear', axis=-2)
-#         self.C        = librosa.cqt(y=self.s, sr=self.fs, hop_length=self.hop_length, fmin=self.flim[0], n_bins=32, 
-#                                     bins_per_octave=12, tuning=0.0, filter_scale=1, norm=1, sparsity=0.01, 
-#                                     window='hann', scale=True, pad_mode='constant', dtype=None)
-#         self.D        = librosa.iirt(y=self.s, sr=self.fs, win_length=self.win_length, hop_length=self.hop_length, center=self.center, 
-#                          tuning=0.0, pad_mode='constant', flayout='sos')
+        # self.contrast = feature.spectral_contrast(y=self.s, sr=self.fs, S=self.Sxx, n_fft=self.NN, hop_length=self.NN//2, 
+        #                             win_length=None, center=self.center, pad_mode='constant', freq=None, 
+        #                             fmin=self.flim[0], n_bands=4,quantile=0.02, linear=False)
+        self.s_mel    = feature.melspectrogram(y=self.s, sr=self.fs, S=self.Sxx, n_fft=self.NN, 
+                                       hop_length=self.NN//2, win_length=None, center=self.center, 
+                                       pad_mode='constant', power=2.0, n_mels=self.n_mels,
+                                       fmin=self.flim[0], fmax=self.flim[1])
+        # self.s_sal    = librosa.salience(S=self.FF_coef, freqs=self.freq, harmonics=[1, 2, 3, 4], weights=[1,1,1,1], 
+        #                                  aggregate=None, filter_peaks=True, fill_value=0, kind='linear', axis=-2)
+        # self.C        = librosa.cqt(y=self.s, sr=self.fs, hop_length=self.NN//2, fmin=self.flim[0], n_bins=32, 
+        #                             bins_per_octave=12, tuning=0.0, filter_scale=1, norm=1, sparsity=0.01, 
+        #                             window='hann', scale=True, pad_mode='constant', dtype=None)
+        # self.D        = librosa.iirt(y=self.s, sr=self.fs, win_length=2*self.NN, hop_length=self.NN//2, center=self.center, 
+        #                  tuning=0.0, pad_mode='constant', flayout='sos')
         
 #         self.pitches    = pitches
 #         self.magnitudes = magnitudes
         
-        # # self.features  = [energy, Ht, Hf]
-        # # self.entropies = [EAS, ECU, ECV, EPS, EPS_KURT, EPS_SKEW]
-        # # self.times_on = times_on
+        # self.features  = [energy, Ht, Hf]
+        # self.entropies = [EAS, ECU, ECV, EPS, EPS_KURT, EPS_SKEW]
+        
+        # self.times_on = times_on
+        
+        self.T        = self.s.size/self.fs #self.tu[-1]-self.tu[0]
         
         # # ------------- "better method" --------------
-        # self.FF     = pyin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=self.NN, 
-        #                win_length=self.win_length, hop_length=self.hop_length, n_thresholds=100, beta_parameters=(2, 18), 
+        # self.FF     = pyin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=2*self.NN, 
+        #                win_length=None, hop_length=self.NN//2, n_thresholds=100, beta_parameters=(2, 18), 
         #                boltzmann_parameter=2, resolution=0.1, max_transition_rate=35.92, switch_prob=0.01, 
         #                no_trough_prob=0.01, fill_na=0, center=self.center, pad_mode='constant')
-        self.FF     = yin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=self.NN, 
-                          win_length=self.NN//2, hop_length=self.NN//4, trough_threshold=umbral_FF, center=self.center, pad_mode='constant')
+        self.FF     = yin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=2*self.NN, 
+                          win_length=None, hop_length=self.NN//2, trough_threshold=umbral_FF, center=self.center, pad_mode='constant')
         self.timeFF = np.linspace(0,self.time[-1],self.FF.size)
         self.FF_fun = interp1d(self.timeFF, self.FF)
-        self.SCI    = self.f_msf / self.FF_fun(self.time)
+        self.SCI    = self.f_msf / self.FF_fun(self.FF_time)
     
     def AlphaBeta(self): 
         a = np.array([self.p["a0"].value, self.p["a1"].value, self.p["a2"].value]);   
@@ -162,7 +188,7 @@ class Syllable(object):
         self.beta  = b[0] + b[1]*(1e-4*y) + b[2]*(1e-4*y)**2   
             
     def MotorGestures(self, ovfs=20, prct_noise=0):  # ovfs:oversamp
-        t, tmax, dt = 0, int(self.s.size)*ovfs-1, 1./(ovfs*self.fs) # t0, tmax, td
+        t, tmax, dt = 0, int(self.s.size)*ovfs, 1./(ovfs*self.fs) # t0, tmax, td
         # pback and pin vectors initialization
         pi, pb, out = np.zeros(tmax), np.zeros(tmax), np.zeros(int(self.s.size))
         # initial vector ODEs (v0), it is not too relevant
@@ -223,15 +249,16 @@ class Syllable(object):
         
         return synth
         
-    # def Enve(self, out, fs, Nt):
-    #     time = np.linspace(0, len(out)/fs, len(out))
-    #     out_env = sound.envelope(out, Nt=Nt) 
-    #     t_env = np.arange(0,len(out_env),1)*len(out)/fs/len(out_env)
-    #     t_env[-1] = time[-1] 
-    #     fun_s = interp1d(t_env, out_env)
-    #     return fun_s(time)
+    def Enve(self, out):
+        out_env = sound.envelope(out, Nt=self.Nt) 
+        t_env = np.arange(0,len(out_env),1)*len(out)/self.fs/len(out_env)
+        t_env[-1] = self.time[-1] 
+        fun_s = interp1d(t_env, out_env)
+        return fun_s(self.time)
         
     def WriteAudio(self):
+        # sound.write('{}/File{}-{}-{}.wav'.format(self.paths.examples,self.no_file, self.id,self.no_syllable), 
+        #                                          self.fs, np.asarray(self.s,  dtype=np.float32))
         name = '{}/File{}-{}-{}.wav'.format(self.paths.examples,self.no_file, self.id,self.no_syllable)
         WriteAudio(name, fs=self.fs, s=self.s)
         
@@ -275,9 +302,9 @@ class Syllable(object):
         synth.scoreF_msf_mean    = synth.deltaF_msf.mean()
         
         # -------         acoustic dissimilarity --------------------
-        synth.correlation = np.zeros_like(self.time)
-        synth.Df          = np.zeros_like(self.time)
-        synth.SKL         = np.zeros_like(self.time)
+        synth.correlation = np.zeros_like(self.FF_time)
+        synth.Df          = np.zeros_like(self.FF_time)
+        synth.SKL         = np.zeros_like(self.FF_time)
         for i in range(synth.mfccs.shape[1]):
             x, y = self.mfccs[:,i], synth.mfccs[:,i]
             r = Norm(x*y,ord=1)/(Norm(x,ord=2)*Norm(y,ord=2))

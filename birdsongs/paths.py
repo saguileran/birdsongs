@@ -2,11 +2,12 @@ import os, glob
 import pandas as pd
 
 class Paths(object):
-    def __init__(self, root_path, audios_path=None, bird_name=None):
-        self.root     = root_path
-        self.base     = "{}birdsongs\\".format(self.root) 
-        self.auxdata  = '{}auxiliar_data\\'.format(self.base)
-        self.results  = '{}results\\'.format(self.base) 
+    def __init__(self, root_path=None, audios_path=None, bird_name=None):
+        if root_path==None: self.root = ".\\"
+        else:               self.root = root_path
+        #self.base     = "{}birdsongs\\".format(self.root) 
+        self.auxdata  = '{}auxiliar_data\\'.format(self.root)
+        self.results  = '{}results\\'.format(self.root) 
         self.examples = '{}audios\\'.format(self.results)  # write audios folder
         
         if audios_path==None:

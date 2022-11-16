@@ -9,7 +9,7 @@ class Song(Syllable):
         no_file = number of the file to analyze
         umbral = threshold to detect a syllable, less than one
     """
-    def __init__(self, paths, no_file, sfs=None, umbral=0.05, llambda=1., NN=1024, overlap=0.5, umbral_FF=1, flim=(1.5e3,2e4), center=False):
+    def __init__(self, paths, no_file, sfs=None, umbral=0.05, llambda=1., NN=1024, overlap=0.5, umbral_FF=1.5, flim=(1.5e3,2e4), center=False, tlim=None, split_method="freq"):
         self.no_file = no_file
         self.paths   = paths
         self.llambda = llambda
@@ -19,11 +19,19 @@ class Song(Syllable):
         if sfs==None:
             self.file_name = self.paths.sound_files[self.no_file-1]
             s, fs = sound.load(self.file_name)
-            if len(np.shape(s))>1 and s.shape[1]==2 :s = (s[:,1]+s[:,0])/2 # two channels to one
+            #s, fs = librosa.load(self.file_name)
+            #if len(np.shape(s))>1 and s.shape[1]==2 :s = (s[:,1]+s[:,0])/2 # two channels to one
             self.id = "song"
         else:
             s, fs   = sfs
             self.id = "song-synth"
+        
+        if tlim==None: 
+            self.s  = sound.normalize(s, max_amp=1.0)
+            self.t0 = 0
+        else:          
+            self.s  = sound.normalize(s[int(tlim[0]*fs):int(tlim[1]*fs)], max_amp=1.0)
+            self.t0 = tlim[0]        
         
         self.NN         = NN
         self.win_length = self.NN//2
@@ -35,7 +43,6 @@ class Song(Syllable):
         
         self.SylInd   = []
         self.fs       = fs
-        self.s        = sound.normalize(s, max_amp=1.0)
         self.time_s   = np.linspace(0, len(self.s)/self.fs, len(self.s))
         self.envelope = Enve(self.s, self.fs, Nt=500)
         
@@ -58,7 +65,7 @@ class Song(Syllable):
         self.FF     = yin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=self.NN, 
                           win_length=self.win_length, hop_length=self.hop_length, trough_threshold=umbral_FF, center=self.center, pad_mode='constant')
         
-        self.syllables = self.Syllables(method="freq")
+        self.syllables = self.Syllables(method=split_method)
         
         self.no_syllables = len(self.syllables)
         print('The son has {} syllables'.format(len(self.syllables)))
@@ -71,22 +78,21 @@ class Song(Syllable):
         
             return syllables 
         elif method=="freq":
-            ss = np.where((self.FF < 15e3) & (self.FF>2e3)) # filter frequency
-            ff_t   = self.time[ss]                        # cleaning timeFF
-            FF_new = self.FF[ss]                            # cleaning FF
-            FF_dif = np.abs(np.diff(FF_new))                # find where is it cutted
-
-            # alternative form with pandas
-            # df = pd.DataFrame(data={"FF":self.FF, "time":self.time})
-            # q  = df["FF"].quantile(0.99)
-            # df[df["FF"] < q]
-            # q_low, q_hi = df["FF"].quantile(0.05), df["FF"].quantile(0.99)
-            # df_filtered = df[(df["FF"] < q_hi) & (df["FF"] > q_low)]
+            # ss = np.where((self.FF < self.flim[1]) & (self.FF>self.flim[0])) # filter frequency
+            # ff_t   = self.time[ss]                        # cleaning timeFF
+            # FF_new = self.FF[ss]                            # cleaning FF
+            # FF_dif = np.abs(np.diff(FF_new))                # find where is it cutted
+            # # alternative form with pandas
+            df = pd.DataFrame(data={"FF":self.FF, "time":self.time})
+            q  = df["FF"].quantile(0.99)
+            df[df["FF"] < q]
+            q_low, q_hi = df["FF"].quantile(0.1), df["FF"].quantile(0.99)
+            df_filtered = df[(df["FF"] < q_hi) & (df["FF"] > q_low)]
+            
+            ff_t   = self.time[df_filtered["FF"].index]
+            FF_new = self.FF[df_filtered["FF"].index]
+            FF_dif = np.abs(np.diff(FF_new))
             # plt.plot(self.FF, 'o');  plt.plot(df_filtered["FF"], 'o')
-
-            # ff_t   = self.time[df_filtered["FF"].index]                        # cleaning timeFF
-            # FF_new = self.FF[f_filtered["FF"].index]                            # cleaning FF
-            # FF_dif = np.abs(np.diff(FF_new))
             
             peaks, _ = find_peaks(FF_dif, distance=10, height=500) # FF_dif
             syl = [np.arange(peaks[i]+1,peaks[i+1]) for i in range(len(peaks)-1)]
@@ -161,5 +167,3 @@ class Song(Syllable):
         self.s_synth = np.empty_like(self.s)
         for i in range(self.syllables.size):
             self.s_synth[self.SylInd[i][1]] = self.syllables[i]
-            
-    

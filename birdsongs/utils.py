@@ -1,4 +1,4 @@
-import peakutils, time #emcee,
+import peakutils, time, warnings #emcee,
 import numpy as np
 import pandas as pd
 import sympy as sym
@@ -31,6 +31,7 @@ from maad import *
 from IPython.display import Audio # reproduce audio 
 
 Pool() # crea pool to parallel programming for optimization
+warnings.filterwarnings(action='once') # omite warnings spam
 
 def rk4(f, v, dt):
     """

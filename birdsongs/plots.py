@@ -18,7 +18,7 @@ class Ploter(object):
             fig.suptitle("GridSpec")
             fig.tight_layout(pad=3.0) #fig.subplots_adjust(top=0.85)
 
-            viridis = cm.get_cmap('Blues')
+            viridis = mpl.colormaps["Blues"] #cm.get_cmap('Blues')
             c       = viridis(np.linspace(0.3, 1, np.size(obj.time_s)))
 
             ax1.scatter(obj.time_s, obj.alpha, c=c, label="alfa")
@@ -100,7 +100,7 @@ class Ploter(object):
                          hop_length=obj.hop_length, ax=ax[0], cmap=self.cmap)
             
             if FF_on: 
-                ax[0].plot(obj.time, obj.FF, "co", label="Fundamental Frequency", ms=5)
+                ax[0].plot(obj.time, obj.FF, "co", label="Fundamental Frequency", ms=8)
                 ax[0].legend()
             # for i in range(len(obj.syllables)):  
             #     ax[0].plot([obj.time[obj.syllables[i][0]], obj.time[obj.syllables[i][-1]]], [0, 0], 'k', lw=5)

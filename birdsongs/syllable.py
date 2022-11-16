@@ -8,7 +8,7 @@ class Syllable(object):
         fs = sampling rate
         t0 = initial time of the syllable
     """
-    def __init__(self, s, fs, t0, Nt=200, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4), center=False, n_mels=20, umbral_FF=1, tlim=None):
+    def __init__(self, s, fs, t0=None, Nt=200, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4), center=False, n_mels=20, umbral_FF=1, tlim=None):
         ## The bifurcation can be cahge modifying the self.f2 and self.f1 functions
         ## ------------- Bogdanov–Takens bifurcation ------------------
         self.beta_bif = np.linspace(-2.5, 1/3, 1000)  # mu2:beta,  mu1:alpha
@@ -53,12 +53,15 @@ class Syllable(object):
         self.llambda    = llambda
         
         # ------ define syllable by time interval [tini, tend] --------
-        if tlim==None: 
+        if tlim==None and t0!=None: 
             self.s  = sound.normalize(s, max_amp=1.0)
             self.t0 = t0
-        else:          
+        elif tlim==None and t0==None: 
+            self.t0 = 0
+            self.s  = sound.normalize(s, max_amp=1.0)
+        elif tlim!=None:
             self.s  = sound.normalize(s[int(tlim[0]*fs):int(tlim[1]*fs)], max_amp=1.0)
-            self.t0 = t0+tlim[0]
+            self.t0 = tlim[0]
         self.time_s   = np.linspace(0, len(self.s)/self.fs, len(self.s))
         self.envelope = Enve(self.s, self.fs, self.Nt)
         self.T        = self.s.size/self.fs
@@ -141,6 +144,20 @@ class Syllable(object):
         #                no_trough_prob=0.01, fill_na=0, center=self.center, pad_mode='constant')
         self.FF     = yin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=self.NN, 
                           win_length=self.NN//2, hop_length=self.NN//4, trough_threshold=umbral_FF, center=self.center, pad_mode='constant')
+        
+#         # # remove atypical data
+#         df = pd.DataFrame(data={"FF":self.FF, "time":self.time})
+#         q  = df["FF"].quantile(0.99)
+#         df[df["FF"] < q]
+#         q_low, q_hi = df["FF"].quantile(0.1), df["FF"].quantile(0.99)
+#         df_filtered = df[(df["FF"] < q_hi) & (df["FF"] > q_low)]
+
+#         self.time   = self.time[df_filtered["FF"].index]
+#         self.FF = self.FF[df_filtered["FF"].index]
+
+        
+        
+        
         self.timeFF = np.linspace(0,self.time[-1],self.FF.size)
         self.FF_fun = interp1d(self.timeFF, self.FF)
         self.SCI    = self.f_msf / self.FF_fun(self.time)
@@ -206,6 +223,7 @@ class Syllable(object):
             v = rk4(ODEs, v, dt);  self.Vs.append(v)  # RK4 - step
             out[t//ovfs] = RB*v[-1]               # output signal (synthetic) 
             t += 1;
+        self.timesVs = np.linspace(0, len(self.s)/self.fs, len(self.s)*ovfs)
         # ------------------------------------------------------------
         #self.Vs = np.array(self.Vs)
         # define solution (synthetic syllable) as a Syllable object 

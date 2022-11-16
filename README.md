@@ -32,6 +32,12 @@ cd birdsongs
 
 you can verify the current branch with the command `git branch -a`. You have to be in `main` branch, to change the branch use the command `git checkout main`.
 
+The next step is to install the required package 
+
+```bat
+pip install -r requirements.txt
+```
+
 
 # Overview
 

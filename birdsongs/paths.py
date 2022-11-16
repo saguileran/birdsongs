@@ -6,12 +6,12 @@ class Paths(object):
         if root_path==None: self.root = ".\\"
         else:               self.root = root_path
         #self.base     = "{}birdsongs\\".format(self.root) 
-        self.auxdata  = '{}auxiliar_data\\'.format(self.root)
-        self.results  = '{}results\\'.format(self.root) 
-        self.examples = '{}audios\\'.format(self.results)  # write audios folder
+        self.auxdata  = '{}examples\\auxiliar_data\\'.format(self.root)
+        self.results  = '{}examples\\results\\'.format(self.root) 
+        self.examples = '{}examples\\audios\\'.format(self.results)  # write audios folder
         
         if audios_path==None:
-            self.audios      = '{}audios\\'.format(self.root)     # wav folder
+            self.audios      = self.examples #'{}audios\\'.format(self.root)     # wav folder
             self.sound_files = glob.glob(os.path.join(self.audios, '*wav'))
         else:
             if "ebird" in audios_path: 

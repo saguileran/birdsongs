@@ -1,11 +1,21 @@
-[BirdSongs](https://saguileran.github.io/birdsongs/)
-==============
+[![birdsong logo](logo )](https://github.com/saguileran/birdsongs/)
+
+# birdsongs
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/saguileran/birdsongs/main?labpath=BirdSongs.ipynb)
 
-This is my dissertation requiered to obtain a degree of physics at the National University of Colombia.
 
-# Requirments
+#  Table of Contents
+
+- [Installation](#Installation)
+    - [Requirements](##Requirments)
+    - [Downloading](##Downloading)
+- [Requirements](##Requirments)
+---
+
+# Installation
+
+## Requirments
 
 syllables requires:
 
@@ -21,23 +31,66 @@ syllables requires:
 - sklearn
 - IPython
 
-# Installation
+## Downloading
 
-In order to use the code first clone the repository and enter to birdsongs folder
+In order to use birdsongs, clone the repository and enter to the folder repository
 
 ```bat
 git clone https://github.com/saguileran/birdsongs.git
 cd birdsongs
 ```
-
 you can verify the current branch with the command `git branch -a`. You have to be in `main` branch, to change the branch use the command `git checkout main`.
 
-The next step is to install the required package 
+The next step is to install the required packages, any of the following commands line will work
 
 ```bat
-pip install -r requirements.txt
+pip install -r ./birdsongs/requirements.txt
+python -m pip install -r ./birdsongs/requirements.txt
+cd birdsongs
 ```
 
+the last step is to enter at the birdsongs folder to use its function with the examples audios.
+
+
+## Use
+
+### Define objects
+
+Import the package as bs
+
+```python
+import birdsongs as bs
+```
+
+define a ploter and paths objects  
+
+```python
+ploter = bs.Ploter()
+paths = bs.Paths()
+```
+define and plot the audio birdsong 
+
+```python
+NoFiles = 3
+bird = bs.Song(paths, 3)
+ploter.Plot(bird)
+```
+
+The last step is to define the syllable and optimizer objects to generate the synthetic dat 
+```python
+syllable  = bs.Syllable(bird.s, bird.fs)  # change to enter just bird
+#optimizer = bs.Optimizer()
+```
+
+
+<!---
+and then add to python 
+
+```bat
+pip install -e birdsongs
+python -m pip install -e birdsongs
+```
+-->
 
 # Overview
 

@@ -9,7 +9,7 @@ class Song(Syllable):
         no_file = number of the file to analyze
         umbral = threshold to detect a syllable, less than one
     """
-    def __init__(self, paths, no_file, sfs=None, umbral=0.05, llambda=1., NN=1024, overlap=0.5, umbral_FF=1.5, flim=(1.5e3,2e4), center=False, tlim=None, split_method="freq"):
+    def __init__(self, paths, no_file, sfs=None, umbral=0.05, llambda=1., NN=1024, overlap=0.5, umbral_FF=1.5, flim=(1.5e3,2e4), center=False, tlim=None, split_method="freq", Nt=500):
         self.no_file = no_file
         self.paths   = paths
         self.llambda = llambda
@@ -44,7 +44,7 @@ class Song(Syllable):
         self.SylInd   = []
         self.fs       = fs
         self.time_s   = np.linspace(0, len(self.s)/self.fs, len(self.s))
-        self.envelope = Enve(self.s, self.fs, Nt=500)
+        self.envelope = Enve(self.s, self.fs, Nt=Nt)
         
         self.stft = librosa.stft(y=self.s, n_fft=self.NN, hop_length=self.hop_length, win_length=self.NN, window='hann',
                                  center=self.center, dtype=None, pad_mode='constant')

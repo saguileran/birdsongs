@@ -223,7 +223,7 @@ class Syllable(object):
             v = rk4(ODEs, v, dt);  self.Vs.append(v)  # RK4 - step
             out[t//ovfs] = RB*v[-1]               # output signal (synthetic) 
             t += 1;
-        self.timesVs = np.linspace(0, len(self.s)/self.fs, len(self.s)*ovfs)
+        
         # ------------------------------------------------------------
         #self.Vs = np.array(self.Vs)
         # define solution (synthetic syllable) as a Syllable object 
@@ -236,6 +236,7 @@ class Syllable(object):
         synth.Vs          = self.Vs
         synth.alpha       = self.alpha
         synth.beta        = self.beta
+        synth.timesVs     = np.linspace(0, len(self.s)/self.fs, len(self.s)*ovfs)
         
         delattr(self,"alpha"); delattr(self,"beta")
         

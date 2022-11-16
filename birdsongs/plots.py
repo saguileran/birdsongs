@@ -63,19 +63,19 @@ class Ploter(object):
             fig, ax = plt.subplots(3, 1, figsize=(12, 9))
             fig.subplots_adjust(wspace=0.35, hspace=0.4)
 
-            time = obj.time[:obj.Vs.shape[0]]
+            #time = obj.time[:obj.Vs.shape[0]]
 
-            ax[0].plot(obj.Vs[:,4], color='b')
+            ax[0].plot(obj.timesVs, obj.Vs[:,4], color='b')
             #ax[0].set_xlim((0,1e5))
             ax[0].set_xlabel("time (s)"); ax[0].set_ylabel("$P_{out}$");
             ax[0].set_title("Trachea Output Pressure")
 
-            ax[1].plot(obj.Vs[:,1], color='g') 
+            ax[1].plot(obj.timesVs, obj.Vs[:,1], color='g') 
             #ax[1].set_xlim(xlim)
             ax[1].set_xlabel("time (s)"); ax[1].set_ylabel("$P_{in}$");
             ax[1].set_title("Trachea Input Pressure")
 
-            ax[2].plot(obj.Vs[:,0], color='r')
+            ax[2].plot(obj.timesVs, obj.Vs[:,0], color='r')
             #ax[2].set_xlim(xlim)
             ax[2].set_xlabel("time (s)"); ax[2].set_ylabel("$x(t)$");
             ax[2].set_title("Labial position")
@@ -121,7 +121,7 @@ class Ploter(object):
 
             if chunck_on:
                 ax[0].plot(obj.chunck.time+obj.chunck.t0, obj.chunck.FF, 'gv', label='Chunck', ms=10)
-                ax[2].plot(obj.chunck.time, obj.chunck.FF, 'gv', label='Chunck', ms=8)
+                ax[2].plot(obj.chunck.time+obj.chunck.t0, obj.chunck.FF, 'gv', label='Chunck', ms=8)
 
             if syllable_on:
                 ax[0].plot(obj.syllable.time+obj.syllable.t0, obj.syllable.FF, 'b+', label='Syllable'.format(obj.syllable.fs), ms=6)

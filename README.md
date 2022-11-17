@@ -16,7 +16,9 @@
 - [Contents of the Repository](#Contents_of_the_Repository)
 - [Results](#Results)
 - [References](#References)
-- [Audios References](##Audios_References)
+    - [Literature](##Literature)
+    - [Software](##Software)
+    - [Audios Dataset](##Audios_Dataset)
 ---
 
 # Installation
@@ -145,8 +147,12 @@ Using the previous objects defined, the optimization problem is solved by follow
 
 # References
 
+## Literature
+
 <div class="csl-entry">[1] Amador, A., Perl, Y. S., Mindlin, G. B., &#38; Margoliash, D. (2013). Elemental gesture dynamics are encoded by song premotor cortical neurons. <i>Nature 2013 495:7439</i>, <i>495</i>(7439), 59–64. <a href="https://doi.org/10.1038/nature11967">https://doi.org/10.1038/nature11967</a></div>
 <br>
+
+## Software
 
 <div class="csl-entry">[2] Newville, M., Stensitzki, T., Allen, D. B., &#38; Ingargiola, A. (2014). <i>LMFIT: Non-Linear Least-Square Minimization and Curve-Fitting for Python</i>. <a href="https://doi.org/10.5281/ZENODO.11813">https://doi.org/10.5281/ZENODO.11813</a></div>
 <br>
@@ -156,9 +162,8 @@ Using the previous objects defined, the optimization problem is solved by follow
 
 <div class="csl-entry">[4] McFee, B., Raffel, C., Liang, D., Ellis, D. P., McVicar, M., Battenberg, E., & Nieto, O. &#38; (2015). librosa: Audio and music signal analysis in python. <i>  In Proceedings of the 14th python in science conference </i>, <i>12</i>(12), (Vol. 8). https://librosa.org/doc/latest/index.html</div>
 
+## Audios Dataset
 
-## Audios References
+<div class="csl-entry">[5] Xeno-canto Foundation and Naturalis Biodiversity Center &#38; (2005). xeno-canto: <i> Sharing bird sounds from around the world</i>,  https://xeno-canto.org/</div>
 
-- xeno-canto Sharing bird sounds from around the world 
-    https://xeno-canto.org/species/Zonotrichia-capensis?dir=0&order=cnt&pg=19
-- https://media.ebird.org/catalog?taxonCode=rucspa6&mediaType=audio
+<div class="csl-entry">[6] Ther Cornell Lab of Ornithology &#38; (2005). ebird <i>,  https://ebird.org/</div>

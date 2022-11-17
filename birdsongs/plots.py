@@ -121,7 +121,7 @@ class Ploter(object):
 
             if chunck_on:
                 ax[0].plot(obj.chunck.time+obj.chunck.t0, obj.chunck.FF, 'gv', label='Chunck', ms=10)
-                ax[2].plot(obj.chunck.time+obj.chunck.t0, obj.chunck.FF, 'gv', label='Chunck', ms=8)
+                ax[2].plot(obj.chunck.time+obj.chunck.t0-obj.syllable.t0, obj.chunck.FF, 'gv', label='Chunck', ms=8)
 
             if syllable_on:
                 ax[0].plot(obj.syllable.time+obj.syllable.t0, obj.syllable.FF, 'b+', label='Syllable'.format(obj.syllable.fs), ms=6)
@@ -202,7 +202,7 @@ class Ploter(object):
         #fig.colorbar(pcm, ax=ax[0,1], location='right', label='Power (dB)')
         
         ax[0,1].plot(obj.time, obj.FF, 'bo-', lw=2)
-        ax[0,1].set_title('Real'); ax[0,11].set_ylabel('f (khz)'); ax[0,1].set_ylim(obj.flim);
+        ax[0,1].set_title('Real'); ax[0,1].set_ylabel('f (khz)'); ax[0,1].set_ylim(obj.flim);
         
         img = librosa.display.specshow(obj_synth.Sxx_dB, x_axis="s", y_axis="linear", sr=obj_synth.fs,
                          hop_length=obj_synth.hop_length, ax=ax[1,1], cmap=self.cmap)
@@ -252,10 +252,10 @@ class Ploter(object):
             ax1.set_title('Spectrogram - Fundamental Frequency (FF)')
             
             ax2 = fig.add_subplot(gs[0:2, 3:])
-            ax2.plot(obj_synth.time,  obj_synth.deltaFF ,      "*-", color="k",  ms=12, lw=3, label=r' $||ΔFF||_{}$= {:.4f}, mean={:.4f}'.format(obj.ord, obj_synth.scoreFF, obj_synth.deltaFF_mean)); 
-            ax2.plot(obj_synth.time, obj_synth.deltaRMS,      "-p", color="r",  label=r' $|| ΔF_{{ rms }}||_{}$= {:.4f}, mean={:.4f}'.format(obj.ord,  obj_synth.scoreRMS, obj_synth.scoreRMS_mean)); 
-            ax2.plot(obj.time,       obj_synth.deltaCentroid,  "-o", color="y", label=r'$ || \Delta F_{{ centroid }}||_{}$ = {:.4f}, mean={:.4f}'.format(obj.ord, obj_synth.scoreCentroid, obj_synth.scoreCentroid_mean)); 
-            ax2.plot(obj.time,       obj_synth.deltaF_msf,     "D-", color="purple", label=r'$ || \Delta F_{{ msf }}||_{}$ = {:.4f}, mean={:.4f}'.format(obj.ord, obj_synth.scoreF_msf, obj_synth.scoreF_msf_mean)); 
+            ax2.plot(obj_synth.time,  obj_synth.deltaFF ,      "*-", color="k",  ms=12, lw=3, label=r' $||ΔFF||_{}$= {:.4f}, mean={:.4f}'.format(obj_synth.ord, obj_synth.scoreFF, obj_synth.deltaFF_mean)); 
+            ax2.plot(obj_synth.time, obj_synth.deltaRMS,      "-p", color="r",  label=r' $|| ΔF_{{ rms }}||_{}$= {:.4f}, mean={:.4f}'.format(obj_synth.ord,  obj_synth.scoreRMS, obj_synth.scoreRMS_mean)); 
+            ax2.plot(obj.time,       obj_synth.deltaCentroid,  "-o", color="y", label=r'$ || \Delta F_{{ centroid }}||_{}$ = {:.4f}, mean={:.4f}'.format(obj_synth.ord, obj_synth.scoreCentroid, obj_synth.scoreCentroid_mean)); 
+            ax2.plot(obj.time,       obj_synth.deltaF_msf,     "D-", color="purple", label=r'$ || \Delta F_{{ msf }}||_{}$ = {:.4f}, mean={:.4f}'.format(obj_synth.ord, obj_synth.scoreF_msf, obj_synth.scoreF_msf_mean)); 
 
 
             ax2.plot(obj_synth.time, obj_synth.rms*1e-3, 'p-', color="darkred", label=r'$F_{rms}$ synth', ms=7)
@@ -321,8 +321,8 @@ class Ploter(object):
             ax7.set_xticks(ax7.get_xticks(), ax7.get_xticklabels(), rotation=90, ha='right')
             ax7.yaxis.set_major_formatter(ticks)
             ax7.set_ylabel('f (khz) (s)'); ax7.set_xlabel('');
-            ax7.set_ylim(obj.flim);  ax7.set_xlim((obj.time[0], obj.time[-1])); ax5.set_ylim(obj.flim); 
-            ax7.set_title(r'Spectrum Error (ΔSxx), $||Sxx||_{}$={:.4f}'.format(obj.ord, obj_synth.scoreMfccs ))#ax7.sharex(ax6)
+            ax7.set_ylim(obj.flim);  ax7.set_xlim((obj.time[0], obj.time[-1]));  
+            ax7.set_title(r'Spectrum Error (ΔSxx), $||Sxx||_{}$={:.4f}'.format(obj_synth.ord, obj_synth.scoreMfccs ))#ax7.sharex(ax6)
 
             ax8 = fig.add_subplot(gs[3, 1])
             img = librosa.display.specshow(obj_synth.deltaMel, x_axis="s", y_axis="linear", sr=obj.fs,
@@ -332,7 +332,7 @@ class Ploter(object):
             ax8.set_ylabel('f (khz) (s)'); ax8.set_xlabel('time (s)');  
             ax8.set_ylim(obj.flim);  ax8.set_xlim((obj.time[0], obj.time[-1])); 
             ax8.yaxis.set_major_formatter(ticks)
-            ax8.set_title(r'Mel Normalized Error (ΔMel), $||Δmel||_{}$={:.4f}'.format(obj.ord, obj_synth.scoreMfccs ))
+            ax8.set_title(r'Mel Normalized Error (ΔMel), $||Δmel||_{}$={:.4f}'.format(obj_synth.ord, obj_synth.scoreMfccs ))
             ax8.sharex(ax7)
 
             # ------------------ sound -------------------------
@@ -345,7 +345,7 @@ class Ploter(object):
             ax9.set_title("Sound Waves")
 
             ax10 = fig.add_subplot(gs[3, 3:4])
-            ax10.plot(obj_synth.time_s, obj_synth.deltaEnv, 'ko-', label=r' $||env||_{}$ = {:.4f},'.format(obj.ord, obj_synth.scoreEnv)+'\nmean={:.4f}'.format(obj_synth.deltaEnv_mean))
+            ax10.plot(obj_synth.time_s, obj_synth.deltaEnv, 'ko-', label=r' $||env||_{}$ = {:.4f},'.format(obj_synth.ord, obj_synth.scoreEnv)+'\nmean={:.4f}'.format(obj_synth.deltaEnv_mean))
             ax10.set_xlabel("t (s)"); ax10.set_ylabel("Amplitud (a.u.)"); 
             ax10.set_title("Envelope Difference (Δ env)"); 
             ax10.set_ylim((0,1)); ax10.legend()
@@ -363,10 +363,10 @@ class Ploter(object):
 
             ax12 = fig.add_subplot(gs[3, 4])
             
-            ax12.plot(obj.time, obj_synth.Df, 'H', label=r'$||DF||_{}$={:.3f},'.format(obj.ord, obj_synth.scoreDF)+'\n  mean={:.3f} '.format(obj_synth.Df.mean()), ms=7)
-            ax12.plot(obj.time, obj_synth.SKL, 's', color="purple", label=r'$||SKL||_{}$={:.3f},'.format(obj.ord, obj_synth.scoreSKL)+'\n  mean={:.3f}'.format(obj_synth.SKL.mean()), ms=7)
-            ax12.plot(obj.time, obj_synth.correlation, 'p', label=r'$||cor||_{}$={:.3f},'.format(obj.ord, obj_synth.scoreCorrelation)+'\n   mean={:.3f} '.format(obj_synth.correlation.mean()))
-            ax12.plot(obj_synth.time, obj_synth.deltaSCI, 'ko', label=r'$||SCI||_{}$={:.4f},'.format(obj.ord, obj_synth.scoreSCI)+'\n   mean={:.3f}'.format(obj_synth.deltaSCI_mean))
+            ax12.plot(obj.time, obj_synth.Df, 'H', label=r'$||DF||_{}$={:.3f},'.format(obj_synth.ord, obj_synth.scoreDF)+'\n  mean={:.3f} '.format(obj_synth.Df.mean()), ms=7)
+            ax12.plot(obj.time, obj_synth.SKL, 's', color="purple", label=r'$||SKL||_{}$={:.3f},'.format(obj_synth.ord, obj_synth.scoreSKL)+'\n  mean={:.3f}'.format(obj_synth.SKL.mean()), ms=7)
+            ax12.plot(obj.time, obj_synth.correlation, 'p', label=r'$||cor||_{}$={:.3f},'.format(obj_synth.ord, obj_synth.scoreCorrelation)+'\n   mean={:.3f} '.format(obj_synth.correlation.mean()))
+            ax12.plot(obj_synth.time, obj_synth.deltaSCI, 'ko', label=r'$||SCI||_{}$={:.4f},'.format(obj_synth.ord, obj_synth.scoreSCI)+'\n   mean={:.3f}'.format(obj_synth.deltaSCI_mean))
             
             ax12.set_xlabel("t (s)"); ax12.set_ylabel("ΔSCI (adimensionless)"); 
             ax12.set_title("SCI Error and Acoustic Dissimilarity (ΔSCI & ADI)"); 

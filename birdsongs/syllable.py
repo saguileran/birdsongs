@@ -8,7 +8,7 @@ class Syllable(object):
         fs = sampling rate
         t0 = initial time of the syllable
     """
-    def __init__(self, s, fs, t0=None, Nt=200, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4), center=False, n_mels=20, umbral_FF=1, tlim=None):
+    def __init__(self, bird, t0=None, Nt=200, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4), n_mels=20, umbral_FF=1, tlim=None, out=[]):
         ## The bifurcation can be cahge modifying the self.f2 and self.f1 functions
         ## ------------- Bogdanov–Takens bifurcation ------------------
         self.beta_bif = np.linspace(-2.5, 1/3, 1000)  # mu2:beta,  mu1:alpha
@@ -41,17 +41,22 @@ class Syllable(object):
                         ('b2',   0., False,    0,    3, None, None), 
                         ('gm',  4e4, False,  1e4,  1e5, None, None))
         # -------------------------------------------------------------------        
+        self.bird       = bird
         self.Nt         = Nt
-        self.fs         = fs
         self.NN         = NN
         self.win_length = self.NN
         self.hop_length = self.NN//4
-        self.center     = center
         self.no_overlap = int(overlap*self.NN)
         self.n_mels     = n_mels
         self.flim       = flim
         self.llambda    = llambda
+        self.fs         = self.bird.fs
+        self.center     = self.bird.center
+        self.no_file    = self.bird.no_file
+        self.paths      = self.bird.paths
         
+        if len(out)==0: s = self.bird.s
+        else:           s = out
         # ------ define syllable by time interval [tini, tend] --------
         if tlim==None and t0!=None: 
             self.s  = sound.normalize(s, max_amp=1.0)
@@ -60,8 +65,10 @@ class Syllable(object):
             self.t0 = 0
             self.s  = sound.normalize(s, max_amp=1.0)
         elif tlim!=None:
-            self.s  = sound.normalize(s[int(tlim[0]*fs):int(tlim[1]*fs)], max_amp=1.0)
+            self.s  = sound.normalize(s[int(tlim[0]*self.fs):int(tlim[1]*self.fs)], max_amp=1.0)
             self.t0 = tlim[0]
+            self.no_syllable = 0
+            self.id          = "syllable"
         self.time_s   = np.linspace(0, len(self.s)/self.fs, len(self.s))
         self.envelope = Enve(self.s, self.fs, self.Nt)
         self.T        = self.s.size/self.fs
@@ -227,7 +234,7 @@ class Syllable(object):
         # ------------------------------------------------------------
         #self.Vs = np.array(self.Vs)
         # define solution (synthetic syllable) as a Syllable object 
-        synth = Syllable(out, self.fs, self.t0, Nt=self.Nt, llambda=self.llambda, NN=self.NN, overlap=0.5, flim=self.flim, center=self.center)
+        synth = Syllable(self.bird, Nt=self.Nt, llambda=self.llambda, NN=self.NN, overlap=0.5, flim=self.flim, out=out)
         synth.no_syllable = self.no_syllable
         synth.no_file     = self.no_file
         synth.p           = self.p
@@ -255,10 +262,11 @@ class Syllable(object):
         WriteAudio(name, fs=self.fs, s=self.s)
         
     def Solve(self, p, orde=2):
-        self.ord = orde; self.p = p; # order of score norms and define parameteres to optimize
+        self.p = p;  # define parameteres to optimize
         self.AlphaBeta()             # define alpha and beta parameters
         synth = self.MotorGestures() # solve the problem and define the synthetic syllable
         
+        self.ord = orde; synth.ord=self.ord;  # order of score norms
         # deltaNOP    = np.abs(synth.NOP-self.NOP).astype(float)
         deltaSxx    = np.abs(synth.Sxx_dB-self.Sxx_dB)
         deltaMel    = np.abs(synth.FF_coef-self.FF_coef)
@@ -315,5 +323,6 @@ class Syllable(object):
         synth.scoreCorrelation = Norm(synth.correlation, ord=self.ord)/synth.correlation.size
         synth.scoreSKL         = Norm(synth.SKL, ord=self.ord)/synth.SKL.size
         synth.scoreDF          = Norm(synth.Df, ord=self.ord)/synth.Df.size
+        
         
         return synth

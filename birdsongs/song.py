@@ -115,7 +115,7 @@ class Song(Syllable):
         self.time_syllable = self.time_s[ss]
         self.t0            = self.time_syllable[0]
         
-        self.syllable      = Syllable(self.syll_complet, self.fs, self.t0, center=self.center, flim=self.flim, NN=NN)
+        self.syllable      = Syllable(self, tlim=(self.time_syllable[0], self.time_syllable[-1]), flim=self.flim, NN=NN)
             
         self.syllable.no_syllable  = self.no_syllable
         self.syllable.no_file      = self.no_file
@@ -135,11 +135,11 @@ class Song(Syllable):
     def Chunck(self, no_chunck, Nt=int(256/10), llambda=1.5, NN=256, overlap=0.5):
         self.no_chunck     = no_chunck
         
-        self.chunck        = Syllable(self.chuncks[:,self.no_chunck-1], self.fs, self.times_chun[0,self.no_chunck-1], NN=NN, llambda=llambda, Nt=Nt, overlap=overlap, center=self.center, flim=self.flim)
+        self.chunck        = Syllable(self, t0 = self.times_chun[0,self.no_chunck-1], NN=NN, llambda=llambda, Nt=Nt, overlap=overlap, flim=self.flim, out=self.chuncks[:,self.no_chunck-1])
         
         self.chunck.no_syllable  = self.no_chunck
-        self.chunck.no_file      = self.no_file
-        self.chunck.paths        = self.paths
+        #self.chunck.no_file      = self.no_file
+        #self.chunck.paths        = self.paths
         self.chunck.id           = "chunck"
         
         return self.chunck

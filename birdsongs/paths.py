@@ -3,15 +3,15 @@ import pandas as pd
 
 class Paths(object):
     def __init__(self, root_path=None, audios_path=None, bird_name=None):
-        if root_path==None: self.root = ".\\"
+        if root_path==None: self.root = ".\\examples\\"
         else:               self.root = root_path
         #self.base     = "{}birdsongs\\".format(self.root) 
-        self.auxdata  = '{}examples\\auxiliar_data\\'.format(self.root)
-        self.results  = '{}examples\\results\\'.format(self.root) 
-        self.examples = '{}examples\\audios\\'.format(self.results)  # write audios folder
+        self.auxdata  = '{}auxiliar_data\\'.format(self.root)
+        self.results  = '{}results\\'.format(self.root) 
+        self.examples = '{}audios\\'.format(self.results)  # write audios folder
         
         if audios_path==None:
-            self.audios      = self.examples #'{}audios\\'.format(self.root)     # wav folder
+            self.audios      = '{}audios\\'.format(self.root)     # wav folder
             self.sound_files = glob.glob(os.path.join(self.audios, '*wav'))
         else:
             if "ebird" in audios_path: 
@@ -39,3 +39,6 @@ class Paths(object):
         if not os.path.exists(self.results):    os.makedirs(self.results)
         if not os.path.exists(self.examples):   os.makedirs(self.examples)
         print("The folder has {} songs".format(self.no_files))
+        
+    def ShowFiles(self):
+        [print(str(i)+"-"+self.sound_files[i]) for i in range(len(self.sound_files))]

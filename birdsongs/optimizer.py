@@ -7,8 +7,8 @@ class Optimizer(Syllable):
         self.obj       = obj
         self.obj0      = obj
         self.method    = method_kwargs["method"]
-        del method_kwargs["method"]
-        self.kwargs = method_kwargs
+        #del method_kwargs["method"]
+        self.kwargs = [key for key, value in method_kwargs.items() if key!="method"]#method_kwargs
         
     def residualSCI(self, p):
         syllable_synth = self.obj.Solve(p)

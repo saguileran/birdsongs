@@ -16,7 +16,7 @@ A python package to analyze, visualize and create synthetic syllables.
     - [Use](##Use)
 - [Overview](#Overview)
 - [Objective](#Objective)
-- [Contents of the Repository](#Contents_of_the_Repository)
+- [Repository Contents](#Repository_Contents)
 - [Results](#Results)
 - [References](#References)
     - [Literature](##Literature)
@@ -111,10 +111,7 @@ python -m pip install -e birdsongs
 
 Design, development, and evaluation of a physical model for generating synthetic birdsongs from recorded birdsongs
 
-
-
-
-# Contents of the Repository
+# Repository Contents
 
 This repository have the documentation, scripts, and results delelop to achive the proposed objective.
 
@@ -140,7 +137,7 @@ In order to understand the diagram methodology, the following icons will be used
 
 <p align="center">  <img src="./docs/img/objects.png" width="500" alt="methodology"></p>
 
-## Problem Solution and Implementation
+## Implementation
 
 Using the previous objects defined, the optimization problem is solved by following the next diagram 
 

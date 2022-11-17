@@ -1,6 +1,9 @@
-[![birdsong logo](logo )](https://github.com/saguileran/birdsongs/)
+<a birdsong logohref="https://github.com/saguileran/birdsongs/"><img src="/docs/img/logo.png" alt="drawing" width="500"/>
 
 # birdsongs
+
+A python package to create ssynthetic syllables.
+
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/saguileran/birdsongs/main?labpath=BirdSongs.ipynb)
 

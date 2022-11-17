@@ -1,4 +1,4 @@
-<a birdsong logohref="https://github.com/saguileran/birdsongs/"><img src="/docs/img/logo.png" alt="drawing" width="500"/>
+<a href="https://github.com/saguileran/birdsongs/"><img src="/docs/img/logo.png" alt="drawing" width="500"/>
 
 # birdsongs
 

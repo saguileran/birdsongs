@@ -41,4 +41,4 @@ class Paths(object):
         print("The folder has {} songs".format(self.no_files))
         
     def ShowFiles(self):
-        [print(str(i)+"-"+self.sound_files[i]) for i in range(len(self.sound_files))]
+        [print(str(i)+"-"+self.sound_files[i]) for i in range(len(self.sound_files))];

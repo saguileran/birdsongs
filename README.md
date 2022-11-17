@@ -2,7 +2,7 @@
 
 # birdsongs
 
-A python package to create ssynthetic syllables.
+A python package to analyze, visualize and create synthetic syllables.
 
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/saguileran/birdsongs/main?labpath=BirdSongs.ipynb)

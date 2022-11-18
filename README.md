@@ -28,7 +28,7 @@ A python package to analyze, visualize and create synthetic syllables.
 
 ## Requirments
 
-syllables requires:
+syllables is implemented in python 3.8: It requires:
 
 - numpy
 - matplotlib 
@@ -44,6 +44,7 @@ syllables requires:
 - mpl_interactions
 - mpl_point_clicker
 
+    
 ## Downloading
 
 In order to use birdsongs, clone the repository and enter to the folder repository
@@ -82,6 +83,7 @@ define a ploter and paths objects, optionally you can specify the audio folder o
 # audios = "path\to\audios"
 # root = "path\to\audios"
 # bird_name = "path\to\audios"
+
 ploter = bs.Ploter()  # save = True to save the figures
 paths  = bs.Paths()   # root, audios_path, bird_name
 ```
@@ -95,13 +97,13 @@ you can also define the time intervals of interest from the whole song with the 
     
 ```python
 klicker = ploter.FindTimes(bird) # FF_on=True enables fundamental frequency plot
+plt.show()
 ``` 
 after close the matplotlib windows run 
     
 ```python
 time_intervals = Positions(klicker)
 ``` 
-
 The final step is to define the optimizer object to generate the synthetic syllable (song). 
     
 ```python

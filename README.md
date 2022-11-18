@@ -41,6 +41,8 @@ syllables requires:
 - pandas
 - sklearn
 - IPython
+- mpl_interactions
+- mpl_point_clicker
 
 ## Downloading
 

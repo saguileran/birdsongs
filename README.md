@@ -106,11 +106,24 @@ The final step is to define the optimizer object to generate the synthetic sylla
     
 ```python
 syllable  = bs.Syllable(bird)  # tlim=(t0,tend) you can also give a time interval or frequency limits flim=(f0,fmax)
-brute     = {'method':'brute', 'Ns':11}
-optimizer = bs.Optimizer(syllable, method_kwargs=brute)
+
+brute     = {'method':'brute', 'Ns':11}                   # optimization method and its parameters
+optimizer = bs.Optimizer(syllable, method_kwargs=brute)   # define optimizer to the syllable object
+
+optimizer.optimal_gamma                                   # find teh optimal gamma over the whole bird syllables
+optimizer.OptimalParams(obj, Ns=11)                       # find optimal alpha and beta parameters
+    
+Display(obj.p)                                            # display optimal problem parameters
+obj_synth_optimal = obj.Solve(obj.p)                      # generate the synthetic syllable with the optimal parameters set
+    
+ploter.Syllables(obj, obj_synth_optimal)                  # plot real and synthetic songs, sound waves and spectrograms
+ploter.PlotAlphaBeta(obj_synth_optimal)                   # plot alpha and beta parameters in function of time (just syllable has this attributes)
+ploter.Result(obj, obj_synth_optimal)                     # plot the spectrograms, scores and features of both objects, the real and synthetic
+    
+bird.WriteAudio();  synth_bird.WriteAudio()               # write both objects, real and synthetic
 ```
 
-other available option is split the audio with the time intervals define and find the synthetic song
+other available option is to split the audio with the time intervals define and find the synthetic song
 
 ```python
 brute          = {'method':'brute', 'Ns':11}

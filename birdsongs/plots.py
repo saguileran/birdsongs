@@ -51,6 +51,8 @@ class Ploter(object):
             ax3.set_xlim(xlim); ax3.set_ylim(ylim)
             fig.suptitle("Air-Sac Pressure (α) and Labial Tension (β) Parameters", fontsize=20)#, family='fantasy')
             plt.show()
+            
+            return fig, gs
 
             if self.save: fig.savefig(obj.paths.results+"MotorGesturesParameters-{}-{}-{}.png".format(obj.id,obj.no_file,obj.no_syllable))
     
@@ -83,6 +85,8 @@ class Ploter(object):
 
             fig.suptitle('Labial Parameters (vector $v$)', fontsize=20)
             plt.show()
+            
+            return fig, ax
 
             if self.save: fig.savefig(obj.paths.results+"MotorGesturesVariables-{}-{}-{}.png".format(obj.id,obj.no_file,obj.no_syllable)) 
             
@@ -144,9 +148,10 @@ class Ploter(object):
 
             fig.suptitle('Audio: {}'.format(obj.file_name[39:]), fontsize=18)
             plt.show()
-
+            return fig, ax
+        
             if self.save: fig.savefig(path_save)
-        else:  # syllable
+        else:  # syllable ------------------------------------------------
             fig, ax = plt.subplots(2, 1, figsize=(12, 6+3*int(syllable_on)))
             fig.subplots_adjust(hspace=0.4, wspace=0.4)
 
@@ -173,7 +178,8 @@ class Ploter(object):
             plt.show()
 
             path_save = obj.paths.results+"AllSongAndSyllable-{}-{}.png".format(obj.no_file,obj.no_syllable)
-
+            
+            return fig, ax
             if self.save: fig.savefig(path_save)
 
         
@@ -219,7 +225,7 @@ class Ploter(object):
         #fig.tight_layout(); 
         fig.suptitle('Sound Waves and Spectrograms', fontsize=20)
         plt.show()
-
+        return fig, ax
         if self.save: fig.savefig(obj.paths.results+"SoundAndSpectros-{}-{}-{}.png".format(obj.id,obj.no_file,obj.no_syllable))
 
     
@@ -377,7 +383,30 @@ class Ploter(object):
 
             fig.suptitle("SCORES", fontsize=20)
             plt.show()
-
+            return fig, gs
             if self.save: fig.savefig(obj.paths.results+"ScoresVariables-{}-{}-{}.png".format(obj.id,obj.no_file,obj.no_syllable)) 
 
         else: print("Remember you must enter the object in the defined order: obj, obj_synth. \nEnter the objects again.")   
+        
+        
+    def FindTimes(self, obj, FF_on=False):
+        ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*1e-3))
+        fig, ax = plt.subplots(1, 1, figsize=(10, 4))#, constrained_layout=True)
+        
+        img = librosa.display.specshow(obj.Sxx_dB, x_axis="s", y_axis="linear", sr=obj.fs,
+                     hop_length=obj.hop_length, ax=ax, cmap=self.cmap)
+
+        if FF_on:
+            ax.plot(obj.time, obj.FF, "co", ms=8)#, label="Fundamental Frequency")
+        
+        # for i in range(len(obj.syllables)):  
+        #     ax[0].plot([obj.time[obj.syllables[i][0]], obj.time[obj.syllables[i][-1]]], [0, 0], 'k', lw=5)
+        #     ax[0].text((obj.time[obj.syllables[i][-1]]-obj.time[obj.syllables[i][0]])/2, 0.5, str(i))
+        ax.set_ylim(obj.flim); ax.set_xlim(min(obj.time), max(obj.time));
+        ax.set_title("Song Spectrum"); 
+        ax.yaxis.set_major_formatter(ticks)
+        ax.set_ylabel('f (kHz)');
+        
+        klicker = Klicker(fig, ax)
+        
+        return klicker

@@ -16,18 +16,21 @@ class Paths(object):
         else:
             if "ebird" in audios_path: 
                 search_by, name_col = "Scientific Name", "ML Catalog Number"
-            elif "humbolt":                
+            elif "humbolt" in audios_path:
                 search_by, name_col = "Nombre científico", "Número de Catálogo"
+            elif "xeno" in audios_path:
+                search_by, name_col = "Scientific Name", "File Name"
             
             self.audios = audios_path
-            data = pd.read_csv(self.audios+'spreadsheet.csv')
+            data = pd.read_csv(self.audios+'spreadsheet.csv', encoding_errors='ignore')
             data.dropna(axis = 0, how = 'all', inplace = True)
             self.data = data.convert_dtypes() #.dtypes  
 
             if bird_name!=None:
-                    data_bird = self.data[search_by].str.contains(bird_name)
+                    data_bird = self.data[search_by].str.contains(bird_name, case=False)
                     self.indexes   = data_bird[data_bird==True].index
             else:   self.indexes   = self.data.index
+            
             files_names = self.data[name_col][self.indexes].astype(str).str.cat([".wav"]*self.indexes.size)
             audios_paths = pd.Series([audios_path]*files_names.size)
             if files_names.values.size!=0: 
@@ -35,10 +38,11 @@ class Paths(object):
             else: self.sound_files = []
         
         self.no_files    = len(self.sound_files)
+        self.files_names = [self.sound_files[i][len(self.audios):] for i in range(self.no_files)]
         
         if not os.path.exists(self.results):    os.makedirs(self.results)
         if not os.path.exists(self.examples):   os.makedirs(self.examples)
         print("The folder has {} songs".format(self.no_files))
         
     def ShowFiles(self):
-        [print(str(i)+"-"+self.sound_files[i]) for i in range(len(self.sound_files))];
+        [print(str(i+1)+"-"+self.files_names[i]) for i in range(self.no_files)];

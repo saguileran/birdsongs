@@ -11,3 +11,7 @@ sklearn
 IPython
 mpl_interactions
 mpl_point_clicker
+<<<<<<< Updated upstream
+=======
+soundfile 
+>>>>>>> Stashed changes

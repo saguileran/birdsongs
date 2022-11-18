@@ -1,10 +1,13 @@
-import peakutils, time, warnings #emcee,
+import peakutils, time, warnings, lmfit #emcee,
 import numpy as np
 import pandas as pd
 import sympy as sym
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+
+from mpl_point_clicker import clicker
+from mpl_interactions import zoom_factory, panhandler
 
 from numpy.polynomial import Polynomial
 from numpy.linalg import norm as Norm
@@ -22,8 +25,6 @@ from random import uniform
 from multiprocessing import Pool
 from IPython.display import display as Display
 
-import lmfit
-
 from librosa import yin, pyin, feature, display, onset, times_like, stft, fft_frequencies
 import librosa 
 from maad import *
@@ -31,7 +32,7 @@ from maad import *
 from IPython.display import Audio # reproduce audio 
 
 Pool() # crea pool to parallel programming for optimization
-warnings.filterwarnings(action='once') # omite warnings spam
+#warnings.filterwarnings(action='once') # omite warnings spam
 
 def rk4(f, v, dt):
     """
@@ -62,3 +63,20 @@ def Enve(out, fs, Nt):
 
 def AudioPlay(obj):
     return Audio(data=obj.s, rate=obj.fs)
+
+def Klicker(fig, ax):
+    zoom_factory(ax)
+    ph = panhandler(fig, button=2)
+    klicker = clicker(ax, ["tini","tend"], markers=["o","x"], 
+                      legend_bbox=(0.98, 0.98))# #legend_loc='upper right',
+    #ax.legend(title="Interval Points", bbox_to_anchor=(1.1, 1.05))
+    return klicker
+    
+def Positions(klicker):
+    tinis = np.array([tini[0] for tini in klicker._positions["tini"]])
+    tends = np.array([tend[0] for tend in klicker._positions["tend"]])
+    
+    if tinis.size==tends.size:
+        return np.array([[tinis[i], tends[i]] for i in range(len(tinis))])
+    else:
+        return np.array([tinis, tends])

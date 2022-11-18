@@ -4,11 +4,11 @@ from .utils import *
 
 class Optimizer(Syllable):
     def __init__(self, obj, method_kwargs):
-        self.obj       = obj
-        self.obj0      = obj
-        self.method    = method_kwargs["method"]
-        #del method_kwargs["method"]
-        self.kwargs = [key for key, value in method_kwargs.items() if key!="method"]#method_kwargs
+        self.obj    = obj
+        self.obj0   = obj
+        self.method = method_kwargs["method"]
+        self.kwargs = {key:value for key, value in method_kwargs.items() if key!="method"}#method_kwargs
+        self.syllables = []
         
     def residualSCI(self, p):
         syllable_synth = self.obj.Solve(p)
@@ -92,20 +92,21 @@ class Optimizer(Syllable):
         obj = self.obj
         return mi.params["gm"].value
     
-    def OptimalParams1(self, NsGamma=51, NsPar=21):
-        obj_synth = self.obj.Solve(self.obj.p)     #
+#     def OptimalParams1(self, NsGamma=51, NsPar=21):
+#         obj_synth = self.obj.Solve(self.obj.p)     #
         
-        #self.kwargs["Ns"] = NsGamma;   
-        self.obj.OptimalGamma()
+#         #self.kwargs["Ns"] = NsGamma;   
+#         #self.obj.OptimalGamma()
         
-        #self.kwargs["Ns"] = NsPar;     
-        self.obj.OptimalAs(obj_synth)
-        self.obj.OptimalBs(obj_synth)
+#         #self.kwargs["Ns"] = NsPar;     
+#         self.obj.OptimalAs(obj_synth)
+#         self.obj.OptimalBs(obj_synth)
         
-        self.p = self.obj.p
+#         self.p = self.obj.p
         
-        return self.obj.p
-        #self.obj.WriteAudio()
+#         return self.obj.p
+#         #self.obj.WriteAudio()
+    
     
     # ----------- OPTIMIZATION FUNCTIONS --------------
     # Solve the minimization problem at once
@@ -135,7 +136,8 @@ class Optimizer(Syllable):
         print("Time of execution = {0:.4f}".format(end-start))
         return synth
         
-    def AllGammas(self, bird):
+    def AllGammas(self, bird, Ns=21):
+        if self.method=="brute": self.kwargs["Ns"] = Ns
         Gammas = np.zeros(bird.no_syllables)
         for i in range(1,bird.no_syllables+1):
             obj         = bird.Syllable(i)
@@ -147,14 +149,13 @@ class Optimizer(Syllable):
         self.obj.p["gm"].set(value=self.optimal_gamma, vary=False)
         return Gammas
         
-    def OptimalParams(self, obj, Ns=21):         # optimal_gm
+    def OptimalParams(self, obj, Ns=21):
         if self.method=="brute": self.kwargs["Ns"] = Ns     
         
-        print("As")
-        self.OptimalAs(obj)    
-        print("Bs")
-        self.OptimalBs(obj)
+        print("As");   self.OptimalAs(obj);   
+        print("Bs");   self.OptimalBs(obj);
         print("end")
+        
         obj.p = self.obj.p
         
         #obj.p["gamma"].set(value=optimal_gm)
@@ -181,3 +182,72 @@ class Optimizer(Syllable):
         #self.bird_synth.WriteAudio()
         
         return self.bird_synth
+    
+    
+    
+    
+    def AllGammasByTimes(self, times, Ns=21):
+        if self.method=="brute": self.kwargs["Ns"] = Ns     
+
+        times   = np.array(times)
+        Gammas = np.zeros(times.shape[0])
+        for i in range(times.shape[0]):
+            print("Syllable {}/{}".format(i+1,times.shape[0]))
+            print(times[i,:])
+            syllable = Syllable(self.obj, tlim=times[i,:])
+            Gammas[i-1] = self.OptimalGamma(syllable)
+            self.obj = self.obj0
+            
+        self.optimal_gamma = np.mean(Gammas)
+        self.Gammas = Gammas
+        #self.obj.p["gm"].set(value=self.optimal_gamma)
+        #bird.obj.p["gm"].set(value=self.optimal_gamma)
+        
+        return self.optimal_gamma
+    
+    def SongByTimes(self, times, Ngm=11, Nba=11): 
+        times   = np.array(times)
+        indexes = np.int64(times*self.obj.fs)
+        # times = [[t0_1, tend1],...,[t0_N, tendN]]
+        print("Lookinf for gamma")
+        optimal_gamm = self.AllGammasByTimes(times, Ns=Ngm)
+        print("Optimal gamma found {} over {} syllables".format(optimal_gamm, times.size))
+        
+        self.synth_bird  = np.zeros_like(self.obj.s)
+        self.alphas      = np.zeros_like(self.obj.s)
+        self.betas       = np.zeros_like(self.obj.s)
+        self.ps = []
+        
+        start = time.time()
+        print("Start syllables optimization")
+        for i in range(times.shape[0]):
+            print("Syllable {}/{}".format(i+1,times.shape[0]))
+            obj       = Syllable(self.obj, tlim=times[i,:], 
+                                 umbral_FF=1,  Nt=30, NN=256)
+            obj.p["gm"].set(value=optimal_gamm)
+            obj_synth = obj.Solve(obj.p)
+            self.OptimalParams(obj, Ns=Nba)
+            obj_synth = obj.Solve(obj.p)
+            self.syllables.append(obj_synth.s)
+            
+            index_0, index_end = indexes[i,0], int(indexes[i,0]+obj_synth.s.size)
+            
+            self.synth_bird[index_0: index_end]  = obj_synth.s
+            self.alphas[index_0: index_end] = obj_synth.alpha
+            self.betas[index_0: index_end]  = obj_synth.beta
+            
+            self.ps.append(obj.p)
+            self.obj=self.obj0
+            
+        self.synth_bird = Song(self.obj.paths, self.obj.no_file, sfs=[self.synth_bird, self.obj.fs])
+        
+        #self.synth_bird.synth  = self.synth_bird 
+        self.synth_bird.alphas    = self.alphas
+        self.synth_bird.betas     = self.betas
+        self.synth_bird.file_name = self.obj.file_name
+        self.synth_bird.ps = self.ps
+        
+        end = end.time()
+        print("Optimal parameters found, time of execution {:.4f}".format((end-start)/60))
+        
+        return self.synth_bird

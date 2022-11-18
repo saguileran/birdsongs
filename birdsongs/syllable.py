@@ -8,7 +8,7 @@ class Syllable(object):
         fs = sampling rate
         t0 = initial time of the syllable
     """
-    def __init__(self, bird, t0=None, Nt=200, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4), n_mels=20, umbral_FF=1, tlim=None, out=[]):
+    def __init__(self, bird, t0=None, Nt=200, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4), n_mels=20, umbral_FF=1, tlim=[], out=[]):
         ## The bifurcation can be cahge modifying the self.f2 and self.f1 functions
         ## ------------- Bogdanov–Takens bifurcation ------------------
         self.beta_bif = np.linspace(-2.5, 1/3, 1000)  # mu2:beta,  mu1:alpha
@@ -41,6 +41,7 @@ class Syllable(object):
                         ('b2',   0., False,    0,    3, None, None), 
                         ('gm',  4e4, False,  1e4,  1e5, None, None))
         # -------------------------------------------------------------------        
+        self.n_mfcc     = 8
         self.bird       = bird
         self.Nt         = Nt
         self.NN         = NN
@@ -58,17 +59,20 @@ class Syllable(object):
         if len(out)==0: s = self.bird.s
         else:           s = out
         # ------ define syllable by time interval [tini, tend] --------
-        if tlim==None and t0!=None: 
+        if len(tlim)==0 and t0!=None: 
             self.s  = sound.normalize(s, max_amp=1.0)
             self.t0 = t0
-        elif tlim==None and t0==None: 
+        elif len(tlim)==0 and t0==None: 
             self.t0 = 0
             self.s  = sound.normalize(s, max_amp=1.0)
-        elif tlim!=None:
+        elif len(tlim)!=0:
             self.s  = sound.normalize(s[int(tlim[0]*self.fs):int(tlim[1]*self.fs)], max_amp=1.0)
             self.t0 = tlim[0]
-            self.no_syllable = 0
-            self.id          = "syllable"
+        
+        self.no_syllable = 0
+        self.id          = "syllable"
+        # self.Nt         = self.s.size/100
+        
         self.time_s   = np.linspace(0, len(self.s)/self.fs, len(self.s))
         self.envelope = Enve(self.s, self.fs, self.Nt)
         self.T        = self.s.size/self.fs
@@ -99,7 +103,7 @@ class Syllable(object):
         self.centroid =  feature.spectral_centroid(y=self.s, sr=self.fs, S=np.abs(self.stft), n_fft=self.NN,
                                             hop_length=self.hop_length, freq=self.freqs, win_length=self.win_length, 
                                             window='hann',center=self.center, pad_mode='constant')[0]
-        self.mfccs = feature.mfcc(y=self.s, sr=self.fs, S=self.stft, n_mfcc=20, dct_type=2, norm='ortho', lifter=0)
+        self.mfccs = feature.mfcc(y=self.s, sr=self.fs, S=self.stft, n_mfcc=self.n_mfcc, dct_type=2, norm='ortho', lifter=0)
         self.rms   = feature.rms(y=self.s, S=self.stft, frame_length=self.NN, hop_length=self.hop_length,
                                  center=self.center, pad_mode='constant')[0]
         self.s_mel = feature.melspectrogram(y=self.fs, sr=self.fs, S=self.stft, n_fft=self.NN, hop_length=self.hop_length,

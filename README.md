@@ -73,19 +73,22 @@ Import the package as bs
 
 ```python
 import birdsongs as bs
+from .birdsongs.utils import * 
 ```
 
-define a ploter and paths objects  
+define a ploter and paths objects, optionally you can specify the audio folder or not 
 
 ```python
-ploter = bs.Ploter()
-paths = bs.Paths()
+# audios = "path\to\audios"
+# root = "path\to\audios"
+# bird_name = "path\to\audios"
+ploter = bs.Ploter()  # save = True to save the figures
+paths  = bs.Paths()   # root, audios_path, bird_name
 ```
 define and plot the audio birdsong 
 
 ```python
-NoFiles = 3
-bird = bs.Song(paths, 3)
+bird = bs.Song(paths, no_file=3)
 ploter.Plot(bird)
 ```
 

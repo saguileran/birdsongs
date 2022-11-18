@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
 from mpl_point_clicker import clicker
-from mpl_interactions import zoom_factory, panhandler
+from mpl_pan_zoom import zoom_factory, PanManager, MouseButton
 
 from numpy.polynomial import Polynomial
 from numpy.linalg import norm as Norm
@@ -66,9 +66,14 @@ def AudioPlay(obj):
 
 def Klicker(fig, ax):
     zoom_factory(ax)
-    ph = panhandler(fig, button=2)
+    pm = PanManager(fig, button=MouseButton.MIDDLE)
     klicker = clicker(ax, ["tini","tend"], markers=["o","x"], 
                       legend_bbox=(0.98, 0.98))# #legend_loc='upper right',
+
+    # hacky trick to keep the panmanager alive as long as the clicker is around
+    # without having to return another object
+    klicker._pm = pm
+
     #ax.legend(title="Interval Points", bbox_to_anchor=(1.1, 1.05))
     return klicker
     

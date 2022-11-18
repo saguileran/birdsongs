@@ -9,6 +9,6 @@ sympy
 pandas
 sklearn
 IPython
-mpl_interactions
+mpl-pan-zoom
 mpl_point_clicker
 soundfile 

@@ -105,7 +105,7 @@ time_intervals = Positions(klicker)
 The final step is to define the optimizer object to generate the synthetic syllable (song). 
     
 ```python
-syllable  = bs.Syllable(bird)  # tlim=(t0,tend) you can also give a time interval or frequency limits flim=(f0,fmax)
+syllable  = bs.Syllable(bird)                             # you can also give a time or frequency interval flim=(fmin,fmax), tlim=(t0,tend)
 
 brute     = {'method':'brute', 'Ns':11}                   # optimization method and its parameters
 optimizer = bs.Optimizer(syllable, method_kwargs=brute)   # define optimizer to the syllable object

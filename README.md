@@ -88,17 +88,45 @@ paths  = bs.Paths()   # root, audios_path, bird_name
 define and plot the audio birdsong 
 
 ```python
-bird = bs.Song(paths, no_file=3)
+bird = bs.Song(paths, no_file=3) # tlim=(t0,tend) you can also give a time interval or frequency limits flim=(f0,fmax)
 ploter.Plot(bird)
 ```
-
-The last step is to define the syllable and optimizer objects to generate the synthetic dat 
+you can also define the time intervals of interest from the whole song with the commands
+    
 ```python
-syllable  = bs.Syllable(bird.s, bird.fs)  # change to enter just bird
-#optimizer = bs.Optimizer()
+klicker = ploter.FindTimes(bird) # FF_on=True enables fundamental frequency plot
+``` 
+after close the matplotlib windows run 
+    
+```python
+time_intervals = Positions(klicker)
+``` 
+
+The final step is to define the optimizer object to generate the synthetic syllable (song). 
+    
+```python
+syllable  = bs.Syllable(bird)  # tlim=(t0,tend) you can also give a time interval or frequency limits flim=(f0,fmax)
+brute     = {'method':'brute', 'Ns':11}
+optimizer = bs.Optimizer(syllable, method_kwargs=brute)
 ```
 
+other available option is split the audio with the time intervals define and find the synthetic song
 
+```python
+brute          = {'method':'brute', 'Ns':11}
+optimizer_bird = bs.Optimizer(bird, method_kwargs=brute)
+synth_bird     = optimizer_bird.SongByTimes(time_intervals)
+```
+    
+to visualize and write audio
+    
+```python
+ploter.Plot(synth_bird)
+bird.WriteAudio();  synth_bird.WriteAudio()
+```
+    
+
+    
 <!---
 and then add to python 
 

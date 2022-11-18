@@ -140,6 +140,8 @@ ploter.Plot(synth_bird)
 bird.WriteAudio();  synth_bird.WriteAudio()
 ```
     
+    
+The repository has some audio examples, in examples/audios folder. You can download and store your own audios in the same folder, the audios must be in WAV format or birdosngs will not import them, we suggest use [audacity](https://www.audacityteam.org/) to convert the audios.
 
     
 <!---

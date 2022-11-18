@@ -57,8 +57,8 @@ you can verify the current branch with the command `git branch -a`. You have to 
 The next step is to install the required packages, any of the following commands line will work
 
 ```bat
-pip install -r ./birdsongs/requirements.txt
-python -m pip install -r ./birdsongs/requirements.txt
+pip install -r ./requirements.txt
+python -m pip install -r ./requirements.txt
 cd birdsongs
 ```
 
@@ -73,7 +73,7 @@ Import the package as bs
 
 ```python
 import birdsongs as bs
-from .birdsongs.utils import * 
+from birdsongs.utils import * 
 ```
 
 define a ploter and paths objects, optionally you can specify the audio folder or not 

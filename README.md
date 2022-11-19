@@ -17,9 +17,9 @@ A python package to analyze, visualize and create synthetic syllables.
   - [Requirments](#requirments)
   - [Downloading](#downloading)
   - [Use](#use)
-    - [Define Objects](#define-objects)
+    - [Define](#define)
     - [Solve](#solve)
-    - [Plot and Write](#plot-and-write)
+    - [Visualize](#visualize)
 - [Overview](#overview)
 - [Objective](#objective)
 - [Repository Contents](#repository-contents)
@@ -79,7 +79,7 @@ the last step is to enter at the birdsongs folder to use its function with the e
 
 ## Use
 
-### Define Objects
+### Define
 
 Import the package as `bs`
 
@@ -134,7 +134,7 @@ optimizer_bird = bs.Optimizer(bird, method_kwargs=brute)      # optimizer object
 synth_bird     = optimizer_bird.SongByTimes(time_intervals)   # find the best syllables for each syllable
 ```
     
-### Plot and Write
+### Visualize
   
 Visualize and write the synthetic optimal audio 
     

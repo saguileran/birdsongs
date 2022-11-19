@@ -71,7 +71,7 @@ The next step is to install the required packages, any of the following commands
 
 ```bat
 pip install -r ./requirements.txt
-cd birdsongs
+python -m pip install -r ./requirements.txt
 ```
 
 the last step is to enter at the birdsongs folder to use its function with the examples audios.

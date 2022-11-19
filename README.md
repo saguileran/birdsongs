@@ -36,10 +36,6 @@ A python package to analyze, visualize and create synthetic syllables.
 ## Requirments
 
 syllables is implemented in python 3.8: It requires:
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 
 - numpy
 - matplotlib 

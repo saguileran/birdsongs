@@ -143,10 +143,10 @@ class Ploter(object):
                 
                 ax[0].legend(loc='upper right', title="FF")
 
-                path_save = obj.paths.results+"AllSongAndSyllable-{}-{}.png".format(obj.no_file,obj.no_syllable)
-            else: path_save = obj.paths.results+"AllSongAndSyllable-{}.png".format(obj.no_file)
+                path_save = obj.paths.results / "AllSongAndSyllable-{}-{}.png".format(obj.no_file,obj.no_syllable)
+            else: path_save = obj.paths.results / "AllSongAndSyllable-{}.png".format(obj.no_file)
 
-            fig.suptitle('Audio: {}'.format(obj.file_name[39:]), fontsize=18)
+            fig.suptitle('Audio: {}'.format(obj.file_name.name), fontsize=18)
             plt.show()
             return fig, ax
         

@@ -70,12 +70,16 @@ def Klicker(fig, ax):
     zoom_factory(ax)
     pm = PanManager(fig, button=MouseButton.MIDDLE)
     klicker = clicker(ax, ["tini","tend"], markers=["o","x"], 
+<<<<<<< Updated upstream
                       legend_bbox=(0.98, 0.98))# #legend_loc='upper right',
 
     # hacky trick to keep the panmanager alive as long as the clicker is around
     # without having to return another object
     klicker._pm = pm
 
+=======
+                      legend_bbox=(1.01, 0.98))# #legend_loc='upper right',
+>>>>>>> Stashed changes
     #ax.legend(title="Interval Points", bbox_to_anchor=(1.1, 1.05))
     #return klicker
     

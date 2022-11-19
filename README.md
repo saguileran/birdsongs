@@ -112,7 +112,7 @@ AudioPlay(bird)    # in terminal use bird.Play()
 Define the syllables using time intervals of interest from the whole bird song. You can choose the points using  
     
 ```python
-klicker = ploter.FindTimes(bird) # FF_on=True enables fundamental frequency plot
+klicker = ploter.FindTimes(bird)    # FF_on=True enables fundamental frequency plot
 plt.show()
 ``` 
 after close the matplotlib windows run the following code to save the intervals points, the start and ends points have to have the same number of elements for easy use
@@ -141,7 +141,7 @@ bird.WriteAudio();  synth_bird.WriteAudio()
   
 ### Note  
   
-To find a single synthetic object the process is the following
+To find a single synthetic syllable (or chunck) the process is the following. Nevertheless, to define a syllable (or chunck) you must have defined a bird song (syllable) object. 
 
 ```python
 syllable  = bs.Syllable(bird)               # define the syllable. you can also give a time or frequency interval: flim=(fmin,fmax), tlim=(t0,tend)

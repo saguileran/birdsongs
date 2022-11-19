@@ -9,15 +9,17 @@ A python package to analyze, visualize and create synthetic syllables.
 
 
 #  Table of Contents
-
+<!---
 - [birdsongs](#birdsongs)
 - [Table of Contents](#table-of-contents)
-  - [- Audios Dataset](#--audios-dataset)
+--->
 - [Installation](#installation)
   - [Requirments](#requirments)
   - [Downloading](#downloading)
   - [Use](#use)
-    - [Define objects](#define-objects)
+    - [Define Objects](#define-objects)
+    - [Solve](#solve)
+    - [Plot and Write](#plot-and-write)
 - [Overview](#overview)
 - [Objective](#objective)
 - [Repository Contents](#repository-contents)
@@ -30,7 +32,8 @@ A python package to analyze, visualize and create synthetic syllables.
   - [Software](#software)
   - [Audios Dataset](#audios-dataset)
 ---
-
+  
+  
 # Installation
 
 ## Requirments
@@ -68,7 +71,6 @@ The next step is to install the required packages, any of the following commands
 
 ```bat
 pip install -r ./requirements.txt
-python -m pip install -r ./requirements.txt
 cd birdsongs
 ```
 
@@ -84,8 +86,8 @@ Import the package as `bs`
 ```python
 import birdsongs as bs
 from birdsongs.utils import * 
-```
-
+```  
+  
 Define a ploter and paths objects, optionally you can specify the audio folder or enable to save figures 
 
 ```python
@@ -97,7 +99,7 @@ ploter = bs.Ploter()  # save = True to save the figures
 paths  = bs.Paths()   # root, audios_path, bird_name
 ```
 
-### Song
+**Song**
   
 Define and plot the audio bird song 
 
@@ -107,7 +109,7 @@ ploter.Plot(bird)
 AudioPlay(bird)    # in terminal use bird.Play()
 ```
 
-### Syllables
+**Syllables**
   
 Define the syllables using time intervals of interest from the whole bird song. You can choose the points using  
     
@@ -122,9 +124,9 @@ time_intervals = Positions(klicker)
 time_intervals
 ``` 
   
-### Optimization
+### Solve
   
-The final step is to define the optimizer object to generate the synthetic syllable (song). In this case we are going to find the whole synthetic syllable for the previous syllables defined from the time intervals
+The final step is to define the optimizer object to generate the synthetic syllable (song), solve the optimization problem. In this case we are going to find the whole synthetic syllable for the previous syllables defined from the time intervals
 
 ```python
 brute          = {'method':'brute', 'Ns':11}                  # method of optimization, Ns is the number of grid points
@@ -132,7 +134,9 @@ optimizer_bird = bs.Optimizer(bird, method_kwargs=brute)      # optimizer object
 synth_bird     = optimizer_bird.SongByTimes(time_intervals)   # find the best syllables for each syllable
 ```
     
-to visualize and write the synthetic optimal audio
+### Plot and Write
+  
+Visualize and write the synthetic optimal audio 
     
 ```python
 ploter.Plot(synth_bird)

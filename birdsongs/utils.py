@@ -6,6 +6,8 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
+from playsound import playsound
+
 from mpl_point_clicker import clicker
 from mpl_pan_zoom import zoom_factory, PanManager, MouseButton
 
@@ -75,7 +77,7 @@ def Klicker(fig, ax):
     klicker._pm = pm
 
     #ax.legend(title="Interval Points", bbox_to_anchor=(1.1, 1.05))
-    return klicker
+    #return klicker
     
 def Positions(klicker):
     tinis = np.array([tini[0] for tini in klicker._positions["tini"]])

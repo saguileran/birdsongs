@@ -1,18 +1,19 @@
-import os, glob
+import os
 import pandas as pd
+from pathlib import Path
 
 class Paths(object):
     def __init__(self, root_path=None, audios_path=None, bird_name=None):
-        if root_path==None: self.root = ".\\examples\\"
-        else:               self.root = root_path
+        if root_path==None: self.root = Path("./examples")
+        else:               self.root = Path(root_path)
         #self.base     = "{}birdsongs\\".format(self.root) 
-        self.auxdata  = '{}auxiliar_data\\'.format(self.root)
-        self.results  = '{}results\\'.format(self.root) 
-        self.examples = '{}audios\\'.format(self.results)  # write audios folder
+        self.auxdata  = self.root / 'auxiliar_data'
+        self.results  = self.root / 'results'
+        self.examples = self.results / 'audios'  # write audios folder
         
         if audios_path==None:
-            self.audios      = '{}audios\\'.format(self.root)     # wav folder
-            self.sound_files = glob.glob(os.path.join(self.audios, '*wav'))
+            self.audios      = self.root / 'audios'     # wav folder
+            self.sound_files = list(self.audios.glob("*.wav"))
         else:
             if "ebird" in audios_path: 
                 search_by, name_col = "Scientific Name", "ML Catalog Number"
@@ -38,10 +39,10 @@ class Paths(object):
             else: self.sound_files = []
         
         self.no_files    = len(self.sound_files)
-        self.files_names = [self.sound_files[i][len(self.audios):] for i in range(self.no_files)]
+        self.files_names = [f.name for f in self.sound_files]
         
-        if not os.path.exists(self.results):    os.makedirs(self.results)
-        if not os.path.exists(self.examples):   os.makedirs(self.examples)
+        self.results.mkdir(parents=True, exist_ok=True)
+        self.examples.mkdir(parents=True, exist_ok=True)
         print("The folder has {} songs".format(self.no_files))
         
     def ShowFiles(self):

@@ -8,7 +8,7 @@ class Syllable(object):
         fs = sampling rate
         t0 = initial time of the syllable
     """
-    def __init__(self, bird, t0=None, Nt=200, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4), n_mels=20, umbral_FF=1, tlim=[], out=[]):
+    def __init__(self, bird, t0=None, Nt=200, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4), n_mels=4, umbral_FF=1, tlim=[], out=[]):
         ## The bifurcation can be cahge modifying the self.f2 and self.f1 functions
         ## ------------- Bogdanov–Takens bifurcation ------------------
         self.beta_bif = np.linspace(-2.5, 1/3, 1000)  # mu2:beta,  mu1:alpha
@@ -55,6 +55,7 @@ class Syllable(object):
         self.center     = self.bird.center
         self.no_file    = self.bird.no_file
         self.paths      = self.bird.paths
+        self.file_name  = bird.file_name
         
         if len(out)==0: s = self.bird.s
         else:           s = out
@@ -68,6 +69,7 @@ class Syllable(object):
         elif len(tlim)!=0:
             self.s  = sound.normalize(s[int(tlim[0]*self.fs):int(tlim[1]*self.fs)], max_amp=1.0)
             self.t0 = tlim[0]
+            self.tlim = tlim
         
         self.no_syllable = 0
         self.id          = "syllable"
@@ -330,3 +332,5 @@ class Syllable(object):
         
         
         return synth
+    
+    def Play(self): playsound(self.file_name)

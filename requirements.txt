@@ -12,3 +12,4 @@ IPython
 mpl-pan-zoom
 mpl_point_clicker
 soundfile 
+playsound

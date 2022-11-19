@@ -9,21 +9,31 @@ A python package to analyze, visualize and create synthetic syllables.
 
 
 #  Table of Contents
-
-- [Installation](#Installation)
-    - [Requirements](##Requirments)
-    - [Downloading](##Downloading)
-    - [Use](##Use)
-- [Overview](#Overview)
-- [Objective](#Objective)
-- [Repository Contents](#Repository_Contents)
-- [Results](#Results)
-- [References](#References)
-    - [Literature](##Literature)
-    - [Software](##Software)
-    - [Audios Dataset](##Audios_Dataset)
+<!---
+- [birdsongs](#birdsongs)
+- [Table of Contents](#table-of-contents)
+--->
+- [Installation](#installation)
+  - [Requirments](#requirments)
+  - [Downloading](#downloading)
+  - [Use](#use)
+    - [Define](#define)
+    - [Solve](#solve)
+    - [Visualize](#visualize)
+- [Overview](#overview)
+- [Objective](#objective)
+- [Repository Contents](#repository-contents)
+  - [Physical Model](#physical-model)
+  - [Programming Object Oriented (POO)](#programming-object-oriented-poo)
+  - [Implementation](#implementation)
+- [Results](#results)
+- [References](#references)
+  - [Literature](#literature)
+  - [Software](#software)
+  - [Audios Dataset](#audios-dataset)
 ---
-
+  
+  
 # Installation
 
 ## Requirments
@@ -43,6 +53,8 @@ syllables is implemented in python 3.8: It requires:
 - IPython
 - mpl_pan_zoom
 - mpl_point_clicker
+- playsound
+- soundfile
 
     
 ## Downloading
@@ -60,7 +72,6 @@ The next step is to install the required packages, any of the following commands
 ```bat
 pip install -r ./requirements.txt
 python -m pip install -r ./requirements.txt
-cd birdsongs
 ```
 
 the last step is to enter at the birdsongs folder to use its function with the examples audios.
@@ -68,16 +79,16 @@ the last step is to enter at the birdsongs folder to use its function with the e
 
 ## Use
 
-### Define objects
+### Define
 
-Import the package as bs
+Import the package as `bs`
 
 ```python
 import birdsongs as bs
 from birdsongs.utils import * 
-```
-
-define a ploter and paths objects, optionally you can specify the audio folder or not 
+```  
+  
+Define a ploter and paths objects, optionally you can specify the audio folder or enable to save figures 
 
 ```python
 # audios = "path\to\audios"
@@ -87,29 +98,59 @@ define a ploter and paths objects, optionally you can specify the audio folder o
 ploter = bs.Ploter()  # save = True to save the figures
 paths  = bs.Paths()   # root, audios_path, bird_name
 ```
-define and plot the audio birdsong 
+
+**Song**
+  
+Define and plot the audio bird song 
 
 ```python
 bird = bs.Song(paths, no_file=3) # tlim=(t0,tend) you can also give a time interval or frequency limits flim=(f0,fmax)
 ploter.Plot(bird)
+AudioPlay(bird)    # in terminal use bird.Play()
 ```
-you can also define the time intervals of interest from the whole song with the commands
+
+**Syllables**
+  
+Define the syllables using time intervals of interest from the whole bird song. You can choose the points using  
     
 ```python
-klicker = ploter.FindTimes(bird) # FF_on=True enables fundamental frequency plot
+klicker = ploter.FindTimes(bird)    # FF_on=True enables fundamental frequency plot
 plt.show()
 ``` 
-after close the matplotlib windows run 
+after close the matplotlib windows run the following code to save the intervals points, the start and ends points have to have the same number of elements for easy use
     
 ```python
 time_intervals = Positions(klicker)
+time_intervals
 ``` 
-The final step is to define the optimizer object to generate the synthetic syllable (song). 
+  
+### Solve
+  
+The final step is to define the optimizer object to generate the synthetic syllable (song), solve the optimization problem. In this case we are going to find the whole synthetic syllable for the previous syllables defined from the time intervals
+
+```python
+brute          = {'method':'brute', 'Ns':11}                  # method of optimization, Ns is the number of grid points
+optimizer_bird = bs.Optimizer(bird, method_kwargs=brute)      # optimizer object, they will save all the optimal parameters
+synth_bird     = optimizer_bird.SongByTimes(time_intervals)   # find the best syllables for each syllable
+```
+    
+### Visualize
+  
+Visualize and write the synthetic optimal audio 
     
 ```python
-syllable  = bs.Syllable(bird)               # you can also give a time or frequency interval flim=(fmin,fmax), tlim=(t0,tend)
+ploter.Plot(synth_bird)
+bird.WriteAudio();  synth_bird.WriteAudio()
+```
+  
+### Note  
+  
+To find a single synthetic syllable (or chunck) the process is the following. Nevertheless, to define a syllable (or chunck) you must have defined a bird song (syllable) object. 
 
-brute     = {'method':'brute', 'Ns':11}     # optimization method and its parameters
+```python
+syllable  = bs.Syllable(bird)               # define the syllable. you can also give a time or frequency interval: flim=(fmin,fmax), tlim=(t0,tend)
+
+brute     = {'method':'brute', 'Ns':11}     # define optimization method and its parameters
 optimizer = bs.Optimizer(syllable, brute)   # define optimizer to the syllable object
 
 optimizer.optimal_gamma                     # find teh optimal gamma over the whole bird syllables
@@ -124,24 +165,8 @@ ploter.Result(obj, obj_synth_optimal)       # plot the spectrograms, scores and 
     
 bird.WriteAudio();  synth_bird.WriteAudio() # write both objects, real and synthetic
 ```
-
-other available option is to split the audio with the time intervals define and find the synthetic song
-
-```python
-brute          = {'method':'brute', 'Ns':11}
-optimizer_bird = bs.Optimizer(bird, method_kwargs=brute)
-synth_bird     = optimizer_bird.SongByTimes(time_intervals)
-```
     
-to visualize and write audio
-    
-```python
-ploter.Plot(synth_bird)
-bird.WriteAudio();  synth_bird.WriteAudio()
-```
-    
-    
-The repository has some audio examples, in examples/audios folder. You can download and store your own audios in the same folder, the audios must be in WAV format or birdosngs will not import them, we suggest use [audacity](https://www.audacityteam.org/) to convert the audios.
+The repository has some audio examples, in examples/audios folder. You can download and store your own audios in the same folder or give the audio folder path to the Paths object. The audios **must** be in WAV format or birdosngs will not import them, we suggest use [audacity](https://www.audacityteam.org/) to convert the audios without any problem.
 
     
 <!---
@@ -159,7 +184,7 @@ python -m pip install -e birdsongs
 
 # Objective
 
-Design, development, and evaluation of a physical model for generating synthetic birdsongs from recorded birdsongs
+Design, development, and evaluation of a physical model to generating synthetic bird songs from recorded birdsongs
 
 # Repository Contents
 

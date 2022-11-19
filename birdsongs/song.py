@@ -15,9 +15,10 @@ class Song(Syllable):
         self.llambda = llambda
         self.flim    = flim
         self.center  = center
+        self.file_name = self.paths.sound_files[self.no_file-1]
         
         if sfs==None:
-            self.file_name = self.paths.sound_files[self.no_file-1]
+            #self.file_name = self.paths.sound_files[self.no_file-1]
             s, fs = sound.load(self.file_name)
             #s, fs = librosa.load(self.file_name)
             #if len(np.shape(s))>1 and s.shape[1]==2 :s = (s[:,1]+s[:,0])/2 # two channels to one
@@ -31,7 +32,8 @@ class Song(Syllable):
             self.t0 = 0
         else:          
             self.s  = sound.normalize(s[int(tlim[0]*fs):int(tlim[1]*fs)], max_amp=1.0)
-            self.t0 = tlim[0]        
+            self.t0 = tlim[0]
+            self.tlim = tlim
         
         self.NN         = NN
         self.win_length = self.NN//2
@@ -167,3 +169,5 @@ class Song(Syllable):
         self.s_synth = np.empty_like(self.s)
         for i in range(self.syllables.size):
             self.s_synth[self.SylInd[i][1]] = self.syllables[i]
+            
+    def Play(self): playsound(self.file_name)

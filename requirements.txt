@@ -12,3 +12,4 @@ IPython
 mpl_interactions
 mpl_point_clicker
 soundfile 
+playsound

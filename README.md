@@ -10,18 +10,25 @@ A python package to analyze, visualize and create synthetic syllables.
 
 #  Table of Contents
 
-- [Installation](#Installation)
-    - [Requirements](##Requirments)
-    - [Downloading](##Downloading)
-    - [Use](##Use)
-- [Overview](#Overview)
-- [Objective](#Objective)
-- [Repository Contents](#Repository_Contents)
-- [Results](#Results)
-- [References](#References)
-    - [Literature](##Literature)
-    - [Software](##Software)
-    - [Audios Dataset](##Audios_Dataset)
+- [birdsongs](#birdsongs)
+- [Table of Contents](#table-of-contents)
+  - [- Audios Dataset](#--audios-dataset)
+- [Installation](#installation)
+  - [Requirments](#requirments)
+  - [Downloading](#downloading)
+  - [Use](#use)
+    - [Define objects](#define-objects)
+- [Overview](#overview)
+- [Objective](#objective)
+- [Repository Contents](#repository-contents)
+  - [Physical Model](#physical-model)
+  - [Programming Object Oriented (POO)](#programming-object-oriented-poo)
+  - [Implementation](#implementation)
+- [Results](#results)
+- [References](#references)
+  - [Literature](#literature)
+  - [Software](#software)
+  - [Audios Dataset](#audios-dataset)
 ---
 
 # Installation
@@ -29,6 +36,10 @@ A python package to analyze, visualize and create synthetic syllables.
 ## Requirments
 
 syllables is implemented in python 3.8: It requires:
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 
 - numpy
 - matplotlib 
@@ -43,6 +54,8 @@ syllables is implemented in python 3.8: It requires:
 - IPython
 - mpl_interactions
 - mpl_point_clicker
+- playsound
+- soundfile
 
     
 ## Downloading

@@ -6,6 +6,8 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
+from playsound import playsound
+
 from mpl_point_clicker import clicker
 from mpl_interactions import zoom_factory, panhandler
 
@@ -68,7 +70,7 @@ def Klicker(fig, ax):
     zoom_factory(ax)
     ph = panhandler(fig, button=2)
     klicker = clicker(ax, ["tini","tend"], markers=["o","x"], 
-                      legend_bbox=(0.98, 0.98))# #legend_loc='upper right',
+                      legend_bbox=(0.99, 0.98))# #legend_loc='upper right',
     #ax.legend(title="Interval Points", bbox_to_anchor=(1.1, 1.05))
     return klicker
     

@@ -51,7 +51,7 @@ syllables is implemented in python 3.8: It requires:
 - pandas
 - sklearn
 - IPython
-- mpl_interactions
+- mpl_pan_zoom
 - mpl_point_clicker
 - playsound
 - soundfile

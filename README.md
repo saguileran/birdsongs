@@ -184,7 +184,7 @@ python -m pip install -e birdsongs
 
 # Objective
 
-Design, development, and evaluation of a physical model for generating synthetic birdsongs from recorded birdsongs
+Design, development, and evaluation of a physical model to generating synthetic bird songs from recorded birdsongs
 
 # Repository Contents
 

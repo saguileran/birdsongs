@@ -15,6 +15,7 @@ from numpy.polynomial import Polynomial
 from numpy.linalg import norm as Norm
 
 from matplotlib import cm
+from mpl_toolkits.mplot3d import Axes3D 
 from matplotlib.gridspec import GridSpec
 
 from scipy import signal
@@ -69,23 +70,19 @@ def AudioPlay(obj):
 def Klicker(fig, ax):
     zoom_factory(ax)
     pm = PanManager(fig, button=MouseButton.MIDDLE)
-    klicker = clicker(ax, ["tini","tend"], markers=["o","x"], 
-<<<<<<< Updated upstream
-                      legend_bbox=(0.98, 0.98))# #legend_loc='upper right',
+    klicker = clicker(ax, [r"$t_{ini}$",r"$t_{end}$"], markers=["o","x"], colors=["blue","black"],
+                      legend_bbox=(1.01, 0.98))# #legend_loc='upper right',
 
     # hacky trick to keep the panmanager alive as long as the clicker is around
     # without having to return another object
     klicker._pm = pm
 
-=======
-                      legend_bbox=(1.01, 0.98))# #legend_loc='upper right',
->>>>>>> Stashed changes
     #ax.legend(title="Interval Points", bbox_to_anchor=(1.1, 1.05))
-    #return klicker
+    return klicker
     
 def Positions(klicker):
-    tinis = np.array([tini[0] for tini in klicker._positions["tini"]])
-    tends = np.array([tend[0] for tend in klicker._positions["tend"]])
+    tinis = np.array([tini[0] for tini in klicker._positions[r"$t_{ini}$"]])
+    tends = np.array([tend[0] for tend in klicker._positions[r"$t_{end}$"]])
     
     if tinis.size==tends.size:
         return np.array([[tinis[i], tends[i]] for i in range(len(tinis))])

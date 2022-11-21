@@ -7,8 +7,8 @@ class Syllable(object):
         s  = signal
         fs = sampling rate
         t0 = initial time of the syllable
-    """
-    def __init__(self, bird, t0=None, Nt=200, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4), n_mels=4, umbral_FF=1, tlim=[], out=[]):
+    """ 
+    def __init__(self, bird, t0=None, Nt=200, llambda=1.5, NN=1024, overlap=0.5, flim=(1.5e3,2e4), n_mels=4, umbral_FF=1, tlim=[], out=[]):
         ## The bifurcation can be cahge modifying the self.f2 and self.f1 functions
         ## ------------- Bogdanov–Takens bifurcation ------------------
         self.beta_bif = np.linspace(-2.5, 1/3, 1000)  # mu2:beta,  mu1:alpha
@@ -196,9 +196,9 @@ class Syllable(object):
         # pback and pin vectors initialization
         pi, pb, out = np.zeros(tmax), np.zeros(tmax), np.zeros(int(self.s.size))
         # initial vector ODEs (v0), it is not too relevant
-        v = 1e-4*np.array([1e2, 1e1, 1, 1, 1, 1]); 
+        v = 1e-4*np.array([1e2, 1e1, 1, 1, 1, 1]);  self.Vs = [v];
         # ------------- BIRD PARAMETERS -----------
-        BirdData = pd.read_csv(self.paths.auxdata+'ZonotrichiaData.csv')
+        BirdData = pd.read_csv(self.paths.auxdata/'ZonotrichiaData.csv')
         c, L, r, Ch, MG, MB, RB, Rh = BirdData['value'] # c, L, r, c, L1, L2, r2, rd 
         # - Trachea:
         #           r: reflection coeficient    [adimensionelss]
@@ -238,7 +238,7 @@ class Syllable(object):
             t += 1;
         
         # ------------------------------------------------------------
-        #self.Vs = np.array(self.Vs)
+        self.Vs = np.array(self.Vs)
         # define solution (synthetic syllable) as a Syllable object 
         synth = Syllable(self.bird, Nt=self.Nt, llambda=self.llambda, NN=self.NN, overlap=0.5, flim=self.flim, out=out)
         synth.no_syllable = self.no_syllable

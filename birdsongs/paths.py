@@ -43,7 +43,7 @@ class Paths(object):
         
         self.results.mkdir(parents=True, exist_ok=True)
         self.examples.mkdir(parents=True, exist_ok=True)
-        print("The folder has {} songs".format(self.no_files))
         
     def ShowFiles(self):
+        print("The folder has {} songs:".format(self.no_files))
         [print(str(i+1)+"-"+self.files_names[i]) for i in range(self.no_files)];

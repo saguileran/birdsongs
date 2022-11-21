@@ -1,15 +1,16 @@
 from .utils import *
 
 class Ploter(object): 
-    def __init__(self, save=False, cmap="magma"): #" gray_r afmhot_r"
+    def __init__(self, save=False, cmap="magma", figsize=(8,3)): #" gray_r afmhot_r"
         self.save = save
         self.cmap = cmap
+        self.figsize = figsize
     
     def PlotAlphaBeta(self, obj, xlim=(-0.05,.2), ylim=(-0.2,0.9)):
         if "synth" in obj.id:
             if obj.alpha.max()>0.2: xlim=(-0.05,1.1*obj.alpha.max())
             if obj.beta.max()>0.9:  ylim=(-0.2,1.1*obj.beta.max())
-            fig = plt.figure(constrained_layout=True, figsize=(10, 6))
+            fig = plt.figure(constrained_layout=True, figsize=(self.figsize[0], 2*self.figsize[1]))
             gs  = GridSpec(2, 2, figure=fig)
             ax1 = fig.add_subplot(gs[0, 0])
             ax2 = fig.add_subplot(gs[1:, 0])
@@ -60,44 +61,47 @@ class Ploter(object):
             print("This  is not a synthetic object, try with otherone.")
     
     
-    def PlotVs(self,obj, xlim=(0,0.025)):
+    def PlotVs(self,obj, xlim=()):
         if "synth" in obj.id:
-            fig, ax = plt.subplots(3, 1, figsize=(12, 9))
-            fig.subplots_adjust(wspace=0.35, hspace=0.4)
+            if len(xlim)==0: xlim=(obj.timesVs[0], obj.timesVs[-1])
+            fig, ax = plt.subplots(2, 2, figsize=(int(1.5*self.figsize[0]), 2*self.figsize[1]))
+            fig.subplots_adjust(wspace=0.25, hspace=0.4, top=1.05)
 
-            #time = obj.time[:obj.Vs.shape[0]]
+            ax[0,0].plot(obj.timesVs, obj.Vs[:,1], color='g') 
+            ax[0,0].set_ylabel("$p_{in}$"); #ax[0,0].set_xlabel("time (s)"); 
+            ax[0,0].set_title(r"Trachea Input Pressure ($p_{in}$)")
+            ax[0,0].set_xlim(xlim); 
+            
+            ax[0,1].plot(obj.timesVs, obj.Vs[:,4], color='b')
+            ax[0,1].set_ylabel("$p_{out}$"); # ax[0,1].set_xlabel("time (s)");
+            ax[0,1].set_title(r"Trachea Output Pressure ($p_{out}$)")
+            ax[0,1].set_xlim(xlim); ax[0,1].sharex(ax[0,0])
+            
+            ax[1,0].plot(obj.timesVs, obj.Vs[:,0], color='r')
+            ax[1,0].set_xlabel("time (s)"); ax[1,0].set_ylabel("$x(t)$");
+            ax[1,0].set_title(r"Labial Displacement ($x(t)$)")
+            ax[1,0].set_xlim(xlim); ax[1,0].sharex(ax[0,1]); 
+            
+            ax[1,1].plot(obj.timesVs, obj.Vs[:,0], color='m')
+            ax[1,1].set_xlabel("time (s)"); ax[1,1].set_ylabel("$y(t)$");
+            ax[1,1].set_title(r"Labial Velocity ($y(t)$)")
+            ax[1,1].set_xlim(xlim); ax[1,1].sharex(ax[1,0]); 
 
-            ax[0].plot(obj.timesVs, obj.Vs[:,4], color='b')
-            #ax[0].set_xlim((0,1e5))
-            ax[0].set_xlabel("time (s)"); ax[0].set_ylabel("$P_{out}$");
-            ax[0].set_title("Trachea Output Pressure")
-
-            ax[1].plot(obj.timesVs, obj.Vs[:,1], color='g') 
-            #ax[1].set_xlim(xlim)
-            ax[1].set_xlabel("time (s)"); ax[1].set_ylabel("$P_{in}$");
-            ax[1].set_title("Trachea Input Pressure")
-
-            ax[2].plot(obj.timesVs, obj.Vs[:,0], color='r')
-            #ax[2].set_xlim(xlim)
-            ax[2].set_xlabel("time (s)"); ax[2].set_ylabel("$x(t)$");
-            ax[2].set_title("Labial position")
-            ax[2].sharex(ax[1])
-
-            fig.suptitle('Labial Parameters (vector $v$)', fontsize=20)
+            fig.suptitle('Motor Gestures Parameters\nAudio:'+str(obj.file_name)[len(str(obj.paths.audios))+1:], fontsize=20)
             plt.show()
             
             return fig, ax
 
             if self.save: fig.savefig(obj.paths.results+"MotorGesturesVariables-{}-{}-{}.png".format(obj.id,obj.no_file,obj.no_syllable)) 
             
-        else:  print("This is not a synthetic object")
+        else:  print("This is not a synthetic object, there is not motor gestures variables asociated to it.")
             
     
     
     def Plot(self, obj, syllable_on=False, chunck_on=False, FF_on=False): 
         ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*1e-3))
         if "song" in obj.id:
-            fig, ax = plt.subplots(2+int(syllable_on), 1, figsize=(12, 6+3*int(syllable_on)))
+            fig, ax = plt.subplots(2+int(syllable_on), 1, figsize=(self.figsize[0], self.figsize[1]*(2+int(syllable_on))))
             fig.subplots_adjust(hspace=0.4, wspace=0.4)
 
             img = librosa.display.specshow(obj.Sxx_dB, x_axis="s", y_axis="linear", sr=obj.fs,
@@ -143,16 +147,16 @@ class Ploter(object):
                 
                 ax[0].legend(loc='upper right', title="FF")
 
-                path_save = obj.paths.results / "AllSongAndSyllable-{}-{}.png".format(obj.no_file,obj.no_syllable)
-            else: path_save = obj.paths.results / "AllSongAndSyllable-{}.png".format(obj.no_file)
+                path_save = obj.paths.results/"AllSongAndSyllable-{}-{}.png".format(obj.no_file,obj.no_syllable)
+            else: path_save = obj.paths.results/"AllSongAndSyllable-{}.png".format(obj.no_file)
 
-            fig.suptitle('Audio: {}'.format(obj.file_name.name), fontsize=18)
+            fig.suptitle('Audio: {}'.format(obj.file_name), fontsize=18)
             plt.show()
             return fig, ax
         
             if self.save: fig.savefig(path_save)
         else:  # syllable ------------------------------------------------
-            fig, ax = plt.subplots(2, 1, figsize=(12, 6+3*int(syllable_on)))
+            fig, ax = plt.subplots(2, 1, figsize=(self.figsize[0], self.figsize[1]*(2+int(syllable_on))))
             fig.subplots_adjust(hspace=0.4, wspace=0.4)
 
             img = librosa.display.specshow(obj.Sxx_dB, x_axis="s", y_axis="linear", sr=obj.fs,
@@ -177,62 +181,59 @@ class Ploter(object):
             fig.suptitle('id: {}, NoFile: {}, NoSyllable: {}'.format(obj.id, obj.no_file, obj.no_syllable), fontsize=16)
             plt.show()
 
-            path_save = obj.paths.results+"AllSongAndSyllable-{}-{}.png".format(obj.no_file,obj.no_syllable)
+            path_save = obj.paths.results/"AllSongAndSyllable-{}-{}.png".format(obj.no_file,obj.no_syllable)
             
             return fig, ax
             if self.save: fig.savefig(path_save)
 
         
     def Syllables(self, obj, obj_synth): #PlotSyllables
-        fig, ax = plt.subplots(2, 2, figsize=(12, 5), sharex=True, sharey='col')
-        fig.subplots_adjust(top=0.85)     
+        ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*1e-3))
+        
+        fig, ax = plt.subplots(2, 2, figsize=(int(1.5*self.figsize[0]), 2*self.figsize[1])) # , sharex=True, sharey='col'
+        fig.subplots_adjust(top=0.85, hspace=0.35, wspace=0.2)     
 
         ax[0,0].plot(obj.time_s, obj.s, label='canto', c='b')
         ax[0,0].set_title('Real')
         ax[0,0].plot(obj.time_s, obj.envelope, label='envelope', c='k')
         ax[0,0].legend(); ax[0,0].set_ylabel("Amplitud (a.u.)")
+        
         ax[1,0].plot(obj_synth.time_s, obj_synth.s, label='synthetic', c='g')
         ax[1,0].set_title('Synthetic') 
-        ax[1,0].plot(obj_synth.time_s, obj_synth.envelope
-    , label='envelope', c='k')
-        ax[1,0].legend(); ax[1,0].set_xlabel('t (s)'); ax[1,0].set_ylabel("Amplitud (a.u.)")
-
-        Delta_tu   = obj.time[-1] - obj.time[0]
-        Delta_tu_s = 1#tu_s[-1] - tu_s[0]
+        ax[1,0].plot(obj_synth.time_s, obj_synth.envelope, label='envelope', c='k')
+        ax[1,0].legend(); ax[1,0].set_xlabel('time (s)'); ax[1,0].set_ylabel("Amplitud (a.u.)")
+        ax[1,0].sharex(ax[0,0])
 
         img = librosa.display.specshow(obj.Sxx_dB, x_axis="s", y_axis="linear", sr=obj.fs,
                          hop_length=obj.hop_length, ax=ax[0,1], cmap=self.cmap)
         fig.colorbar(img, ax=ax[0,1], format="%+2.f dB")
-        #C = img.get_array().data.reshape(obj.Sxx_dB.shape)
-        #ax[0,1].pcolormesh(obj.times, obj.freqs*1e-3, C, cmap=plt.get_cmap(self.cmap), rasterized=True, edgecolors="face")#, vmin=10, vmax=70)
-        #fig.colorbar(pcm, ax=ax[0,1], location='right', label='Power (dB)')
-        
+        ax[0,1].yaxis.set_major_formatter(ticks);  ax[0,1].set_ylim(obj.flim)
         ax[0,1].plot(obj.time, obj.FF, 'bo-', lw=2)
-        ax[0,1].set_title('Real'); ax[0,1].set_ylabel('f (khz)'); ax[0,1].set_ylim(obj.flim);
+        ax[0,1].set_title('Real'); ax[0,1].set_ylabel('f (khz)');
+        ax[0,1].sharex(ax[1,0])
         
         img = librosa.display.specshow(obj_synth.Sxx_dB, x_axis="s", y_axis="linear", sr=obj_synth.fs,
                          hop_length=obj_synth.hop_length, ax=ax[1,1], cmap=self.cmap)
         fig.colorbar(img, ax=ax[1,1], format="%+2.f dB")
-        #C = img.get_array().data.reshape(obj_synth.Sxx_dB.shape)
-        #ax[1,1].pcolormesh(obj_synth.times, obj_synth.freqs*1e-3,  C, cmap=plt.get_cmap(self.cmap), rasterized=True, edgecolors="face")#, vmin=10, vmax=70)
-        #fig.colorbar(pcm, ax=ax[1,1], location='right', label='Power (dB)')
-        
         ax[1,1].plot(obj_synth.time, obj_synth.FF, 'go-', lw=2)
+        ax[1,1].yaxis.set_major_formatter(ticks)
         ax[1,1].set_title('Synthetic') 
-        ax[1,1].set_ylim(obj.flim);   ax[1,1].set_xlim(min(obj_synth.time), max(obj_synth.time))
-        ax[1,1].set_xlabel('t (s)'); ax[1,1].set_ylabel('f (khz)');
+        ax[1,1].set_ylim(obj.flim);     ax[1,1].set_xlim(min(obj_synth.time), max(obj_synth.time))
+        ax[1,1].set_xlabel('time (s)'); ax[1,1].set_ylabel('f (khz)');
+        ax[1,1].sharex(ax[0,1])
 
-        #fig.tight_layout(); 
         fig.suptitle('Sound Waves and Spectrograms', fontsize=20)
         plt.show()
-        return fig, ax
+        
         if self.save: fig.savefig(obj.paths.results+"SoundAndSpectros-{}-{}-{}.png".format(obj.id,obj.no_file,obj.no_syllable))
+        
+        return fig, ax
 
     
     def Result(self, obj, obj_synth, cmp="afmhot_r"):
         if not("synth" in obj.id) and "synth" in obj_synth.id:
             ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*1e-3))
-            fig = plt.figure(constrained_layout=False, figsize=(24, 12))
+            fig = plt.figure(constrained_layout=False, figsize=(5*self.figsize[0], 4*self.figsize[1]))
             gs  = fig.add_gridspec(nrows=4, ncols=5, wspace=0.05, hspace=0.05, width_ratios=[1,1,1,1.2,1.2], left=0.05, right=0.98,)
             vmin, vmax = obj.Sxx_dB.min(), obj.Sxx_dB.max()
             # ----- FF ---------------
@@ -391,7 +392,7 @@ class Ploter(object):
         
     def FindTimes(self, obj, FF_on=False):
         ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*1e-3))
-        fig, ax = plt.subplots(1, 1, figsize=(10, 4))#, constrained_layout=True)
+        fig, ax = plt.subplots(1, 1, figsize=(self.figsize[0]+1, self.figsize[1]+2))#, constrained_layout=True)
         
         img = librosa.display.specshow(obj.Sxx_dB, x_axis="s", y_axis="linear", sr=obj.fs,
                      hop_length=obj.hop_length, ax=ax, cmap=self.cmap)
@@ -408,5 +409,17 @@ class Ploter(object):
         ax.set_ylabel('f (kHz)');
         
         klicker = Klicker(fig, ax)
+        plt.show()
         
         return klicker
+    
+    
+    def Plot3d(self, obj):
+        
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.plot_surface(obj.times, obj.freqs, obj.Sxx_dB, cmap=self.cmap)
+        ax.set_xlabel("time (s)"); ax.set_ylabel("Frequency (Hz)")
+        ax.set_zlabel("Power (dB)")
+        
+        plt.show()

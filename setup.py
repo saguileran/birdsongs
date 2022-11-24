@@ -12,7 +12,7 @@ if __name__ == '__main__':
     url='https://github.com/saguileran/birdsongs',
     license='LICENSE.txt',
     description='A python package to analyze and visualize birdsongs',
-    long_description=open('README.txt').read(),
+    long_description=open('README.md').read(),
     install_requires=[
             "librosa",
             "lmfit",

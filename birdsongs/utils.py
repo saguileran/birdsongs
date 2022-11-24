@@ -22,11 +22,14 @@ from scipy import signal
 from scipy.interpolate import interp1d
 from scipy.optimize import root
 from scipy.signal import argrelextrema, butter, savgol_filter, find_peaks #hilbert
+from scipy.special import comb
 
 from sklearn.linear_model import LinearRegression
 from random import uniform
 from multiprocessing import Pool
 from IPython.display import display as Display
+from IPython.display import display, Math
+
 
 from librosa import yin, pyin, feature, display, onset, times_like, stft, fft_frequencies
 import librosa 
@@ -88,3 +91,17 @@ def Positions(klicker):
         return np.array([[tinis[i], tends[i]] for i in range(len(tinis))])
     else:
         return np.array([tinis, tends])
+    
+def Print(string): return display(Math(string))
+
+
+def smoothstep(x, x_min=0, x_max=1, N=1):
+    x = np.clip((x - x_min) / (x_max - x_min), 0, 1)
+
+    result = 0
+    for n in range(0, N + 1):
+         result += comb(N + n, n) * comb(2 * N + 1, N - n) * (-x) ** n
+
+    result *= x ** (N + 1)
+
+    return result

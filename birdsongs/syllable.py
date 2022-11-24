@@ -8,7 +8,7 @@ class Syllable(object):
         fs = sampling rate
         t0 = initial time of the syllable
     """ 
-    def __init__(self, bird, t0=None, Nt=200, llambda=1.5, NN=1024, overlap=0.5, flim=(1.5e3,2e4), n_mels=4, umbral_FF=1, tlim=[], out=[]):
+    def __init__(self, birdsong, t0=None, Nt=200, llambda=1.5, NN=1024, overlap=0.5, flim=(1.5e3,2e4), n_mels=4, umbral_FF=1, tlim=[], out=[]):
         ## The bifurcation can be cahge modifying the self.f2 and self.f1 functions
         ## ------------- Bogdanov–Takens bifurcation ------------------
         self.beta_bif = np.linspace(-2.5, 1/3, 1000)  # mu2:beta,  mu1:alpha
@@ -42,7 +42,7 @@ class Syllable(object):
                         ('gm',  4e4, False,  1e4,  1e5, None, None))
         # -------------------------------------------------------------------        
         self.n_mfcc     = 8
-        self.bird       = bird
+        self.birdsong   = birdsong
         self.Nt         = Nt
         self.NN         = NN
         self.win_length = self.NN
@@ -51,13 +51,13 @@ class Syllable(object):
         self.n_mels     = n_mels
         self.flim       = flim
         self.llambda    = llambda
-        self.fs         = self.bird.fs
-        self.center     = self.bird.center
-        self.no_file    = self.bird.no_file
-        self.paths      = self.bird.paths
-        self.file_name  = bird.file_name
+        self.fs         = self.birdsong.fs
+        self.center     = self.birdsong.center
+        self.no_file    = self.birdsong.no_file
+        self.paths      = self.birdsong.paths
+        self.file_name  = str(birdsong.file_name)[len(str(birdsong.paths.audios))+1:]
         
-        if len(out)==0: s = self.bird.s
+        if len(out)==0: s = self.birdsong.s
         else:           s = out
         # ------ define syllable by time interval [tini, tend] --------
         if len(tlim)==0 and t0!=None: 
@@ -73,13 +73,11 @@ class Syllable(object):
         
         self.no_syllable = 0
         self.id          = "syllable"
-        # self.Nt         = self.s.size/100
         
         self.time_s   = np.linspace(0, len(self.s)/self.fs, len(self.s))
         self.envelope = Enve(self.s, self.fs, self.Nt)
         self.T        = self.s.size/self.fs
         self.time0    = np.linspace(0, len(self.s)/self.fs, len(self.s))
-        self.Vs       = [] # np.zeros((self.s.size, 5)); # velocity
         
         # -------------------------------------------------------------------
         # ------------- ACOUSTIC FEATURES -----------------------------------
@@ -240,7 +238,7 @@ class Syllable(object):
         # ------------------------------------------------------------
         self.Vs = np.array(self.Vs)
         # define solution (synthetic syllable) as a Syllable object 
-        synth = Syllable(self.bird, Nt=self.Nt, llambda=self.llambda, NN=self.NN, overlap=0.5, flim=self.flim, out=out)
+        synth = Syllable(self.birdsong, Nt=self.Nt, llambda=self.llambda, NN=self.NN, overlap=0.5, flim=self.flim, out=out)
         synth.no_syllable = self.no_syllable
         synth.no_file     = self.no_file
         synth.p           = self.p
@@ -264,7 +262,7 @@ class Syllable(object):
     #     return fun_s(time)
         
     def WriteAudio(self):
-        name = '{}/File{}-{}-{}.wav'.format(self.paths.examples,self.no_file, self.id,self.no_syllable)
+        name = '{}/{}-{}-{}.wav'.format(self.paths.examples, self.file_name, self.id, self.no_syllable)
         WriteAudio(name, fs=self.fs, s=self.s)
         
     def Solve(self, p, orde=2):

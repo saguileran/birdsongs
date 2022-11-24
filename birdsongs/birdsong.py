@@ -15,10 +15,11 @@ class BirdSong(Syllable):
         self.llambda = llambda
         self.flim    = flim
         self.center  = center
-        self.file_name = self.paths.sound_files[self.no_file-1]
+        self.file_path = self.paths.sound_files[self.no_file-1]
+        self.file_name =  str(self.paths.sound_files[self.no_file-1])[len(str(self.paths.audios))+1:]
         
         if sfs==None:
-            s, fs = sound.load(self.file_name)
+            s, fs = sound.load(self.file_path)
             #s, fs = librosa.load(self.file_name)
             s = librosa.to_mono(s)
             self.id = "song"
@@ -66,7 +67,7 @@ class BirdSong(Syllable):
         self.FF     = yin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=self.NN, 
                           win_length=self.win_length, hop_length=self.hop_length, trough_threshold=umbral_FF, center=self.center, pad_mode='constant')
         
-        if len(times)!=0:
+        if len(times)==0:
             self.syllables = self.Syllables(method=split_method)
         else:
             indexes = np.int64(self.fs*np.array(times))
@@ -151,7 +152,7 @@ class BirdSong(Syllable):
         return self.chunck
     
     def WriteAudio(self):
-        name = '{}/File{}-{}.wav'.format(self.paths.examples,self.no_file, self.id)
+        name = '{}/{}-{}.wav'.format(self.paths.examples,self.file_name, self.id)
         WriteAudio(name, fs=self.fs, s=self.s)
     
     # ------------- solver for some parameters -----------------
@@ -174,4 +175,4 @@ class BirdSong(Syllable):
         for i in range(self.syllables.size):
             self.s_synth[self.SylInd[i][1]] = self.syllables[i]
             
-    def Play(self): playsound(self.file_name)
+    def Play(self): playsound(self.file_path)

@@ -11,7 +11,7 @@ class Ploter(object):
             if obj.alpha.max()>0.2: xlim=(-0.05,1.1*obj.alpha.max())
             if obj.beta.max()>0.9:  ylim=(-0.2,1.1*obj.beta.max())
             fig = plt.figure(constrained_layout=True, figsize=(self.figsize[0], 2*self.figsize[1]))
-            gs  = GridSpec(2, 2, figure=fig)
+            gs  = GridSpec(2, 2, figure=fig); 
             ax1 = fig.add_subplot(gs[0, 0])
             ax2 = fig.add_subplot(gs[1:, 0])
             ax3 = fig.add_subplot(gs[:, 1])
@@ -87,7 +87,7 @@ class Ploter(object):
             ax[1,1].set_title(r"Labial Velocity ($y(t)$)")
             ax[1,1].set_xlim(xlim); ax[1,1].sharex(ax[1,0]); 
 
-            fig.suptitle('Motor Gestures Parameters\nAudio:'+str(obj.file_name)[len(str(obj.paths.audios))+1:], fontsize=20)
+            fig.suptitle('Motor Gestures Parameters\nAudio:'+str(obj.file_name), fontsize=20)
             plt.show()
             
             return fig, ax
@@ -98,12 +98,12 @@ class Ploter(object):
             
     
     
-    def Plot(self, obj, syllable_on=False, chunck_on=False, FF_on=False): 
+    def Plot(self, obj, syllable_on=False, chunck_on=False, FF_on=False, SelectTime_on=False): 
         ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*1e-3))
         if "song" in obj.id:
             fig, ax = plt.subplots(2+int(syllable_on), 1, figsize=(self.figsize[0], self.figsize[1]*(2+int(syllable_on))))
             fig.subplots_adjust(hspace=0.4, wspace=0.4)
-
+            
             img = librosa.display.specshow(obj.Sxx_dB, x_axis="s", y_axis="linear", sr=obj.fs,
                          hop_length=obj.hop_length, ax=ax[0], cmap=self.cmap)
             
@@ -150,9 +150,11 @@ class Ploter(object):
                 path_save = obj.paths.results/"AllSongAndSyllable-{}-{}.png".format(obj.no_file,obj.no_syllable)
             else: path_save = obj.paths.results/"AllSongAndSyllable-{}.png".format(obj.no_file)
 
-            fig.suptitle('Audio: {}'.format(obj.file_name), fontsize=18)
+            fig.suptitle('Audio:\n{}'.format(obj.file_name), fontsize=18)
+            if SelectTime_on==True:  self.klicker = Klicker(fig, ax[0])
+            fig.tight_layout()
             plt.show()
-            return fig, ax
+            
         
             if self.save: fig.savefig(path_save)
         else:  # syllable ------------------------------------------------
@@ -161,11 +163,18 @@ class Ploter(object):
 
             img = librosa.display.specshow(obj.Sxx_dB, x_axis="s", y_axis="linear", sr=obj.fs,
                          hop_length=obj.hop_length, ax=ax[0])
-            #fig.colorbar(img, ax=ax[0], format="%+2.f dB")
-            ax[0].plot(obj.time, obj.FF)
+            #fig.colorbar(imgx|, ax=ax[0], format="%+2.f dB")
             ax[0].yaxis.set_major_formatter(ticks)
-            ax[0].plot(obj.time, obj.FF,"bo", ms=7,label="Fundamental Frequency")
-            ax[0].legend()
+            
+            if SelectTime_on==True and FF_on==True:
+                ax[0].plot(obj.time, obj.FF,"bo", ms=7)
+                self.klicker = Klicker(fig, ax[0])
+            elif SelectTime_on==True and FF_on==False:
+                self.klicker = Klicker(fig, ax[0])
+            elif SelectTime_on==False and FF_on==True:
+                ax[0].plot(obj.time, obj.FF,"bo", ms=7,label="Fundamental Frequency")
+                ax[0].legend()
+            
             ax[0].set_ylim(obj.flim); ax[0].set_xlim(min(obj.time), max(obj.time));
             ax[0].set_title("Spectrum"); 
             ax[0].set_ylabel('f (kHz)'); #ax[0].set_xlabel('t (s)'); 
@@ -179,6 +188,7 @@ class Ploter(object):
             ax[1].sharex(ax[0])
 
             fig.suptitle('id: {}, NoFile: {}, NoSyllable: {}'.format(obj.id, obj.no_file, obj.no_syllable), fontsize=16)
+            fig.tight_layout()
             plt.show()
 
             path_save = obj.paths.results/"AllSongAndSyllable-{}-{}.png".format(obj.no_file,obj.no_syllable)
@@ -187,7 +197,7 @@ class Ploter(object):
             if self.save: fig.savefig(path_save)
 
         
-    def Syllables(self, obj, obj_synth): #PlotSyllables
+    def Syllables(self, obj, obj_synth, FF_on=False): #PlotSyllables
         ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*1e-3))
         
         fig, ax = plt.subplots(2, 2, figsize=(int(1.5*self.figsize[0]), 2*self.figsize[1])) # , sharex=True, sharey='col'
@@ -208,20 +218,25 @@ class Ploter(object):
                          hop_length=obj.hop_length, ax=ax[0,1], cmap=self.cmap)
         fig.colorbar(img, ax=ax[0,1], format="%+2.f dB")
         ax[0,1].yaxis.set_major_formatter(ticks);  ax[0,1].set_ylim(obj.flim)
-        ax[0,1].plot(obj.time, obj.FF, 'bo-', lw=2)
+        
         ax[0,1].set_title('Real'); ax[0,1].set_ylabel('f (khz)');
         ax[0,1].sharex(ax[1,0])
         
         img = librosa.display.specshow(obj_synth.Sxx_dB, x_axis="s", y_axis="linear", sr=obj_synth.fs,
                          hop_length=obj_synth.hop_length, ax=ax[1,1], cmap=self.cmap)
         fig.colorbar(img, ax=ax[1,1], format="%+2.f dB")
-        ax[1,1].plot(obj_synth.time, obj_synth.FF, 'go-', lw=2)
         ax[1,1].yaxis.set_major_formatter(ticks)
         ax[1,1].set_title('Synthetic') 
         ax[1,1].set_ylim(obj.flim);     ax[1,1].set_xlim(min(obj_synth.time), max(obj_synth.time))
         ax[1,1].set_xlabel('time (s)'); ax[1,1].set_ylabel('f (khz)');
         ax[1,1].sharex(ax[0,1])
 
+        if FF_on: 
+            ax[0,1].plot(obj.time, obj.FF, 'bo-', lw=2, label="Real FF")
+            ax[1,1].plot(obj_synth.time, obj_synth.FF, 'go-', lw=2,  label="Synth FF")
+            
+            ax[0,1].legend(); ax[1,1].legend();
+        
         fig.suptitle('Sound Waves and Spectrograms', fontsize=20)
         plt.show()
         
@@ -400,9 +415,9 @@ class Ploter(object):
         if FF_on:
             ax.plot(obj.time, obj.FF, "co", ms=8)#, label="Fundamental Frequency")
         
-        # for i in range(len(obj.syllables)):  
-        #     ax[0].plot([obj.time[obj.syllables[i][0]], obj.time[obj.syllables[i][-1]]], [0, 0], 'k', lw=5)
-        #     ax[0].text((obj.time[obj.syllables[i][-1]]-obj.time[obj.syllables[i][0]])/2, 0.5, str(i))
+        for i in range(len(obj.syllables)):  
+            ax[0].plot([obj.time[obj.syllables[i][0]], obj.time[obj.syllables[i][-1]]], [0, 0], color='white', lw=5)
+            ax[0].text((obj.time[obj.syllables[i][-1]]-obj.time[obj.syllables[i][0]])/2, 0.5, str(i), color='white')
         ax.set_ylim(obj.flim); ax.set_xlim(min(obj.time), max(obj.time));
         ax.set_title("Song Spectrum"); 
         ax.yaxis.set_major_formatter(ticks)

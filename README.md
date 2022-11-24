@@ -1,8 +1,9 @@
-<a href="https://github.com/saguileran/birdsongs/"><img src="/docs/img/logo.png" alt="drawing" width="500"/>
+<a href="https://github.com/saguileran/birdsongs/"><img src="./docs/img/logo.png" width="500"></a>
+
 
 # birdsongs
 
-A python package to analyze, visualize and create synthetic syllables.
+A python package to analyze, visualize and generate synthetic birdsongs.
 
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/saguileran/birdsongs/main?labpath=BirdSongs.ipynb)
@@ -13,6 +14,8 @@ A python package to analyze, visualize and create synthetic syllables.
 - [birdsongs](#birdsongs)
 - [Table of Contents](#table-of-contents)
 --->
+- [birdsongs](#birdsongs)
+- [Table of Contents](#table-of-contents)
 - [Installation](#installation)
   - [Requirments](#requirments)
   - [Downloading](#downloading)
@@ -20,6 +23,7 @@ A python package to analyze, visualize and create synthetic syllables.
     - [Define](#define)
     - [Solve](#solve)
     - [Visualize](#visualize)
+    - [Note](#note)
 - [Overview](#overview)
 - [Objective](#objective)
 - [Repository Contents](#repository-contents)
@@ -40,21 +44,22 @@ A python package to analyze, visualize and create synthetic syllables.
 
 syllables is implemented in python 3.8: It requires:
 
-- numpy
-- matplotlib 
-- scipy
-- peakutils
-- lmfit
 - librosa
-- scikit-maad
+- lmfit
+- scipy
 - sympy
+- numpy
 - pandas
-- sklearn
-- IPython
+- matplotlib
+- playsound
+- PeakUtils
 - mpl_pan_zoom
 - mpl_point_clicker
-- playsound
-- soundfile
+- scikit_learn
+- scikit_maad
+- setuptools
+- ipython
+- lazy_loader
 
     
 ## Downloading
@@ -74,7 +79,16 @@ pip install -r ./requirements.txt
 python -m pip install -r ./requirements.txt
 ```
 
-the last step is to enter at the birdsongs folder to use its function with the examples audios.
+You can now use the package in a python terminal opened at the birdsongs folder. To use the package from any folder install the repository, this can be done with any of the two following lines
+
+```bat
+python .\setup.py install
+pip install .
+```
+
+That's all! 
+
+Take a look at the tutorials notebooks located at examples to get an idea.
 
 
 ## Use

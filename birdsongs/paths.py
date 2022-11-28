@@ -14,6 +14,7 @@ class Paths(object):
         if audios_path==None:
             self.audios      = self.root / 'audios'     # wav folder
             self.sound_files = list(self.audios.glob("*.wav"))
+            self.files_names = [str(f)[len(str(self.audios))+1:] for f in self.sound_files]
         else:
             if "ebird" in audios_path: 
                 search_by, name_col = "Scientific Name", "ML Catalog Number"
@@ -34,16 +35,18 @@ class Paths(object):
             
             files_names = self.data[name_col][self.indexes].astype(str).str.cat([".wav"]*self.indexes.size)
             audios_paths = pd.Series([audios_path]*files_names.size)
+            
             if files_names.values.size!=0: 
                 self.sound_files = audios_paths.str.cat(files_names.values).values
-            else: self.sound_files = []
+                self.files_names = [f[len(audios_paths[0]):] for f in self.sound_files]
+            else: 
+                self.sound_files = []; self.files_names = [];             
         
         self.no_files    = len(self.sound_files)
-        self.files_names = [f.name for f in self.sound_files]
-        
+            
         self.results.mkdir(parents=True, exist_ok=True)
         self.examples.mkdir(parents=True, exist_ok=True)
         
     def ShowFiles(self):
         print("The folder has {} songs:".format(self.no_files))
-        [print(str(i+1)+"-"+self.files_names[i]) for i in range(self.no_files)];
+        [print(str(i)+"-"+str(self.files_names[i])) for i in range(self.no_files)];

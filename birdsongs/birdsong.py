@@ -1,7 +1,7 @@
 from .syllable import *
 from .utils import *
 
-class BirdSong(Syllable):
+class BirdSong(Syllable, object):
     """
     Store a song and its properties in a class 
     INPUT:
@@ -9,25 +9,25 @@ class BirdSong(Syllable):
         no_file = number of the file to analyze
         umbral = threshold to detect a syllable, less than one
     """
-    def __init__(self, paths, no_file, sfs=None, umbral=0.05, llambda=1., NN=1024, overlap=0.5, umbral_FF=1.5, flim=(1.5e3,2e4), center=False, tlim=None, split_method="freq", Nt=500, times=[]):
+    def __init__(self, paths, no_file, sfs=[], umbral=0.05, llambda=1., NN=1024, overlap=0.5, umbral_FF=1.5, flim=(1.5e3,2e4), center=False, tlim=[], split_method="freq", Nt=500, syll_times=[]):
         self.no_file = no_file
         self.paths   = paths
         self.llambda = llambda
         self.flim    = flim
         self.center  = center
-        self.file_path = self.paths.sound_files[self.no_file-1]
-        self.file_name =  str(self.paths.sound_files[self.no_file-1])[len(str(self.paths.audios))+1:]
+        self.file_path = self.paths.sound_files[self.no_file]
+        self.file_name =  str(self.paths.sound_files[self.no_file])[len(str(self.paths.audios))+1:]
         
-        if sfs==None:
+        if len(sfs)==0:
             s, fs = sound.load(self.file_path)
             #s, fs = librosa.load(self.file_name)
             s = librosa.to_mono(s)
-            self.id = "song"
+            self.id = "birdsong"
         else:
             s, fs   = sfs
-            self.id = "song-synth"
+            self.id = "birdsong-synth"
         
-        if tlim==None: 
+        if len(tlim)==0: 
             self.s  = sound.normalize(s, max_amp=1.0)
             self.t0 = 0
         else:          
@@ -40,6 +40,7 @@ class BirdSong(Syllable):
         self.hop_length = self.NN//4
         self.center     = center
         self.no_overlap = int(overlap*self.NN)
+        self.umbral_FF  = umbral_FF
         
         self.umbral   = umbral
         
@@ -65,25 +66,25 @@ class BirdSong(Syllable):
         self.time -= self.time[0]
         
         self.FF     = yin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=self.NN, 
-                          win_length=self.win_length, hop_length=self.hop_length, trough_threshold=umbral_FF, center=self.center, pad_mode='constant')
+                          win_length=self.win_length, hop_length=self.hop_length, trough_threshold=self.umbral_FF, center=self.center, pad_mode='constant')
         
-        if len(times)==0:
+        if len(syll_times)==0:
             self.syllables = self.Syllables(method=split_method)
         else:
-            indexes = np.int64(self.fs*np.array(times))
+            indexes = np.int64(self.fs*np.array(syll_times))
             indexes = [np.arange(ind[0],ind[1],1) for ind in indexes]
             
             self.syllables = [x for x in indexes if len(x) > 2*self.NN]
+        
         self.no_syllables = len(self.syllables)
-        print('The son has {} syllables'.format(len(self.syllables)))
+        print('The son has {} syllables'.format(self.no_syllables))
         
     def Syllables(self, method="freq"):
         if method=="amplitud":
             supra      = np.where(self.envelope > self.umbral)[0]
             candidates = np.split(supra, np.where(np.diff(supra) != 1)[0]+1)
-            syllables = [x for x in candidates if len(x) > self.NN] 
-        
-            return syllables 
+            
+            return [x for x in candidates if len(x) > 2*self.NN] 
         elif method=="freq":
             # ss = np.where((self.FF < self.flim[1]) & (self.FF>self.flim[0])) # filter frequency
             # ff_t   = self.time[ss]                        # cleaning timeFF

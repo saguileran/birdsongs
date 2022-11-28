@@ -2,7 +2,7 @@ from .syllable import *
 from .birdsong import *
 from .utils import *
 
-class Optimizer(Syllable):
+class Optimizer(Syllable, object):
     def __init__(self, obj, method_kwargs):
         self.obj    = obj
         self.obj0   = obj
@@ -12,22 +12,30 @@ class Optimizer(Syllable):
         
     def residualSCI(self, p):
         syllable_synth = self.obj.Solve(p)
-        return syllable_synth.scoreSCI +  syllable_synth.scoreFF
+        return syllable_synth.SCIFF #scoreSCI +  syllable_synth.scoreFF
     # return scoreSxx + syllable_synth.scoreMfccs + syllable_synth.scoreMel # scoreCorrelation #scoreSCI 
     
     def residualFF(self, p):
         syllable_synth = self.obj.Solve(p)
         return syllable_synth.scoreFF # + syllable_synth.scoreCentroid
     
-    def residualIndexes(self, p):
-        syllable_synth = self.obj.Solve(p)
-        #self.entropies = [EAS, ECU, ECV, EPS, EPS_KURT, EPS_SKEW]
-        return syllable_synth.scoreACI_sum + syllable_synth.scoreBI + syllable_synth.entropies
+    # def residualIndexes(self, p):
+    #     syllable_synth = self.obj.Solve(p)
+    #     #self.entropies = [EAS, ECU, ECV, EPS, EPS_KURT, EPS_SKEW]
+    #     return syllable_synth.scoreACI_sum + syllable_synth.scoreBI + syllable_synth.entropies
     
     def residualCorrelation(self, p):
         syllable_synth = self.obj.Solve(p)
-        return syllable_synth.scoreFF -np.mean(syllable_synth.correlation+syllable_synth.Df+syllable_synth.scoreSKL)
+        return syllable_synth.residualCorrelation
+        # return syllable_synth.scoreFF -np.mean(syllable_synth.correlation+syllable_synth.Df+syllable_synth.scoreSKL)
 
+    # making peackeable
+    def residualCorrelation_p(p): return Optimizer, (p.a,)
+    # print("pickling a C instance...")
+    
+    
+    
+    
     # -----------------------------------------------------------------------
     # ---------------- OPTIMAL PARAMETERS ------------------------------
     def OptimalBs(self, obj):
@@ -65,6 +73,13 @@ class Optimizer(Syllable):
         # ---------------- a0--------------------
         start0 = time.time()
         self.obj.p["a0"].set(vary=True)
+        
+        # def ResidualCo(c):
+        #     print("pickling a C instance...")
+        #     return Syllable, (c.residualCorrelation,)
+        # copyreg.pickle(Syllable, ResidualCo)
+        
+        
         mi0    = lmfit.minimize(self.residualCorrelation, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
         self.obj.p["a0"].set(vary=False, value=mi0.params["a0"].value)
         end0   = time.time()
@@ -72,6 +87,7 @@ class Optimizer(Syllable):
         # ---------------- a1--------------------
         start1 = time.time()
         self.obj.p["a1"].set(vary=True)
+        
         mi1    = lmfit.minimize(self.residualCorrelation, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
         self.obj.p["a1"].set(vary=False, value=mi1.params["a1"].value)
         end1   = time.time()
@@ -211,19 +227,23 @@ class Optimizer(Syllable):
         
         return self.optimal_gamma
     
-    def SongByTimes(self, times, Ngm=11, Nba=11, NN=1024, optimal_gamm=0): 
+    def SongByTimes(self, times, Ngm=11, Nba=11, NN=512, optimal_gamm=-1): 
         times   = np.array(times)
         indexes = np.int64(times*self.obj.fs)
         # times = [[t0_1, tend1],...,[t0_N, tendN]]
         print("Looking for optial time scale constant (γ*)")
         tstart = time.time()
         
-        if optimal_gamm==0:  optimal_gamm = self.AllGammasByTimes(times, Ns=Ngm, NN=NN)
+        if optimal_gamm==-1:  optimal_gamm = self.AllGammasByTimes(times, Ns=Ngm, NN=NN)
 
         tend = time.time()
         print("γ found {} over {} syllables. Time of execution {:.4f} min".format(optimal_gamm, times.shape[0], (tend-tstart)/60))
         
+        self.bird_s = np.zeros_like(self.obj.s)
+        self.bird_t = np.copy(self.obj.time_s)
+        
         self.synth_bird_s = np.zeros_like(self.obj.s)
+        self.synth_bird_t = np.copy(self.obj.time_s)
         self.alphas       = np.zeros_like(self.obj.s)
         self.betas        = np.zeros_like(self.obj.s)
         self.ps = []
@@ -232,8 +252,7 @@ class Optimizer(Syllable):
         print("Start syllables optimization")
         for i in range(times.shape[0]):
             print("Syllable {}/{}".format(i+1,times.shape[0]))
-            obj       = Syllable(self.obj, tlim=times[i,:], 
-                                 umbral_FF=1,  Nt=30, NN=NN)#
+            obj       = Syllable(self.obj, tlim=times[i,:], umbral_FF=self.obj.umbral_FF, Nt=30, NN=NN)
             obj.p["gm"].set(value=optimal_gamm)
             obj_synth = obj.Solve(obj.p)
             self.OptimalParams(obj, Ns=Nba)
@@ -242,22 +261,60 @@ class Optimizer(Syllable):
             
             index_0, index_end = indexes[i,0], int(indexes[i,0]+obj_synth.s.size)
             
-            self.synth_bird_s[index_0: index_end]  = obj_synth.s
-            self.alphas[index_0: index_end] = obj_synth.alpha
-            self.betas[index_0: index_end]  = obj_synth.beta
+            self.bird_s[index_0: index_end]       = obj.s
+            self.synth_bird_s[index_0: index_end] = obj_synth.s
+            self.alphas[index_0: index_end]       = obj_synth.alpha
+            self.betas[index_0: index_end]        = obj_synth.beta
             
             self.ps.append(obj.p)
             self.obj=self.obj0
             
-        self.synth_bird = BirdSong(self.obj.paths, self.obj.no_file, sfs=[self.synth_bird_s, self.obj.fs], split_method="amplitud", umbral=-.01)
+        # self.synth_bird = BirdSong(self.obj.paths, self.obj.no_file, sfs=[self.synth_bird_s, self.obj.fs], split_method="amplitud", umbral=-.01)
+        self.synth_bird = Syllable(self.obj0, NN=NN, out=self.synth_bird_s)
+        self.bird       = Syllable(self.obj0, NN=NN, out=self.bird_s)
         
-        self.synth_bird.synth  = self.synth_bird 
-        self.synth_bird.alphas    = self.alphas
-        self.synth_bird.betas     = self.betas
-        self.synth_bird.file_name = self.obj.file_name
-        self.synth_bird.ps = self.ps
+        #self.synth_bird.synth    = self.synth_bird 
+        # self.synth_bird.file_name = self.obj.file_name
+        self.synth_bird.alpha    = self.alphas
+        self.synth_bird.beta     = self.betas
+        self.synth_bird.ps       = self.ps
+        self.synth_bird.id       = "birdsong-synth"
+        self.bird.id             = "birdsong"
         
         end = time.time()
         print("Optimal parameters found. The time of execution was {:.4f} hours".format((end-start)/60/60))
         
-        # return self.synth_bird
+        # self.synth_bird.alpha = optimizer.alphas
+        # self.synth_bird.beta  = optimizer.betas
+        
+        return self.bird, self.synth_bird
+        
+    def SmoothAB(self, times, smooth=3, fraction=5):
+        times   = np.array(times)
+        indexes = np.int64(times*self.obj.fs)
+        self.alphas_smooth = np.copy(self.alphas)
+        self.betas_smooth  = np.copy(self.betas)
+        
+        for i in range(times.shape[0]):
+            index_0, index_end = indexes[i,0], int(indexes[i,1])-1
+            
+            NoSamples = (index_end-index_0)//fraction  # syllable samples length fraction
+            x = self.synth_bird_t
+            yleft  = smoothstep(x, x_min=x[int(index_0-NoSamples/2)], x_max=x[index_0], N=smooth)
+            yright = smoothstep(x, x_min=x[index_end], x_max=x[int(index_end+NoSamples/2)], N=smooth)
+            
+            self.synth_bird_s[int(index_0-NoSamples/2):index_0]      = self.synth_bird_s[index_0]*yleft[int(index_0-NoSamples/2):index_0]
+            self.synth_bird_s[index_end:int(index_end+NoSamples/2)] = self.synth_bird_s[index_end]*yright[index_end:int(index_end+NoSamples/2)][::-1]
+            
+            # self.alphas_smooth[int(index_0-NoSamples/2):index_0]     = self.alphas[index_0]*yleft[int(index_0-NoSamples/2):index_0]
+            # self.betas_smooth[int(index_0-NoSamples/2):index_0]      = self.betas[index_0]*yleft[int(index_0-NoSamples/2):index_0]
+            # self.alphas_smooth[index_end:int(index_end+NoSamples/2)] = self.alphas[index_end]*yright[index_end:int(index_end+NoSamples/2)][::-1]
+            # self.betas_smooth[index_end:int(index_end+NoSamples/2)]  = self.betas[index_end]*yright[index_end:int(index_end+NoSamples/2)][::-1]
+            # ----------------------------------------------
+        
+        # self.synth_bird.alphas_smooth = self.alphas_smooth
+        # self.synth_bird.betas_smooth  = self.betas_smooth
+        
+        # self.synth_bird_s = self.synth_bird_s
+        
+        return self.synth_bird_s

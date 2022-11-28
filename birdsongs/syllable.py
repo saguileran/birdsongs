@@ -8,7 +8,7 @@ class Syllable(object):
         fs = sampling rate
         t0 = initial time of the syllable
     """ 
-    def __init__(self, birdsong, t0=None, Nt=200, llambda=1.5, NN=1024, overlap=0.5, flim=(1.5e3,2e4), n_mels=4, umbral_FF=1, tlim=[], out=[]):
+    def __init__(self, birdsong, t0=0, Nt=200, llambda=1.5, NN=0, overlap=0.5, flim=(1.5e3,2e4), n_mels=4, umbral_FF=1, tlim=[], out=[], no_syllable=0, ide=""):
         ## The bifurcation can be cahge modifying the self.f2 and self.f1 functions
         ## ------------- Bogdanov–Takens bifurcation ------------------
         self.beta_bif = np.linspace(-2.5, 1/3, 1000)  # mu2:beta,  mu1:alpha
@@ -33,37 +33,38 @@ class Syllable(object):
         ## -------------------------------------------------------------------------------------
         self.p = lmfit.Parameters()
         # add params:   (NAME   VALUE    VARY    MIN  MAX  EXPR BRUTE_STEP)
-        self.p.add_many(('a0', 0.11, False ,   0, 0.25, None, None), 
+        self.p.add_many(('a0', 0.11, False, 0.01, 0.25, None, None), 
                         ('a1', 0.05, False,   -2,    2, None, None),
                         ('a2',   0., False,    0,    2, None, None),
                         ('b0', -0.1, False,   -1,  0.5, None, None),  
-                        ('b1',    1, False,  0.2,    2, None, None), 
-                        ('b2',   0., False,    0,    3, None, None), 
+                        ('b1',    1, False,    0,    2, None, None), 
+                        ('b2',   0., False,    0,    2, None, None), 
                         ('gm',  4e4, False,  1e4,  1e5, None, None))
         # -------------------------------------------------------------------        
         self.n_mfcc     = 8
         self.birdsong   = birdsong
         self.Nt         = Nt
-        self.NN         = NN
-        self.win_length = self.NN
-        self.hop_length = self.NN//4
-        self.no_overlap = int(overlap*self.NN)
+        
         self.n_mels     = n_mels
         self.flim       = flim
         self.llambda    = llambda
+        self.umbral_FF  = umbral_FF
+        
         self.fs         = self.birdsong.fs
         self.center     = self.birdsong.center
         self.no_file    = self.birdsong.no_file
         self.paths      = self.birdsong.paths
-        self.file_name  = str(birdsong.file_name)[len(str(birdsong.paths.audios))+1:]
+        self.file_name  = self.birdsong.file_name
+        self.umbral     = self.birdsong.umbral
         
+        # define a syllable by entering the amplitude array (out)
         if len(out)==0: s = self.birdsong.s
         else:           s = out
         # ------ define syllable by time interval [tini, tend] --------
-        if len(tlim)==0 and t0!=None: 
+        if len(tlim)==0 and t0!=0: 
             self.s  = sound.normalize(s, max_amp=1.0)
             self.t0 = t0
-        elif len(tlim)==0 and t0==None: 
+        elif len(tlim)==0 and t0==0: 
             self.t0 = 0
             self.s  = sound.normalize(s, max_amp=1.0)
         elif len(tlim)!=0:
@@ -71,13 +72,24 @@ class Syllable(object):
             self.t0 = tlim[0]
             self.tlim = tlim
         
-        self.no_syllable = 0
-        self.id          = "syllable"
-        
         self.time_s   = np.linspace(0, len(self.s)/self.fs, len(self.s))
         self.envelope = Enve(self.s, self.fs, self.Nt)
         self.T        = self.s.size/self.fs
         self.time0    = np.linspace(0, len(self.s)/self.fs, len(self.s))
+        
+        if NN==0:
+            if self.s.size < self.fs/5: # a decimal of a second (0.2 s)
+                self.id          = "chunck"
+                self.NN          = 128
+            else:
+                self.id          = "syllable"
+                self.NN          = 1024
+        else: self.NN=NN
+        if ide!="": self.id = ide
+        self.no_syllable = no_syllable
+        self.win_length  = self.NN
+        self.hop_length  = self.NN//4
+        self.no_overlap  = int(overlap*self.NN)        
         
         # -------------------------------------------------------------------
         # ------------- ACOUSTIC FEATURES -----------------------------------
@@ -154,7 +166,7 @@ class Syllable(object):
         #                boltzmann_parameter=2, resolution=0.1, max_transition_rate=35.92, switch_prob=0.01, 
         #                no_trough_prob=0.01, fill_na=0, center=self.center, pad_mode='constant')
         self.FF     = yin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=self.NN, 
-                          win_length=self.NN//2, hop_length=self.NN//4, trough_threshold=umbral_FF, center=self.center, pad_mode='constant')
+                          win_length=self.NN//2, hop_length=self.NN//4, trough_threshold=self.umbral_FF, center=self.center, pad_mode='constant')
         
 #         # # remove atypical data
 #         df = pd.DataFrame(data={"FF":self.FF, "time":self.time})
@@ -173,7 +185,7 @@ class Syllable(object):
         self.FF_fun = interp1d(self.timeFF, self.FF)
         self.SCI    = self.f_msf / self.FF_fun(self.time)
     
-    def AlphaBeta(self): 
+    def AlphaBeta(self):
         a = np.array([self.p["a0"].value, self.p["a1"].value, self.p["a2"].value]);   
         b = np.array([self.p["b0"].value, self.p["b1"].value, self.p["b2"].value])
         
@@ -183,13 +195,16 @@ class Syllable(object):
         self.alpha = np.dot(a, t_par);  # lines (or parabolas)
         
         # define by same shape as fudamenta frequency
-        if "syllable" in self.id: poly = Polynomial.fit(self.timeFF, self.FF, deg=10)
-        elif "chunck" in self.id: poly = Polynomial.fit(self.timeFF, self.FF, deg=1)
+        if "syllable" in self.id: 
+            poly = Polynomial.fit(self.timeFF, self.FF, deg=10)
+            x, y = poly.linspace(np.size(self.s))
+            self.beta  = b[0] + b[1]*(1e-4*y) + b[2]*(1e-4*y)**2   
+        elif "chunck" in self.id: 
+            self.beta = np.dot(b, t_par);
             
-        x, y = poly.linspace(np.size(self.s))
-        self.beta  = b[0] + b[1]*(1e-4*y) + b[2]*(1e-4*y)**2   
+        
             
-    def MotorGestures(self, ovfs=20, prct_noise=0):  # ovfs:oversamp
+    def MotorGestures(self, alpha, beta, gamma, ovfs=20, prct_noise=0):  # ovfs:oversamp
         t, tmax, dt = 0, int(self.s.size)*ovfs-1, 1./(ovfs*self.fs) # t0, tmax, td
         # pback and pin vectors initialization
         pi, pb, out = np.zeros(tmax), np.zeros(tmax), np.zeros(int(self.s.size))
@@ -214,8 +229,8 @@ class Syllable(object):
             # ----------------- direct implementation of the EDOs -----------
             # dv[0] = y
             # dv[1] = (-self.alpha[t//ovfs]-self.beta[t//ovfs]*x-x**3+x**2)*self.p["gm"].value**2 - (x**2*y+x*y)*self.p["gm"].value
-            dv[0] = self.f1(x, y, self.alpha[t//ovfs], self.beta[t//ovfs], self.p["gm"].value)
-            dv[1] = self.f2(x, y, self.alpha[t//ovfs], self.beta[t//ovfs], self.p["gm"].value)
+            dv[0] = self.f1(x, y, alpha[t//ovfs], beta[t//ovfs], gamma)
+            dv[1] = self.f2(x, y, alpha[t//ovfs], beta[t//ovfs], gamma)
             # ------------------------- trachea ------------------------
             pbold = pb[t]                                 # pressure back before
             # Pin(t) = Ay(t)+pback(t-L/C) = envelope_Signal*v[1]+pb[t-L/C/dt]
@@ -267,10 +282,30 @@ class Syllable(object):
         
     def Solve(self, p, orde=2):
         self.p = p;  # define parameteres to optimize
-        self.AlphaBeta()             # define alpha and beta parameters
-        synth = self.MotorGestures() # solve the problem and define the synthetic syllable
+        self.ord = orde; 
         
-        self.ord = orde; synth.ord=self.ord;  # order of score norms
+        if self.s.size < 2*self.fs/100: self.id = "chunck"
+        else:                           self.id = "syllable"
+                
+        self.AlphaBeta()             # define alpha and beta parameters
+        synth = self.MotorGestures(self.alpha, self.beta, self.p["gm"].value) # solve the problem and define the synthetic syllable
+        synth = self.SynthScores(synth, orde=orde) # compute differences and score variables
+        
+        return synth
+    
+    def SolveAB(self, alpha, beta, gamma, orde=2):
+        self.alpha = alpha; self.beta  = beta;
+        
+        synth = self.MotorGestures(alpha, beta, gamma)
+        synth = self.SynthScores(synth, orde=orde)
+        synth.id = "synth-birdsongs"
+        
+        return synth
+    
+    def Play(self): playsound(self.file_name)
+    
+    def SynthScores(self, synth, orde=2):
+        synth.ord=self.ord=orde;  # order of score norms
         # deltaNOP    = np.abs(synth.NOP-self.NOP).astype(float)
         deltaSxx    = np.abs(synth.Sxx_dB-self.Sxx_dB)
         deltaMel    = np.abs(synth.FF_coef-self.FF_coef)
@@ -329,6 +364,8 @@ class Syllable(object):
         synth.scoreDF          = Norm(synth.Df, ord=self.ord)/synth.Df.size
         
         
+        synth.residualCorrelation = synth.scoreFF-np.mean(synth.correlation+synth.Df +synth.scoreSKL)
+        
+        synth.SCIFF = synth.scoreSCI + synth.scoreFF
+        
         return synth
-    
-    def Play(self): playsound(self.file_name)

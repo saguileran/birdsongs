@@ -1,4 +1,4 @@
-import peakutils, time, warnings, lmfit #emcee,
+import peakutils, time, warnings, lmfit, pickle, copyreg #emcee,
 import numpy as np
 import pandas as pd
 import sympy as sym
@@ -73,7 +73,7 @@ def AudioPlay(obj):
 def Klicker(fig, ax):
     zoom_factory(ax)
     pm = PanManager(fig, button=MouseButton.MIDDLE)
-    klicker = clicker(ax, [r"$t_{ini}$",r"$t_{end}$"], markers=["o","x"], colors=["blue","black"],
+    klicker = clicker(ax, [r"$t_{ini}$",r"$t_{end}$"], markers=["o","x"], colors=["blue","green"],
                       legend_bbox=(1.01, 0.98))# #legend_loc='upper right',
 
     # hacky trick to keep the panmanager alive as long as the clicker is around
@@ -99,9 +99,9 @@ def smoothstep(x, x_min=0, x_max=1, N=1):
     x = np.clip((x - x_min) / (x_max - x_min), 0, 1)
 
     result = 0
+    # [result += comb(N+n, n)*comb(2*N+1, N-n)*(-x)**n for n in range(0, N + 1)]
     for n in range(0, N + 1):
-         result += comb(N + n, n) * comb(2 * N + 1, N - n) * (-x) ** n
-
-    result *= x ** (N + 1)
+         result += comb(N+n, n)*comb(2*N+1, N-n)*(-x)**n
+    result *= x**(N+1)
 
     return result

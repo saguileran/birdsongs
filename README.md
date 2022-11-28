@@ -79,13 +79,17 @@ pip install -r ./requirements.txt
 python -m pip install -r ./requirements.txt
 ```
 
-You can now use the package in a python terminal opened at the birdsongs folder. To use the package from any folder install the repository, this can be done with any of the two following lines
+You can now use the package in a python terminal opened at the birdsongs folder. 
+
+
+<!--
+To use the package from any folder install the repository, this can be done with any of the two following lines
 
 ```bat
 python .\setup.py install
 pip install .
 ```
-
+-->
 That's all! 
 
 Take a look at the tutorials notebooks located at examples to get an idea.

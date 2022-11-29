@@ -122,9 +122,9 @@ paths  = bs.Paths()   # root, audios_path, bird_name
 Define and plot the audio bird song 
 
 ```python
-bird = bs.Song(paths, no_file=3) # tlim=(t0,tend) you can also give a time interval or frequency limits flim=(f0,fmax)
-ploter.Plot(bird)
-AudioPlay(bird)    # in terminal use bird.Play()
+birdsong = bs.BirdSong(paths, no_file=3) # tlim=(t0,tend) you can also give a time interval or frequency limits flim=(f0,fmax)
+ploter.Plot(birdsong)
+AudioPlay(birdsong)    # in terminal use birdsong.Play()
 ```
 
 **Syllables**
@@ -132,13 +132,12 @@ AudioPlay(bird)    # in terminal use bird.Play()
 Define the syllables using time intervals of interest from the whole bird song. You can choose the points using  
     
 ```python
-klicker = ploter.FindTimes(bird)    # FF_on=True enables fundamental frequency plot
-plt.show()
+ploter.Plot(birdsong, FF_on=False, SelectTime_on=True)
 ``` 
 after close the matplotlib windows run the following code to save the intervals points, the start and ends points have to have the same number of elements for easy use
     
 ```python
-time_intervals = Positions(klicker)
+time_intervals = Positions(ploter.klicker) # added [0] at the end for single syllables 
 time_intervals
 ``` 
   
@@ -148,8 +147,8 @@ The final step is to define the optimizer object to generate the synthetic sylla
 
 ```python
 brute          = {'method':'brute', 'Ns':11}                  # method of optimization, Ns is the number of grid points
-optimizer_bird = bs.Optimizer(bird, method_kwargs=brute)      # optimizer object, they will save all the optimal parameters
-synth_bird     = optimizer_bird.SongByTimes(time_intervals)   # find the best syllables for each syllable
+optimizer = bs.Optimizer(birdsong, method_kwargs=brute)      # optimizer object, they will save all the optimal parameters
+synth_birdsong  = optimizer_bird.SongByTimes(time_intervals)   # find the best syllables for each syllable
 ```
     
 ### Visualize
@@ -157,8 +156,8 @@ synth_bird     = optimizer_bird.SongByTimes(time_intervals)   # find the best sy
 Visualize and write the synthetic optimal audio 
     
 ```python
-ploter.Plot(synth_bird)
-bird.WriteAudio();  synth_bird.WriteAudio()
+ploter.Plot(synth_birdsong)
+birdsong.WriteAudio();  synth_birdsong.WriteAudio()
 ```
   
 ### Note  
@@ -166,12 +165,13 @@ bird.WriteAudio();  synth_bird.WriteAudio()
 To find a single synthetic syllable (or chunck) the process is the following. Nevertheless, to define a syllable (or chunck) you must have defined a bird song (syllable) object. 
 
 ```python
-syllable  = bs.Syllable(bird)               # define the syllable. you can also give a time or frequency interval: flim=(fmin,fmax), tlim=(t0,tend)
+syllable  = bs.Syllable(birdsong)               # define the syllable. you can also give a time or frequency interval: flim=(fmin,fmax), tlim=(t0,tend)
 
 brute     = {'method':'brute', 'Ns':11}     # define optimization method and its parameters
 optimizer = bs.Optimizer(syllable, brute)   # define optimizer to the syllable object
 
 optimizer.optimal_gamma                     # find teh optimal gamma over the whole bird syllables
+obj = syllable  # birdsong
 optimizer.OptimalParams(obj, Ns=11)         # find optimal alpha and beta parameters
     
 Display(obj.p)                              # display optimal problem parameters

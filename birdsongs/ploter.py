@@ -7,6 +7,7 @@ class Ploter(object):
         self.figsize = figsize
     
     def PlotAlphaBeta(self, obj, xlim=(-0.05,.2), ylim=(-0.2,0.9)):
+        plt.close()
         if "synth" in obj.id:
             if obj.alpha.max()>0.2: xlim=(-0.05,1.1*obj.alpha.max())
             if obj.beta.max()>0.9:  ylim=(-0.2,1.1*obj.beta.max())
@@ -61,6 +62,7 @@ class Ploter(object):
     
     
     def PlotVs(self,obj, xlim=()):
+        plt.close()
         if "synth" in obj.id:
             if len(xlim)==0: xlim=(obj.timesVs[0], obj.timesVs[-1])
             fig, ax = plt.subplots(2, 2, figsize=(int(1.2*self.figsize[0]), 1.5*self.figsize[1]))
@@ -97,9 +99,12 @@ class Ploter(object):
             
     
     
-    def Plot(self, obj, syllable_on=False, chunck_on=False, FF_on=False, SelectTime_on=False): 
+    def Plot(self, obj, syllable=None, chunck=None, FF_on=False, SelectTime_on=False): 
         ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*1e-3))
-        if "birdsong" in obj.id:
+        plt.close()
+        if syllable!=None: syllable_on=1
+        else:              syllable_on=0
+        if "birdsong" in obj.id:            
             fig, ax = plt.subplots(2+int(syllable_on), 1, figsize=(self.figsize[0], self.figsize[1]*(2+int(syllable_on))))
             fig.subplots_adjust(hspace=0.4, wspace=0.4)
             
@@ -126,27 +131,27 @@ class Ploter(object):
             ax[1].set_xlabel('time (s)'); ax[1].set_ylabel('Amplitud normalaized');
             ax[1].sharex(ax[0])
 
-            if chunck_on:
-                ax[0].plot(obj.chunck.time+obj.chunck.t0, obj.chunck.FF, 'gv', label='Chunck', ms=10)
-                ax[2].plot(obj.chunck.time+obj.chunck.t0-obj.syllable.t0, obj.chunck.FF, 'gv', label='Chunck', ms=8)
+            if chunck!=None:
+                ax[0].plot(chunck.time+chunck.t0, chunck.FF, 'gv', label='Chunck', ms=10)
+                ax[2].plot(chunck.time+chunck.t0-syllable.t0, chunck.FF, 'gv', label='Chunck', ms=8)
 
-            if syllable_on:
-                ax[0].plot(obj.syllable.time+obj.syllable.t0, obj.syllable.FF, 'b+', label='Syllable'.format(obj.syllable.fs), ms=6)
+            if syllable!=None:
+                ax[0].plot(syllable.time+syllable.t0, syllable.FF, 'b+', label='Syllable'.format(syllable.fs), ms=6)
 
-                img = librosa.display.specshow(obj.syllable.Sxx_dB, x_axis="s", y_axis="linear", sr=obj.syllable.fs,
-                         hop_length=obj.syllable.hop_length, ax=ax[2], cmap=self.cmap)
+                img = librosa.display.specshow(syllable.Sxx_dB, x_axis="s", y_axis="linear", sr=syllable.fs,
+                         hop_length=syllable.hop_length, ax=ax[2], cmap=self.cmap)
                 
-                ax[2].plot(obj.syllable.time, obj.syllable.FF, 'b+', label='Syllable', ms=15)
+                ax[2].plot(syllable.time, syllable.FF, 'b+', label='Syllable', ms=15)
                 ax[2].set_ylim(obj.flim); 
-                ax[2].set_xlim((obj.syllable.time[0], obj.syllable.time[-1]));
+                ax[2].set_xlim((syllable.time[0], syllable.time[-1]));
                 ax[2].legend(loc='upper right', title="FF")
                 ax[2].set_xlabel('t (s)'); ax[2].set_ylabel('f (khz)')
-                ax[2].set_title('Single Syllable Spectrum, No {}'.format(obj.no_syllable))
+                ax[2].set_title('Single Syllable Spectrum, No {}'.format(syllable.no_syllable))
                 ax[2].yaxis.set_major_formatter(ticks)
                 
                 ax[0].legend(loc='upper right', title="FF")
-
-                path_save = obj.paths.results/"AllSongAndSyllable-{}-{}.png".format(obj.file_name,obj.no_syllable)
+                fig.tight_layout()
+                path_save = obj.paths.results/"AllSongAndSyllable-{}-{}.png".format(obj.file_name, syllable.no_syllable)
             else: path_save = obj.paths.results/"AllSongAndSyllable-{}.png".format(obj.file_name)
 
             fig.suptitle('Audio:\n{}'.format(obj.file_name), fontsize=18)
@@ -197,6 +202,7 @@ class Ploter(object):
 
         
     def Syllables(self, obj, obj_synth, FF_on=False): #PlotSyllables
+        plt.close()
         ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*1e-3))
         
         fig, ax = plt.subplots(2, 2, figsize=(int(1.5*self.figsize[0]), 2*self.figsize[1])) # , sharex=True, sharey='col'
@@ -245,6 +251,7 @@ class Ploter(object):
 
     
     def Result(self, obj, obj_synth, cmp="afmhot_r"):
+        plt.close()
         if not("synth" in obj.id) and "synth" in obj_synth.id:
             ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*1e-3))
             fig = plt.figure(constrained_layout=False, figsize=(5*self.figsize[0], 4*self.figsize[1]))
@@ -396,7 +403,7 @@ class Ploter(object):
             ax12.legend(bbox_to_anchor= (1.05, 1))
 
 
-            fig.suptitle("SCORES", fontsize=20)
+            fig.suptitle(obj.file_name+"\nSCORES", fontsize=20)
             plt.show()
             
             if self.save: fig.savefig(obj.paths.results/"ScoresVariables-{}-{}-{}.png".format(obj.id,obj.file_name,obj.no_syllable), transparent=True) 
@@ -406,6 +413,7 @@ class Ploter(object):
         
         
     def FindTimes(self, obj, FF_on=False):
+        plt.close()
         ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*1e-3))
         fig, ax = plt.subplots(1, 1, figsize=(self.figsize[0]+1, self.figsize[1]+2))#, constrained_layout=True)
         
@@ -430,6 +438,7 @@ class Ploter(object):
     
     
     def Plot3d(self, obj):
+        plt.close()
         
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')

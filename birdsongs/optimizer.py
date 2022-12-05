@@ -270,8 +270,8 @@ class Optimizer(Syllable, object):
             self.obj=self.obj0
             
         # self.synth_bird = BirdSong(self.obj.paths, self.obj.no_file, sfs=[self.synth_bird_s, self.obj.fs], split_method="amplitud", umbral=-.01)
-        self.synth_bird = Syllable(self.obj0, NN=NN, out=self.synth_bird_s)
-        self.bird       = Syllable(self.obj0, NN=NN, out=self.bird_s)
+        self.synth_bird = Syllable(self.obj0, NN=NN, sfs=[self.synth_bird_s, obj.fs])
+        self.bird       = Syllable(self.obj0, NN=NN, sfs=[self.bird_s, obj.fs])
         
         #self.synth_bird.synth    = self.synth_bird 
         # self.synth_bird.file_name = self.obj.file_name
@@ -283,9 +283,6 @@ class Optimizer(Syllable, object):
         
         end = time.time()
         print("Optimal parameters found. The time of execution was {:.4f} hours".format((end-start)/60/60))
-        
-        # self.synth_bird.alpha = optimizer.alphas
-        # self.synth_bird.beta  = optimizer.betas
         
         return self.bird, self.synth_bird
         

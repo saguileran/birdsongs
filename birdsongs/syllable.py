@@ -8,7 +8,7 @@ class Syllable(object):
         fs = sampling rate
         t0 = initial time of the syllable
     """ 
-    def __init__(self, birdsong, t0=0, Nt=200, llambda=1.5, NN=0, overlap=0.5, flim=(1.5e3,2e4), n_mels=4, umbral_FF=1, tlim=[], out=[], no_syllable=0, ide=""):
+    def __init__(self, birdsong=None, t0=0, Nt=200, llambda=1.5, NN=0, overlap=0.5, flim=(1.5e3,2e4), n_mels=4, umbral_FF=1, tlim=[], sfs=[], no_syllable=0, ide="", file_name="total synth"):
         ## The bifurcation can be cahge modifying the self.f2 and self.f1 functions
         ## ------------- Bogdanov–Takens bifurcation ------------------
         self.beta_bif = np.linspace(-2.5, 1/3, 1000)  # mu2:beta,  mu1:alpha
@@ -42,7 +42,6 @@ class Syllable(object):
                         ('gm',  4e4, False,  1e4,  1e5, None, None))
         # -------------------------------------------------------------------        
         self.n_mfcc     = 8
-        self.birdsong   = birdsong
         self.Nt         = Nt
         
         self.n_mels     = n_mels
@@ -50,16 +49,26 @@ class Syllable(object):
         self.llambda    = llambda
         self.umbral_FF  = umbral_FF
         
-        self.fs         = self.birdsong.fs
-        self.center     = self.birdsong.center
-        self.no_file    = self.birdsong.no_file
-        self.paths      = self.birdsong.paths
-        self.file_name  = self.birdsong.file_name
-        self.umbral     = self.birdsong.umbral
-        
         # define a syllable by entering the amplitude array (out)
-        if len(out)==0: s = self.birdsong.s
-        else:           s = out
+        if birdsong!=None: 
+            self.birdsong   = birdsong
+            self.fs         = self.birdsong.fs
+            self.center     = self.birdsong.center
+            self.no_file    = self.birdsong.no_file
+            self.paths      = self.birdsong.paths
+            self.file_name  = self.birdsong.file_name
+            self.umbral     = self.birdsong.umbral
+            s = self.birdsong.s; 
+            NN = self.birdsong.NN
+        elif len(sfs)!=0:           
+            s, fs           = sfs
+            self.fs         = fs
+            self.center     = False
+            self.no_file    = 0
+            self.file_name  = file_name
+            self.umbral     = 0.05
+        
+        
         # ------ define syllable by time interval [tini, tend] --------
         if len(tlim)==0 and t0!=0: 
             self.s  = sound.normalize(s, max_amp=1.0)
@@ -249,15 +258,21 @@ class Syllable(object):
             v = rk4(ODEs, v, dt);  self.Vs.append(v)  # RK4 - step
             out[t//ovfs] = RB*v[-1]               # output signal (synthetic) 
             t += 1;
+            
+            # # if the bird OEC change of size in time
+            # BirdData = pd.read_csv(self.paths.auxdata/'ZonotrichiaData.csv')
+            # c, L, r, Ch, MG, MB, RB, Rh = BirdData['value'] # c, L, r, c, L1, L2, r2, rd 
         
         # ------------------------------------------------------------
         self.Vs = np.array(self.Vs)
         # define solution (synthetic syllable) as a Syllable object 
-        synth = Syllable(self.birdsong, Nt=self.Nt, llambda=self.llambda, NN=self.NN, overlap=0.5, flim=self.flim, out=out)
-        synth.no_syllable = self.no_syllable
-        synth.no_file     = self.no_file
-        synth.p           = self.p
-        synth.paths       = self.paths
+        synth = Syllable(Nt=self.Nt, llambda=self.llambda, NN=self.NN, overlap=0.5, flim=self.flim, sfs=[out, self.fs])
+        
+        
+        # synth.no_syllable = self.no_syllable
+        # synth.no_file     = self.no_file
+        # synth.p           = self.p
+        # synth.paths       = self.paths
         synth.id          = self.id+"-synth"
         synth.Vs          = self.Vs
         synth.alpha       = self.alpha
@@ -290,7 +305,7 @@ class Syllable(object):
         self.AlphaBeta()             # define alpha and beta parameters
         synth = self.MotorGestures(self.alpha, self.beta, self.p["gm"].value) # solve the problem and define the synthetic syllable
         synth = self.SynthScores(synth, orde=orde) # compute differences and score variables
-        
+        synth.paths = self.paths
         return synth
     
     def SolveAB(self, alpha, beta, gamma, orde=2):

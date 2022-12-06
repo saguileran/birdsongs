@@ -1,0 +1,118 @@
+\documentclass{article} 
+\usepackage{amsmath} 
+\usepackage{amsfonts}
+\usepackage{geometry}
+ \usepackage{url}
+ \geometry{
+ letterpaper,
+ %total={170mm,257mm},
+ left=30mm, right=30mm,
+ top=20mm, bottom=20mm,
+ }
+ \setlength{\parindent}{0pt}
+
+\title{\textbf{Dissertation Report}}
+
+\author{Sebastian Aguilera Novoa} % Sets authors name
+\date{September 1, 2022} % Sets date for date compiled
+
+% The preamble ends with the command \begin{document}
+\begin{document} % All begin commands must be paired with an end command somewhere
+    \maketitle % creates title using information in preamble (title, author, date)
+    
+    \section{Data Set} % creates a section
+    
+    I have downloaded some birdsongs of Chingolo Rufous-collared Sparrow, about 150 files, from the internet but it has too much noise. I talked to Ulloa to get better audios, without too much noise, and of colombian species. He told me about the "Colección de Sonidos Ambientales" where Hoover shared with me more than 70 files recorded by the Instituto de Investigación de Recursos Biológicos Alexander von Humboldt and I am cleaning them up, removing human voices, great silences.  \\
+    
+    
+    The second part I am doing is to divide the audios into syllables to characterize the dataset, the type of gestures presented and the duration of them. Since the chingolo has simple gestures the spectral content index (SCI) is not relevant but the natural frequency of each gesture is. The advantage of knowing the type of gestures is that it allows us to minimize the constraints, the parameter space region.
+    
+    
+    \section{Optimization Problem}
+    
+    Since we are dealing with an inverse problem, let's formulate it as a least square problem that will be solved with numerical optimization.  The general problem can be formulated as follows
+    
+    \begin{equation}
+    \begin{aligned}
+    \underset{\alpha, \beta, \mathbb{R}^n, \gamma \in \mathbb{R}}{\text{min}} &\qquad || F_{natR} - F_{natS}|| + || SCI_{natR} - SCI_{natS}||\\
+    \text { subject to } & \quad-0.2\leq\beta \leq 0.9\\
+     & \quad -0.1 \leq \alpha \leq 0.2\\
+     & \qquad \gamma >0
+    \end{aligned}
+    \end{equation}
+    
+    
+    In order to solve the complete problem, it is necessary to divide it in two minimization problems.\\
+    
+    The firs problem is formulated to find $\gamma$ such that minimize the difference between the  spectral content indexes, from the synthetic and the real data
+    \begin{equation}
+    \begin{aligned}
+    \underset{\gamma \in \mathbb{R}}{\text{min}} &\qquad || SCI_{natR} - SCI_{natS}||\\
+    \text { subject to } &  \gamma > 0
+    \end{aligned}
+    \end{equation}
+    
+    Here $\alpha$ and $\beta$ are fixed parameters.\\
+    
+    The second problem has the objective of find the $\alpha$ and $\beta$ parameters such that minimize the difference between the natural frequencies
+    
+    \begin{equation}
+    \begin{aligned}
+    \underset{\alpha \beta \in \mathbb{R}^n}{\text{min}} &\qquad || F_{natR} - F_{natS}|| + || SCI_{natR} - SCI_{natS}||\\
+    \text { subject to } & -0.2\leq\beta \leq 0.9\\
+     & -0.1 \leq \alpha \leq 0.2
+    \end{aligned}
+    \end{equation}
+    
+    
+    Where $F_{natR}$ is the natural frequency of the real audio and $F_{natR}$ is the natural frequency of the synthetic birdsong. The other score is the Spectral Content Index (SCI) that is not relevant for the chingolo but in future for other species it will be necessary.\\
+    
+    
+    
+    I have been talking to Prof. Ruiz to choose the most appropriate  formulation problem and algorithm to solve it.\\
+    
+    
+    Although this is the general case, each species has different ranges of constants and the search can be minimized to small regions of the $\alpha - \beta$ parameter space, depending of the gesture in question.  \\
+    
+    I talked with professor Mindlin on Monday and he allowed me to use a public code of the model found on Github \url{https://github.com/jfdoppler/canarios}, although the code has the model implementation it is not tuned to the copeton so he agreed to share with me a google colab code that is already tuned to the chingolo. While waiting for this code, I have been playing with the existing code to understand how it works. I am setting up  weekly meetings with him on Mondays or Tuesdays.
+    
+    
+    \newpage
+    The natural frequency is calculated using the FFT to the the last equation $i_3$:
+    
+    \begin{itemize}
+        \item \textbf{Syrinx walls}
+        \begin{equation}
+        \begin{gathered}
+        \frac{\mathrm{d} x}{\mathrm{~d} t}=y \\
+        \frac{\mathrm{d} y}{\mathrm{~d} t}=-\alpha(t) \gamma^2-\beta(t) \gamma^2 x-\gamma^2 x^3-\gamma x^2 y+\gamma^2 x^2-\gamma x y 
+        \end{gathered}
+        \end{equation}
+        
+        
+    \item \textbf{Traque pressure}
+    \begin{equation}
+    \begin{gathered}
+    P_{in} = v(t)x(t)-rP_{in}(t-T)\\
+    P_{out} = (1-r)p_i\left( t - \frac{L}{c} \right)
+    \end{gathered}
+    \end{equation}
+    
+    \item \textbf{OEC modeled as Helmholtz oscillator}
+    
+    \begin{equation}
+         \begin{gathered}
+        \frac{d i_1}{dt} = i_2\\
+        \frac{d i_2}{dt} = -\frac{1}{c L_1}i_1  - \left( \frac{r_d}{L_2} + \frac{r_d}{L_1}\right) i_2 + \left( \frac{1}{cL_1} + \frac{r_2r_d}{L_1 L_2}\right) i_3 + \frac{1}{L_1}\frac{dp_{out} }{dt}\\
+        \frac{d i_3}{dt} = -  \frac{L_1}{L_2}  i_2 - \frac{r_d}{L_2} i_3 + \frac{1}{L_2} p_{out}
+    \end{gathered}
+     \end{equation}
+    \end{itemize}
+    
+    
+    
+    
+    
+     
+
+\end{document}  

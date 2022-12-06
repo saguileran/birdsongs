@@ -264,13 +264,13 @@ The model is tested with different syllables of the birdsong of the rufous colla
 
 Simple syllable of a birdsong of the Rufous Collared Sparrow
 
-<p align="center">  <img src="./examples/results/ScoresVariables-syllable-4_short_FINCA153_Zonotrichia_capensis_trimed.wav-0.png" width="600" alt="methodology"></p>
+<p align="center">  <img src="./examples/results/ScoresVariables-syllable-4_short_FINCA153_Zonotrichia_capensis_trimed.wav-0.png" width="1000" alt="methodology"></p>
 
 Simple syllable of a birdsong of the Ocellated Tapaculo - Acropternis
 
-<p align="center">  <img src="./examples/results/ScoresVariables-syllable-XC104508 - Ocellated Tapaculo - Acropternis orthonyx.wav-0.png" width="600" alt="methodology"></p>
+<p align="center">  <img src="./examples/results/ScoresVariables-syllable-XC104508 - Ocellated Tapaculo - Acropternis orthonyx.wav-0.png" width="1000" alt="methodology"></p>
 
-
+The PDF of the thesis is located in the `dissertation` brach of this repository, <a href="https://github.com/saguileran/birdsongs/blob/dissertation/main.pdf">Design, development, and evaluation of a computational physical model to generate synthetic birdsongs from recorded samples</a>, 
 # References
 
 ## Literature
@@ -283,13 +283,16 @@ Simple syllable of a birdsong of the Ocellated Tapaculo - Acropternis
 <div class="csl-entry">[2] Newville, M., Stensitzki, T., Allen, D. B., &#38; Ingargiola, A. (2014). <i>LMFIT: Non-Linear Least-Square Minimization and Curve-Fitting for Python</i>. <a href="https://doi.org/10.5281/ZENODO.11813">https://doi.org/10.5281/ZENODO.11813</a></div>
 <br>
 
-<div class="csl-entry">[3] Ulloa, J. S., Haupert, S., Latorre, J. F., Aubin, T., &#38; Sueur, J. (2021). scikit-maad: An open-source and modular toolbox for quantitative soundscape analysis in Python. <i>Methods in Ecology and Evolution</i>, <i>12</i>(12), 2334–2340. https://doi.org/10.1111/2041-210X.13711</div>
+<div class="csl-entry">[3] Ulloa, J. S., Haupert, S., Latorre, J. F., Aubin, T., &#38; Sueur, J. (2021). scikit-maad: An open-source and modular toolbox for quantitative soundscape analysis in Python. <i>Methods in Ecology and Evolution</i>, <i>12</i>(12), 2334–2340. <a href="https://doi.org/10.1111/2041-210X.13711">https://doi.org/10.1111/2041-210X.13711 Dataset </a> </div>
 <br>
 
-<div class="csl-entry">[4] McFee, B., Raffel, C., Liang, D., Ellis, D. P., McVicar, M., Battenberg, E., & Nieto, O. &#38; (2015). librosa: Audio and music signal analysis in python. <i>  In Proceedings of the 14th python in science conference </i>, <i>12</i>(12), (Vol. 8). https://librosa.org/doc/latest/index.html</div>
+<div class="csl-entry">[4] McFee, B., Raffel, C., Liang, D., Ellis, D. P., McVicar, M., Battenberg, E., & Nieto, O. &#38; (2015). librosa: Audio and music signal analysis in python. <i>  In Proceedings of the 14th python in science conference </i>, <i>12</i>(12), (Vol. 8). <a href="https://librosa.org/doc/latest/index.html">Librosa</a> </div>
 
 ## Audios Dataset
 
-<div class="csl-entry">[5] Xeno-canto Foundation and Naturalis Biodiversity Center &#38; (2005). xeno-canto:  https://xeno-canto.org/  <i> Sharing bird sounds from around the world.</i> <i> Dissertation Audios Dataset https://xeno-canto.org/set/8103</i></div>
+<div class="csl-entry">[5] Xeno-canto Foundation and Naturalis Biodiversity Center &#38; (2005). <a href="https://xeno-canto.org/">xeno-canto:</a>     <i> Sharing bird sounds from around the world.</i> <i>  <a href="https://xeno-canto.org/set/8103">Dissertation Audios Dataset </a> </i></div>
+<br>
 
-<div class="csl-entry">[6] Ther Cornell Lab of Ornithology &#38; (2005). ebird <i>,  https://ebird.org/</div>
+<div class="csl-entry">[6] Ther Cornell Lab of Ornithology &#38; (2005). ebird <i>, <a href="https://ebird.org/">ebird.com</a> </div>
+
+    

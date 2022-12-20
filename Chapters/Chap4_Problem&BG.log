@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999994 (MiKTeX 22.11.25) (preloaded format=xelatex 2022.12.6)  6 DEC 2022 14:57
+This is XeTeX, Version 3.141592653-2.6-0.999994 (MiKTeX 22.11.25) (preloaded format=xelatex 2022.12.6)  12 DEC 2022 14:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -87,24 +87,7 @@ Missing character: There is no s in font nullfont!
 Missing character: There is no o in font nullfont!
 Missing character: There is no n in font nullfont!
 Missing character: There is no g in font nullfont!
-
-Overfull \hbox (20.0pt too wide) in paragraph at lines 3--4
-[] 
- []
-
-
-! LaTeX Error: Missing \begin{document}.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.5 J
-     ust like humans, birds made vocalization to communicate each other usin...
-
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
+Missing character: There is no p in font nullfont!
 Missing character: There is no J in font nullfont!
 Missing character: There is no u in font nullfont!
 Missing character: There is no s in font nullfont!
@@ -560,17 +543,17 @@ Missing character: There is no r in font nullfont!
 Missing character: There is no d in font nullfont!
 Missing character: There is no . in font nullfont!
 
-Overfull \hbox (20.0pt too wide) in paragraph at lines 5--6
+Overfull \hbox (20.0pt too wide) in paragraph at lines 3--6
 []
  []
 
 
-Overfull \hbox (14.44pt too wide) in paragraph at lines 5--6
+Overfull \hbox (14.44pt too wide) in paragraph at lines 3--6
 \TU/lmr/bx/n/10 sy-
  []
 
 
-Overfull \hbox (20.39pt too wide) in paragraph at lines 5--6
+Overfull \hbox (20.39pt too wide) in paragraph at lines 3--6
 \TU/lmr/bx/n/10 rinx
  []
 

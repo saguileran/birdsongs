@@ -18,17 +18,22 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
+locale:  "en-US"
 title: BirdSongs
-email: saguileran@unal.edu.co
 name: BirdSongs
-versio: 0.1
-description: >- # this means to ignore newlines until "baseurl:"
-  Thesis documentation and codes
+title_separator: "-"
+subtitle: "A python package to analyze, visualize and generate synthetic birdsongs."
+description: "A python package to analyze, visualize and generate synthetic birdsongs."
+email: saguileran@unal.edu.co
+#version: 0.1
+#description: >- # this means to ignore newlines until "baseurl:"
+#  Thesis documentation and codes
 #baseurl: "" # the subpath of your site, e.g. /blog
 url: https://saguileran.github.io/birdsongs/ # the base hostname & protocol for your site, e.g. http://example.com
 repository: https://github.com/saguileran/birdsongs
-twitter_username: saguileran
-github_username:  saguileran
+logo: /assets/images/logo.png
+#twitter_username: saguileran
+#github_username:  saguileran
 
 # Build settings
 theme: minima
@@ -36,17 +41,66 @@ plugins:
   - jekyll-feed
   - jekyll-readme-index
 
+# Site Author
 author:
-  name: Sebastian Aguilera Novoa
+  name             : "Sebastian Aguilera Novoa"
+  avatar           : "/assets/images/photo.png"
+  bio              : "Hi, I'm physicist interested on computer science."
+  location         : "Bogotá, CO"
+  email            : "saguileran@unal.edu.co"
+  links:
+    - label: "Email"
+      icon: "fas fa-fw fa-envelope-square"
+      url: mailto:saguileran@unal.edu.co
+    - label: "Website"
+      icon: "fas fa-fw fa-link"
+      url: "https://saguileran.github.io/"
+    - label: "Twitter"
+      icon: "fab fa-fw fa-twitter-square"
+      url: "https://twitter.com/saguileran"
+    - label: "Facebook"
+      icon: "fab fa-fw fa-facebook-square"
+      url: "https://facebook.com/saguileran"
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/saguileran"
+    - label: "Instagram"
+      icon: "fab fa-fw fa-instagram"
+      # url: "https://instagram.com/"
+
+# Site Footer
+footer:
+  links:
+    - label: "Twitter"
+      icon: "fab fa-fw fa-twitter-square"
+      # url:
+    - label: "Facebook"
+      icon: "fab fa-fw fa-facebook-square"
+      # url:
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      # url:
+    - label: "GitLab"
+      icon: "fab fa-fw fa-gitlab"
+      # url:
+    - label: "Bitbucket"
+      icon: "fab fa-fw fa-bitbucket"
+      # url:
+    - label: "Instagram"
+      icon: "fab fa-fw fa-instagram"
+      # url:
+
+author:
+  name: 
   email: "saguileran@unal.edu.co"
   about: |
-    Hi, I'm
+    Hi, I'm physicist interested on computer science.
   social:
     github: saguileran
 
 defaults:
 - scope:
-    path: _docs
+    path: ""
     type: docs
   values:
     layout: docs

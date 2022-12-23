@@ -1,0 +1,2 @@
+- name: Configure GitHub Pages
+  uses: actions/configure-pages@v2.1.3

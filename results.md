@@ -66,13 +66,14 @@ Images obtained from the package
 
 
 
-## Tutorial NoteBooks
+## Audios 
 
-| Name                                        | Description                                           |
-| ------------------------------------------- | ----------------------------------------------------- |
-| [BirdSongs.ipynb](https://github.com/saguileran/birdsongs/blob/main/BirdSongs.ipynb) | General use. |
-| [Syllable.ipynb](https://github.com/saguileran/birdsongs/blob/main/syllable.ipynb) | Syllable generation. |
-| [Motor Gestures.ipynb](https://github.com/saguileran/birdsongs/blob/main/motor-gestures.ipynb) | Physical model. |
+| Scientific Name  |  Common Name  | Location | Pitch Complexity | Animal | 
+| ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| Zonotrichia Capensis| Copeton | South America | Simple pitch | Bird |
+| Rhinocryptidae | Tapaculos | South America | Medium | Bird |
+| Mimus Gilvus | Sinsonte | South America | Complex | Bird |
+| Physalaemus Cuvieri | Rana Llorona | South America | Medium | Amphibian  |
 
 
 

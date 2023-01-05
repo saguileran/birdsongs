@@ -113,9 +113,6 @@ author:
   location         : "Bogotá, CO"
   email            : "saguileran@unal.edu.co"
   links:
-    - label: "Email"
-      icon: "fas fa-fw fa-envelope-square"
-      url: "mailto:saguileran@unal.edu.co"
     - label: "Website"
       icon: "fas fa-fw fa-link"
       url: "https://saguileran.github.io/"

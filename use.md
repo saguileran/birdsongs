@@ -202,8 +202,6 @@ python -m pip install -e birdsongs
 ```
 -->
 
-[Use birdsongs Package]({{ "https://github.com/saguileran/birdsongs" | relative_url }}){: .btn .btn--success .btn--large}
-
 
 
 ---

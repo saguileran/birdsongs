@@ -9,6 +9,7 @@ search: true
 @import "minimal-mistakes"; // main partials
 
 $content-width: 100%;
+$link-color: blue;
 
 .centerHuge {
 	display: block;
@@ -16,8 +17,6 @@ $content-width: 100%;
 	margin-right: auto;
 	width: 90%;
 }
-
-$link-color: green;
 
 .page__content {
 	text-align: justify;
@@ -54,3 +53,8 @@ $link-color: green;
 #toc_container li, #toc_container ul, #toc_container ul li{
     list-style: outside circle none !important;
 }
+
+table.center {
+    margin-left:auto; 
+    margin-right:auto;
+  }

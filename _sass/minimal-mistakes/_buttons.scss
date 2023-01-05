@@ -9,6 +9,8 @@
 .btn {
   /* default */
   display: inline-block;
+  margin-left: 33%;
+  margin-right: 33%;
   margin-bottom: 0.25em;
   padding: 0.5em 1em;
   font-family: $sans-serif;
@@ -19,7 +21,7 @@
   border-width: 0;
   border-radius: $border-radius;
   cursor: pointer;
-
+  
   .icon {
     margin-right: 0.5em;
   }

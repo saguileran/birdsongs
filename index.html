@@ -43,7 +43,7 @@ Design, development, and evaluation of a computational-physical model to generat
 
 Schematic implementation of the physical model <b>motor gestures of birdsongs:</b> syrinx, trachea, glottis, OEC, and beak.
 
-<img src="/assets/img/model.png" alt="Model" width="700" height="400" class="centerImage">
+<img src="assets/img/model.png" alt="Model" width="700" height="400" class="centerImage">
 
 <h2 id="Implementation">Implementation</h2>
 
@@ -72,12 +72,9 @@ Taking advantege of POO the repetition of long codes is avoid. Using this progra
 <h2 id="Conclusions">Conclusions</h2>
 
 <ul>
-    <li>Define a object from audio syllable with its tempo and spectral features</li>
-    <li></li>
-    <li></li>
-    <li></li>
-    <li></li>
-
+    <li>The SCI score gives comparable results to finding the optimal pressure parameters coefficients, however it is not always sufficient since the noise can be interpreted as harmonics or spectral content. An improvement is to refine the objective function that find these parametric coefficients</li>
+    <li>The model successfully simulated several syllables of Zonotrichia capensis with different sound quality. The best sounds to generate are the longer, simpler and clear syllables which were simulated with high accuracy. The thrilled syllables can be well-generated using chuncks, small parts of syllables, but it requires tuning the pitch threshold.</li>
+    <li>The most problematic and difficult syllables are the noisy and with high spectral content audios, in which strong harmonics are present making the pitch computing hard or even impossible to compute correctly. Although for some audios is sufficient to change the pitch threshold detector, it does not work for all of them.</li>
 </ul>
 
 <hr style="width:100%;text-align:left;margin-left:0">

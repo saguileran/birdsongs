@@ -1,4 +1,4 @@
-<a href="https://github.com/saguileran/birdsongs/"><img src="./docs/img/logo.png" width="500"></a>
+<a href="https://github.com/saguileran/birdsongs/"><img src="./assets/img/logo.png" width="500"></a>
 
 
 # birdsongs
@@ -234,7 +234,7 @@ The model used, Motor Gestures [1], have been developed by profesog G. Mindlin a
 
 Schematic implementation of the physical model **motor gestures of bydsongs**: syrinx, trachea, glotis, OEC, and beak. 
 
-<p align="center"> <img src="./docs/img/model.png" width="700" title="model"></p>
+<p align="center"> <img src="./assets/img/model.png" width="700" title="model"></p>
 
 ## Programming Object Oriented (POO)
 
@@ -248,7 +248,7 @@ Taking advantege of POO the repetition of long codes is avoid. Using this progra
 
 In order to understand the diagram methodology, the following icons will be used. 
 
-<p align="center">  <img src="./docs/img/objects.png" width="500" alt="methodology"></p>
+<p align="center">  <img src="./assets/img/objects.png" width="500" alt="methodology"></p>
 
 Each icon is an object with different tasks.
 
@@ -256,7 +256,7 @@ Each icon is an object with different tasks.
 
 Using the previous objects defined, the optimization problem is solved by following the next diagram 
 
-<p align="center">  <img src="./docs/img/methodology.png" width="600" alt="methodology"></p>
+<p align="center">  <img src="./assets/img/methodology.png" width="600" alt="methodology"></p>
 
 # Results
 

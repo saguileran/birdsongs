@@ -1,0 +1,38 @@
+\chapter{Conclusions}\label{chap_conclusions}
+
+\section{Conclusions}
+
+
+\begin{itemize}
+    \item The model successfully simulated several syllables of  Zonotrichia capensis with different sound quality. The best sounds to generate are the longer, simpler and clear syllables which were simulated with high accuracy. The thrilled syllables can be well-generated using chuncks, small parts of syllables, but it requires tuning the pitch threshold.
+    
+    \item The most problematic and difficult syllables are the noisy and with high spectral content audios, in which strong harmonics are present making the pitch computing hard or even impossible to compute correctly. Although for some audios is sufficient to change the pitch threshold detector, it does not work for all of them.
+    
+    \item The SCI score gives comparable results to finding the optimal pressure parameters coefficients, however it is not always sufficient since the noise can be interpreted as harmonics or spectral content. An improvement is to refine the objective function that find these parametric coefficients.
+    
+    %\item 
+\end{itemize}
+
+\section{Boundaries}
+
+\begin{itemize}
+    \item Since the model implemented in this work depends on pitch extraction and fundamental frequency computation, its accuracy is limited. In fact, if the fundamental frequency is computed incorrectly, the proposed model will not find an optimal solution because the score function is not correctly defined. 
+    
+    \item Although there are many available birdsong audios on the web, not all of them have clear birdsongs. The best birdsong audios for the model are the audios with great sound quality, clear samples. 
+\end{itemize}
+
+
+\section{Future Works}
+
+\begin{itemize}
+    \item Explore more species and classify them by their parameters values, air sac pressure and tension labia. It can provide a new novel way to classify birds by their syrinx parameters.
+    
+    \item Creating a more realistic model with two pairs of lateral labiums, two syrinx, will allow to create more complex syllables in which two different pitches are present at the same time. How to extract two pitches?
+    
+    \item Use advanced optimization algorithms that involve the calculation of the Jacobian and Hessian of the objective function (that depends of the bifurcation curves). Chuncks can be used to linearize the system locally and make the problem well behaved, may imply a better convergence rate.
+    
+    \item Search and explore physical models of production of sound for other type of animals vocalization: frogs, insects, fishes, etc, or even vocal folds.
+    
+    \item Improve package syllables detection and spectral features computation, implement an algorithm to compute complex fundamental frequencies and its harmonics. Parallelize objects, make them pickleable.
+    
+\end{itemize}

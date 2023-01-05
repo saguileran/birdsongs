@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+<loc>http://localhost:4000/Chapters/Chap4_Problem&amp;BG.pdf</loc>
+<lastmod>2023-01-05T18:53:14-05:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/main.pdf</loc>
+<lastmod>2023-01-05T18:53:16-05:00</lastmod>
+</url>
+</urlset>

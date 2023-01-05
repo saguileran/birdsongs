@@ -1,11 +1,11 @@
 # main links
 main:
   - title: "Home"
-    url: https://saguileran.github.io/birdsongs/
-  #- title: "About"
-  #  url: https://saguileran.github.io/birdsongs/about/
-  # - title: "Sample Posts"
-  #   url: /year-archive/
+    url: /
+  - title: "Results"
+    url: /results/
+  - title: "Use"
+    url: /use/
   # - title: "Sample Collections"
   #   url: /collection-archive/
   # - title: "Sitemap"

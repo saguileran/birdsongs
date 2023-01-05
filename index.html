@@ -3,6 +3,53 @@ layout: single
 author_profile: true
 ---
 
-<title>title Tag</title>
-asdasdsad
-asdasdasdbas
+<h1>BirdSongs</h1>
+A python package to analyze, visualize and generate synthetic birdsongs.
+
+
+
+
+<h2>Overview</h2>
+
+Study and pakcing of the physical model of the motor gestures of birdsongss. This model explains the physics of birdsongs by modeling the organs involved in sound production in birds (syrinx, trachea, glottis, Oro-Oesophageal Cavity (OEC), and beak) with oridary differential equations (EDOs). In this work, a Python package is developed to analyze, visualize and generate synthetic birdsongs using the motor gestures model and recorded samples of birdsongs. To automate the model, the problem is formulated as an minimization problem with two control parameters (air sac pressure of the bird’s bronchi and labial tension) and solved using numerical methods, signal processing tools, and numerical optimization. The package is tested by generating comparable birdsongs, solves the minimization problem using recorded samples of birdsongs and comparing the fundamental frequency (denoted as FF, F0, or also called pitch) and spectral conent index (SCI) of both birdsongs.
+
+<h2>Objective</h2>
+
+Design, development, and evaluation of a computational-physical model to generating synthetic bird songs from recorded samples.
+
+<h2>Physical Model</h2>
+
+Schematic implementation of the physical model <b>motor gestures of bydsongs:</b> syrinx, trachea, glotis, OEC, and beak.
+
+<img src="/assets/img/model.png" alt="Model" width="700" height="400" class="center">
+
+<h2>Implementation</h2>
+
+Using the previous objects defined, the optimization problem is solved by following the next diagram
+
+<img src="/assets/img/methodology.png" alt="Methodology" width="700" height="400" class="center">
+
+
+<h2>Programming Object Oriented (POO)</h2>
+
+Taking advantege of POO the repetition of long codes is avoid. Using this programming paradigm, the execution and implementation of the model is fast and easy. Five objects ared created to solve the optimization problem and analyze the synthetic syllables:
+
+<ul>
+    <li><b>Syllable:</b> define a object from audio syllable with its tempo and spectral features</li>
+    <li><b>Optimizer:</b> define a object to optimize function from method and syllables </li>
+    <li><b>BirdSong:</b> define a object to read and split an audio song in syllables</li>
+    <li><b>Plot:</b> define a object to plot real and synthec syllables or songs</li>
+    <li><b>Paths:</b> define a object to organize folders location</li>
+</ul>
+
+<p>In order to understand the diagram methodology, the following icons will be used.</p>
+
+
+<img src="/assets/img/objects.png" alt="POO" width="500" height="400" class="center">
+
+<h2>Conclusions</h2>
+
+<ul>
+    <li>Define a object from audio syllable with its tempo and spectral features</li>
+    
+</ul>

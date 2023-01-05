@@ -1,11 +1,12 @@
 # main links
 main:
-  - title: "Home"
-    url: /
-  - title: "Results"
-    url: /results/
   - title: "Use"
     url: /use/
+  - title: "Results"
+    url: /results/
+  - title: "Home"
+    url: /
+
   # - title: "Sample Collections"
   #   url: /collection-archive/
   # - title: "Sitemap"

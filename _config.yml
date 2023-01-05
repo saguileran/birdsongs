@@ -13,24 +13,24 @@
 #theme                  : "minimal-mistakes-jekyll"
 #remote_theme           : "mmistakes/minimal-mistakes"
 remote_theme             : "mmistakes/minimal-mistakes@4.24.0"
-minimal_mistakes_skin    : "default" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
+minimal_mistakes_skin    : "" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
 
 github: [metadata]
 
 # Site Settings
 locale                   : "en-US"
-title                    : "BirdSongs"
+title                    : &title "BirdSongs"
 title_separator          : "-"
-subtitle                 : "A python package to analyze, visualizeand generate synthetic birdsongs." # site tagline that appears below site title in masthead
+subtitle                 : &description "A python package to analyze, visualizeand generate synthetic birdsongs." # site tagline that appears below site title in masthead
 name                     : &name "Sebastian Aguilera Novoa"
-description              : &description "A python package to analyze, visualize and generate synthetic birdsongs."
+description              : *description #"A python package to analyze, visualize and generate synthetic birdsongs."
 url                      : "https://saguileran.github.io/birdsongs/" # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
-baseurl                  : # the subpath of your site, e.g. "/blog"
+baseurl                  : "/" # the subpath of your site, e.g. "/blog"
 repository               : "saguileran/birdsongs/" # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
 teaser                   : "assets/img/404.png" # path of fallback teaser image, e.g. "/assets/images/500x300.png"
 logo                     : "assets/img/logo.png" # path of logo image to display in the masthead, e.g. "/assets/images/88x88.png"
-masthead_title           : " " # overrides the website title displayed in the masthead, use " " for no title
-# breadcrumbs            : false # true, false (default)
+masthead_title           : *title # overrides the website title displayed in the masthead, use " " for no title
+breadcrumbs              : false # true, false (default)
 words_per_minute         : 200
 comments:
   provider               : false # false (default), "disqus", "discourse", "facebook", "staticman", "staticman_v2", "utterances", "giscus", "custom"
@@ -84,7 +84,7 @@ baidu_site_verification  :
 
 # Social Sharing
 twitter:
-  username               :
+  username               : "saguileran"
 facebook:
   username               :
   app_id                 :
@@ -107,9 +107,9 @@ analytics:
 
 # Site Author
 author:
-  name             : "Sebastian Aguilera Novoa"
+  name             : *name #"Sebastian Aguilera Novoa"
   avatar           : "/assets/img/bio-photo.jpg"
-  bio              : "I am a physicist interested in sound waves simulations, computer science, and birds."
+  bio              : "A physicist interested in sound waves simulations, computer science, signal processing, and science teaching."
   location         : "Bogotá, CO"
   email            : "saguileran@unal.edu.co"
   links:
@@ -153,7 +153,6 @@ footer:
     - label: "Instagram"
       icon: "fab fa-fw fa-instagram"
       url: "https://instagram.com/saguileran"
-
 
 # Reading Files
 include:
@@ -199,6 +198,7 @@ highlighter: rouge
 lsi: false
 excerpt_separator: "\n\n"
 incremental: false
+parse_block_html: true
 
 
 # Markdown Processing

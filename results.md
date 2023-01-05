@@ -1,6 +1,6 @@
 ---
 permalink: /results/
-layout: single
+layout: splash
 author_profile: false
 title: "Results"
 excerpt: "Results obtained using the python pakacage."
@@ -22,8 +22,8 @@ gallery_parameters_space:
   - url: "/assets/img/results/MotorGesturesParameters-syllable-synth-C527995 - Thick-billed Euphonia - Euphonia laniirostris.wav-0.png"
     image_path: "/assets/img/results/MotorGesturesParameters-syllable-synth-C527995 - Thick-billed Euphonia - Euphonia laniirostris.wav-0.png"
     alt: "C527995 parameter space"
-  - url: "/assets/img/results/.png"
-    image_path: "/assets/img/results/.png"
+  - url: ""
+    image_path: ""
     alt: ""
   - url: "/assets/img/results/MotorGesturesParameters-syllable-synth-XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav-0.png"
     image_path: "/assets/img/results/MotorGesturesParameters-syllable-synth-XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav-0.png"
@@ -45,7 +45,8 @@ results:
     image_path: "/assets/img/results/ScoresVariables-syllable-C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-0.png"
     alt: "C428484 results"
 last_modified_at: 2023-01-05T11:59:26-04:00
-toc: true
+
+classes: narrow
 ---
 
 Images obtained from the package
@@ -65,7 +66,7 @@ Images obtained from the package
 
 
 
-## Demo NoteBooks
+## Tutorial NoteBooks
 
 | Name                                        | Description                                           |
 | ------------------------------------------- | ----------------------------------------------------- |
@@ -78,4 +79,4 @@ Images obtained from the package
 
 ---
 
-
+Try it!

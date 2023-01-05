@@ -1,6 +1,6 @@
 ---
 # Only the main Sass file needs front matter (the dashes are enough)
-search: false
+search: true
 ---
 
 @charset "utf-8";
@@ -8,9 +8,48 @@ search: false
 @import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
 @import "minimal-mistakes"; // main partials
 
-.center {
+
+.centerHuge {
 	display: block;
 	margin-left: auto;
 	margin-right: auto;
-	width: 80%;
+	width: 90%;
+}
+
+$link-color: green;
+
+.page__content {
+	text-align: justify;
+  }
+
+.centerImage
+  {
+   text-align:center;
+   margin-left: auto;
+   margin-right: auto;
+   display:block;
+  }
+
+
+
+
+#toc_container {
+    background: #f9f9f9 none repeat scroll 0 0;
+    border: 1px solid #aaa;
+    display: table;
+    font-size: 90%;
+    margin-bottom: 1em;
+    padding: 20px;
+    width: 500px;
+	
+}
+
+.toc_title {
+    font-weight: 800;
+	text-align: center;
+	font-size: 30px;
+}
+
+#toc_container li, #toc_container ul, #toc_container ul li{
+    list-style: outside circle none !important;
 }

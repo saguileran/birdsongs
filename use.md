@@ -1,8 +1,9 @@
 ---
 permalink: /use/
 layout: single
+search: true
 author_profile: false
-title: "Use"
+#title: "Use"
 excerpt: "Installation and use of birdsongs."
 last_modified_at: 2023-01-05T11:59:26-04:00
 toc: true
@@ -12,24 +13,31 @@ To use
 
 ## Requirments
 
-birdsong is implemented in python 3.8. It requires:
+`birdsong` is implemented in `python-3.8` and requires:
 
-- librosa
-- lmfit
-- scipy
-- sympy
-- numpy
-- pandas
-- matplotlib
-- playsound
-- PeakUtils
-- mpl_pan_zoom
-- mpl_point_clicker
-- scikit_learn
-- scikit_maad
-- setuptools
-- ipython
-- lazy_loader
+<div style="float: left; width: 50%;">
+<ul>
+  <li>librosa</li>
+  <li>lmfit</li>
+  <li>scipy</li>
+  <li>numpy</li>
+  <li>pandas</li>
+  <li>matplotlib</li>
+  <li>playsound</li>
+</ul>
+</div>
+<div tyle="float: right; width: 50%;">
+<ul>
+  <li>PeakUtils</li>
+  <li>mpl_pan_zoom</li>
+  <li>mpl_point_clicker</li>
+  <li>scikit_learn</li>
+  <li>scikit_maad</li>
+  <li>setuptools</li>
+  <li>ipython</li>
+  <li>lazy_loader</li>
+</ul>
+</div>
 
 
 ## Downloading
@@ -49,7 +57,7 @@ pip install -r ./requirements.txt
 python -m pip install -r ./requirements.txt
 ```
 
-You can now use the package in a python terminal opened at the birdsongs folder. 
+You can now use the package in a Python terminal opened at the birdsongs folder. 
 
 
 <!--
@@ -60,7 +68,7 @@ python .\setup.py install
 pip install .
 ```
 -->
-That's all! 
+That is all! 
 
 ## Tutorial NoteBooks
 
@@ -68,11 +76,11 @@ Take a look at the tutorials notebooks for basic uses:
 
 | Name                                        | Description                                           |
 | ------------------------------------------- | ----------------------------------------------------- |
-| [BirdSongs.ipynb](https://github.com/saguileran/birdsongs/blob/main/BirdSongs.ipynb) | General use, generate a whole birdsong (several syllables). |
+| [BirdSongs.ipynb](https://github.com/saguileran/birdsongs/blob/main/BirdSongs.ipynb) | General basic use, generate a whole birdsong (several syllables) and explore the existing tools. |
 | [Syllable.ipynb](https://github.com/saguileran/birdsongs/blob/main/syllable.ipynb) | Syllable generation, define and generate a syllable from a recorded birdsong. |
-| [Motor Gestures.ipynb](https://github.com/saguileran/birdsongs/blob/main/motor-gestures.ipynb) | Physical model. |
+| [Motor_Gestures.ipynb](https://github.com/saguileran/birdsongs/blob/main/motor-gestures.ipynb) | Physical model, explore the motor gestures model and variables meanning. |
 
-
+Feel free to comment or modify any notebook.
 ## Use
 
 ### Define
@@ -182,7 +190,7 @@ ploter.Result(obj, obj_synth_optimal)       # plot the spectrograms, scores and 
 bird.WriteAudio();  synth_bird.WriteAudio() # write both objects, real and synthetic
 ```
     
-The repository has some audio examples, in [examples/audios](https://github.com/saguileran/birdsongs/tree/main/examples/audios) folder. You can download and store your own audios in the same folder or enter the audio folder path to the Paths object. The audios **must** be in WAV format or birdosngs will not import them, we suggest use [audacity](https://www.audacityteam.org/) to convert the audios without any problem.
+The repository has some audio examples, in [examples/audios](https://github.com/saguileran/birdsongs/tree/main/examples/audios) folder. You can download and store your own audios in the same folder or enter the audio folder path to the Paths object. The audios **must** be in WAV format or birdosngs will not import them, we suggest use [Audacity](https://www.audacityteam.org/) to convert the audios without any problem.
 
     
 <!---
@@ -194,13 +202,10 @@ python -m pip install -e birdsongs
 ```
 -->
 
-
-
-
-[Use the package]({{ "https://github.com/saguileran/birdsongs" | relative_url }}){: .btn .btn--success .btn--large}
+[Use birdsongs Package]({{ "https://github.com/saguileran/birdsongs" | relative_url }}){: .btn .btn--success .btn--large}
 
 
 
 ---
 
-asdasd
+Now you are able to generate a synthetic syllable using a recorded birdsong.

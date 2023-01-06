@@ -1,11 +1,11 @@
-This is XeTeX, Version 3.141592653-2.6-0.999994 (MiKTeX 22.11.25) (preloaded format=xelatex 2022.12.6)  6 DEC 2022 14:57
+This is XeTeX, Version 3.141592653-2.6-0.999994 (MiKTeX 22.11.25) (preloaded format=xelatex 2022.12.6)  6 JAN 2023 16:41
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**./main.tex
-(main.tex
+**./EncabezadoTesisMSc.tex
+(EncabezadoTesisMSc.tex
 LaTeX2e <2022-11-01> patch level 1
-L3 programming layer <2022-11-02> (Chapters/EncabezadoTesisMSc.tex
+L3 programming layer <2022-11-02>
 (C:\Users\sebas\AppData\Local\Programs\MiKTeX\tex/latex/koma-script\scrbook.cls
 Document Class: scrbook 2022/10/12 v3.38 KOMA-Script document class (book)
 
@@ -1229,7 +1229,7 @@ Class scrbook Warning: Usage of package `tocbibind' together
 (scrbook)              the list of figures, list of tables, bibliography,
 (scrbook)              index and the running head.
 (scrbook)              Nevertheless, using requested
-(scrbook)              package `tocbibind' on input line 34.
+(scrbook)              package `tocbibind' on input line 35.
 
 
 (C:\Users\sebas\AppData\Local\Programs\MiKTeX\tex/latex/tocbibind\tocbibind.sty
@@ -1352,9 +1352,146 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 \Hy@SectionHShift=\skip88
 )
 
+! Package fontspec Error: The font "AncizarSerif-Light" cannot be found.
+
+For immediate help type H <return>.
+ ...                                              
+                                                  
+l.67 
+     
+
+A font might not be found for many reasons.
+ Check the spelling, where the font is installed etc. etc.
+
+ When in doubt, ask someone for help!
+
+
+
+! Package fontspec Error: The font "AncizarSerif-Light" cannot be found.
+
+For immediate help type H <return>.
+ ...                                              
+                                                  
+l.67 
+     
+
+A font might not be found for many reasons.
+ Check the spelling, where the font is installed etc. etc.
+
+ When in doubt, ask someone for help!
+
+
+
+! Package fontspec Error: The font "AncizarSerif-Light" cannot be found.
+
+For immediate help type H <return>.
+ ...                                              
+                                                  
+l.67 
+     
+
+A font might not be found for many reasons.
+ Check the spelling, where the font is installed etc. etc.
+
+ When in doubt, ask someone for help!
+
+
+
+! Package fontspec Error: The font "AncizarSerif-Semibold" cannot be found.
+
+For immediate help type H <return>.
+ ...                                              
+                                                  
+l.67 
+     
+
+A font might not be found for many reasons.
+ Check the spelling, where the font is installed etc. etc.
+
+ When in doubt, ask someone for help!
+
+
+
+! Package fontspec Error: The font "AncizarSerif-Semibold" cannot be found.
+
+For immediate help type H <return>.
+ ...                                              
+                                                  
+l.67 
+     
+
+A font might not be found for many reasons.
+ Check the spelling, where the font is installed etc. etc.
+
+ When in doubt, ask someone for help!
+
+
+
+! Package fontspec Error: The font "AncizarSerif-LightItalic" cannot be found.
+
+For immediate help type H <return>.
+ ...                                              
+                                                  
+l.67 
+     
+
+A font might not be found for many reasons.
+ Check the spelling, where the font is installed etc. etc.
+
+ When in doubt, ask someone for help!
+
+
+
+! Package fontspec Error: The font "AncizarSerif-LightItalic" cannot be found.
+
+For immediate help type H <return>.
+ ...                                              
+                                                  
+l.67 
+     
+
+A font might not be found for many reasons.
+ Check the spelling, where the font is installed etc. etc.
+
+ When in doubt, ask someone for help!
+
+
+
+! Package fontspec Error: The font "AncizarSerif-SemiboldItalic" cannot be
+(fontspec)                found.
+
+For immediate help type H <return>.
+ ...                                              
+                                                  
+l.67 
+     
+
+A font might not be found for many reasons.
+ Check the spelling, where the font is installed etc. etc.
+
+ When in doubt, ask someone for help!
+
+
+
+! Package fontspec Error: The font "AncizarSerif-SemiboldItalic" cannot be
+(fontspec)                found.
+
+For immediate help type H <return>.
+ ...                                              
+                                                  
+l.67 
+     
+
+A font might not be found for many reasons.
+ Check the spelling, where the font is installed etc. etc.
+
+ When in doubt, ask someone for help!
+
+
+
 Package fontspec Info: Font family 'AncizarSerif(0)' created for font
 (fontspec)             'AncizarSerif' with options [Ligatures=TeX,Path =
-(fontspec)             Ancizar/,Extension = .otf,UprightFont =
+(fontspec)             /Ancizar/,Extension = .otf,UprightFont =
 (fontspec)             *-Light,BoldFont = *-Semibold,ItalicFont =
 (fontspec)             *-LightItalic,BoldItalicFont = *-SemiboldItalic].
 (fontspec)              
@@ -1362,29 +1499,47 @@ Package fontspec Info: Font family 'AncizarSerif(0)' created for font
 (fontspec)             series/shapes:
 (fontspec)              
 (fontspec)             - 'normal' (m/n) with NFSS spec.:
-(fontspec)             <->"[Ancizar/AncizarSerif-Light.otf]/OT:script=latn;lang
-uage=dflt;mapping=tex-text;"
+(fontspec)             <->"[/Ancizar/AncizarSerif-Light.otf]/OT"
 (fontspec)             - 'small caps'  (m/sc) with NFSS spec.:
-(fontspec)             <->"[Ancizar/AncizarSerif-Light.otf]/OT:script=latn;lang
-uage=dflt;+smcp;mapping=tex-text;"
+(fontspec)             <->"[/Ancizar/AncizarSerif-Light.otf]/OT"
 (fontspec)             - 'bold' (b/n) with NFSS spec.:
-(fontspec)             <->"[Ancizar/AncizarSerif-Semibold.otf]/OT:script=latn;l
-anguage=dflt;mapping=tex-text;"
+(fontspec)             <->"[/Ancizar/AncizarSerif-Semibold.otf]/OT"
 (fontspec)             - 'bold small caps'  (b/sc) with NFSS spec.:
-(fontspec)             <->"[Ancizar/AncizarSerif-Semibold.otf]/OT:script=latn;l
-anguage=dflt;+smcp;mapping=tex-text;"
+(fontspec)             <->"[/Ancizar/AncizarSerif-Semibold.otf]/OT"
 (fontspec)             - 'italic' (m/it) with NFSS spec.:
-(fontspec)             <->"[Ancizar/AncizarSerif-LightItalic.otf]/OT:script=lat
-n;language=dflt;mapping=tex-text;"
+(fontspec)             <->"[/Ancizar/AncizarSerif-LightItalic.otf]/OT"
 (fontspec)             - 'italic small caps'  (m/scit) with NFSS spec.:
-(fontspec)             <->"[Ancizar/AncizarSerif-LightItalic.otf]/OT:script=lat
-n;language=dflt;+smcp;mapping=tex-text;"
+(fontspec)             <->"[/Ancizar/AncizarSerif-LightItalic.otf]/OT"
 (fontspec)             - 'bold italic' (b/it) with NFSS spec.:
-(fontspec)             <->"[Ancizar/AncizarSerif-SemiboldItalic.otf]/OT:script=
-latn;language=dflt;mapping=tex-text;"
+(fontspec)             <->"[/Ancizar/AncizarSerif-SemiboldItalic.otf]/OT"
 (fontspec)             - 'bold italic small caps'  (b/scit) with NFSS spec.:
-(fontspec)             <->"[Ancizar/AncizarSerif-SemiboldItalic.otf]/OT:script=
-latn;language=dflt;+smcp;mapping=tex-text;"
+(fontspec)             <->"[/Ancizar/AncizarSerif-SemiboldItalic.otf]/OT"
+
+! Font TU/AncizarSerif(0)/m/n/12=[/Ancizar/AncizarSerif-Light.otf]/OT at 12.0pt
+ not loadable: Metric (TFM) file or installed font not found.
+<to be read again> 
+                   relax 
+l.67 
+     
+I wasn't able to read the size data for this font,
+so I will ignore the font specification.
+[Wizards can fix TFM files using TFtoPL/PLtoTF.]
+You might try inserting a different font spec;
+e.g., type `I\font<same font id>=<substitute font name>'.
+
+
+! Package fontspec Error: The font "AncizarSerif-Light" cannot be found.
+
+For immediate help type H <return>.
+ ...                                              
+                                                  
+l.79 
+     
+
+A font might not be found for many reasons.
+ Check the spelling, where the font is installed etc. etc.
+
+ When in doubt, ask someone for help!
 
 
 (C:\Users\sebas\AppData\Local\Programs\MiKTeX\tex/latex/graphics\rotating.sty
@@ -1394,1734 +1549,19 @@ Package: rotating 2016/08/11 v2.16d rotated objects in LaTeX
 \rotFPbot=\skip90
 \rot@float@box=\box134
 \rot@mess@toks=\toks47
-)) (main.aux (Chapters/HojaTitulo.aux) (Chapters/Chap1_Intro.aux)
-(Chapters/Chap2_LitReview.aux
-
-LaTeX Warning: Label `STFT' multiply defined.
-
-
-LaTeX Warning: Label `SKL_eq' multiply defined.
-
-) (Chapters/Chap4_Problem&BG.aux
-
-LaTeX Warning: Label `fig:quality' multiply defined.
-
-
-LaTeX Warning: Label `fig:quality' multiply defined.
-
-
-LaTeX Warning: Label `fig:air_motion' multiply defined.
-
-
-LaTeX Warning: Label `fig:bird_sound_organs' multiply defined.
-
-
-LaTeX Warning: Label `fig:bird_sound_organs' multiply defined.
-
-) (Chapters/Chap3_Methodology.aux) (Chapters/Chap5_Evaluation.aux
-
-LaTeX Warning: Label `fig:a011' multiply defined.
-
-
-LaTeX Warning: Label `sub@fig:a011' multiply defined.
-
-
-LaTeX Warning: Label `fig:a011' multiply defined.
-
-
-LaTeX Warning: Label `fig:zonotrichia_1' multiply defined.
-
-
-LaTeX Warning: Label `fig:' multiply defined.
-
-
-LaTeX Warning: Label `fig:birdsong_real' multiply defined.
-
-
-LaTeX Warning: Label `fig:tapaculos' multiply defined.
-
-) (Chapters/Chap6_Conclusions.aux))
-\openout1 = `main.aux'.
-
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 5.
-LaTeX Font Info:    ... okay on input line 5.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 5.
-LaTeX Font Info:    ... okay on input line 5.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 5.
-LaTeX Font Info:    ... okay on input line 5.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 5.
-LaTeX Font Info:    ... okay on input line 5.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 5.
-LaTeX Font Info:    Trying to load font information for TS1+cmr on input line 5
-.
-
-(C:\Users\sebas\AppData\Local\Programs\MiKTeX\tex/latex/base\ts1cmr.fd
-File: ts1cmr.fd 2022/07/10 v2.5l Standard LaTeX font definitions
-)
-LaTeX Font Info:    ... okay on input line 5.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 5.
-LaTeX Font Info:    ... okay on input line 5.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 5.
-LaTeX Font Info:    ... okay on input line 5.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 5.
-LaTeX Font Info:    ... okay on input line 5.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 5.
-LaTeX Font Info:    ... okay on input line 5.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 5.
-LaTeX Font Info:    ... okay on input line 5.
-Package scrbase Info: activating english \partname on input line 5.
-Package scrbase Info: activating english \chaptername on input line 5.
-Package scrbase Info: activating english \appendixname on input line 5.
-Package scrbase Info: activating english \figurename on input line 5.
-Package scrbase Info: activating english \tablename on input line 5.
-Package scrbase Info: activating english \contentsname on input line 5.
-Package scrbase Info: activating english \listfigurename on input line 5.
-Package scrbase Info: activating english \listtablename on input line 5.
-Package scrbase Info: activating english \bibname on input line 5.
-Package scrbase Info: activating english \indexname on input line 5.
-Package tocbasic Info: usage of `tocbibind' detected on input line 5.
-
-
-Package tocbasic Warning: `tocbibind' redefinition of `\listoffigures'
-(tocbasic)                detected.
-(tocbasic)                Note: Loading `tocbibind' without option `notlof'
-(tocbasic)                can break several features of `tocbasic'.
-
-
-Package tocbasic Warning: `tocbibind' redefinition of `\listoftables'
-(tocbasic)                detected.
-(tocbasic)                Note: Loading `tocbibind' without option `notlot'
-(tocbasic)                can break several features of `tocbasic'.
-
-
-Package fontspec Info: Adjusting the maths setup (use [no-math] to avoid
-(fontspec)             this).
-
-\symlegacymaths=\mathgroup7
-LaTeX Font Info:    Overwriting symbol font `legacymaths' in version `bold'
-(Font)                  OT1/cmr/m/n --> OT1/cmr/bx/n on input line 5.
-LaTeX Font Info:    Redeclaring math accent \acute on input line 5.
-LaTeX Font Info:    Redeclaring math accent \grave on input line 5.
-LaTeX Font Info:    Redeclaring math accent \ddot on input line 5.
-LaTeX Font Info:    Redeclaring math accent \tilde on input line 5.
-LaTeX Font Info:    Redeclaring math accent \bar on input line 5.
-LaTeX Font Info:    Redeclaring math accent \breve on input line 5.
-LaTeX Font Info:    Redeclaring math accent \check on input line 5.
-LaTeX Font Info:    Redeclaring math accent \hat on input line 5.
-LaTeX Font Info:    Redeclaring math accent \dot on input line 5.
-LaTeX Font Info:    Redeclaring math accent \mathring on input line 5.
-LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 5.
-LaTeX Font Info:    Redeclaring math symbol \Delta on input line 5.
-LaTeX Font Info:    Redeclaring math symbol \Theta on input line 5.
-LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 5.
-LaTeX Font Info:    Redeclaring math symbol \Xi on input line 5.
-LaTeX Font Info:    Redeclaring math symbol \Pi on input line 5.
-LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 5.
-LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 5.
-LaTeX Font Info:    Redeclaring math symbol \Phi on input line 5.
-LaTeX Font Info:    Redeclaring math symbol \Psi on input line 5.
-LaTeX Font Info:    Redeclaring math symbol \Omega on input line 5.
-LaTeX Font Info:    Redeclaring math symbol \mathdollar on input line 5.
-LaTeX Font Info:    Redeclaring symbol font `operators' on input line 5.
-LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `normal' on input line 5.
-LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
-(Font)                  OT1/cmr/m/n --> TU/AncizarSerif(0)/m/n on input line 5.
-
-LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `bold' on input line 5.
-LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
-(Font)                  OT1/cmr/bx/n --> TU/AncizarSerif(0)/m/n on input line 5
-.
-LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
-(Font)                  TU/AncizarSerif(0)/m/n --> TU/AncizarSerif(0)/m/n on in
-put line 5.
-LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
-(Font)                  OT1/cmr/m/it --> TU/AncizarSerif(0)/m/it on input line 
-5.
-LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
-(Font)                  OT1/cmr/bx/n --> TU/AncizarSerif(0)/b/n on input line 5
-.
-LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
-(Font)                  OT1/cmss/m/n --> TU/AncizarSerif(0)/m/n on input line 5
-.
-LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
-(Font)                  OT1/cmtt/m/n --> TU/lmtt/m/n on input line 5.
-LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
-(Font)                  TU/AncizarSerif(0)/m/n --> TU/AncizarSerif(0)/b/n on in
-put line 5.
-LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
-(Font)                  OT1/cmr/bx/it --> TU/AncizarSerif(0)/b/it on input line
- 5.
-LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
-(Font)                  OT1/cmss/bx/n --> TU/AncizarSerif(0)/b/n on input line 
-5.
-LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
-(Font)                  OT1/cmtt/m/n --> TU/lmtt/b/n on input line 5.
-Package caption Info: Begin \AtBeginDocument code.
-Package caption Info: hyperref package is loaded.
-Package caption Info: rotating package is loaded.
-Package caption Info: wrapfig package is loaded.
-Package caption Info: End \AtBeginDocument code.
-
-Package todonotes Warning: The length marginparwidth is less than 2cm and will 
-most likely cause issues with the appearance of inserted todonotes. The issue c
-an be solved by adding a line like \setlength {\marginparwidth }{2cm} prior to 
-loading the todonotes package. on input line 5.
-
-Package hyperref Info: Link coloring ON on input line 5.
-(main.out) (main.out)
-\@outlinefile=\write4
-\openout4 = `main.out'.
-
-Class scrbook Info: loading recommended package `bookmark'.
-(scrbook)           Using `bookmark' together with `hyperref' is recommended,
-(scrbook)           because of handling of possible bookmark level gaps.
-(scrbook)           You can avoid loading `bookmark' with KOMA-Script option
-(scrbook)           `bookmarkpackage=false' before \begin{document} and
-(scrbook)           you can avoid this message adding:
-(scrbook)             \usepackage{bookmark}
-(scrbook)           before \begin{document} on input line 5.
-
-(C:\Users\sebas\AppData\Local\Programs\MiKTeX\tex/latex/bookmark\bookmark.sty
-Package: bookmark 2020-11-06 v1.29 PDF bookmarks (HO)
-
-(C:\Users\sebas\AppData\Local\Programs\MiKTeX\tex/latex/bookmark\bkm-dvipdfm.de
-f
-File: bkm-dvipdfm.def 2020-11-06 v1.29 bookmark driver for dvipdfm (HO)
-\BKM@id=\count381
 ))
-\openout2 = `Chapters/HojaTitulo.aux'.
-
- (Chapters/HojaTitulo.tex
-File: Images/cover1.png Graphic file (type bmp)
-<Images/cover1.png>
- [1
-
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 36--37
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 38--39
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 40--41
-
- []
-
-[2]
-File: Images/logo1.jpg Graphic file (type bmp)
-<Images/logo1.jpg>
- [1
-
-] [2]
-Underfull \hbox (badness 10000) in paragraph at lines 86--88
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 86--88
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 86--88
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 91--98
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 91--98
-\TU/AncizarSerif(0)/m/it/10.95 ”Education is the most powerful weapon you can
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 91--98
-
- []
-
-LaTeX Font Info:    Trying to load font information for U+msa on input line 98.
-
-(C:\Users\sebas\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
-File: umsa.fd 2013/01/14 v3.01 AMS symbols A
-)
-LaTeX Font Info:    Trying to load font information for U+msb on input line 98.
-
-
-(C:\Users\sebas\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
-File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-)
-LaTeX Font Info:    Trying to load font information for U+rsfs on input line 98
-.
-
-(C:\Users\sebas\AppData\Local\Programs\MiKTeX\tex/latex/jknappen\ursfs.fd
-File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
-)
-[3]
-Underfull \hbox (badness 10000) in paragraph at lines 102--106
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 102--106
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 102--106
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 102--106
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 107--108
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 109--110
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 112--113
-
- []
-
-[4]
-Underfull \hbox (badness 10000) in paragraph at lines 121--122
-
- []
-
-
-LaTeX Warning: Citation `simple_motor_gestures_2001' on page v undefined on inp
-ut line 123.
-
-
-Package fontspec Info: Font family 'AncizarSerif(1)' created for font
-(fontspec)             'AncizarSerif' with options [Ligatures=TeX,Path =
-(fontspec)             Ancizar/,Extension = .otf,UprightFont =
-(fontspec)             *-Light,BoldFont = *-Semibold,ItalicFont =
-(fontspec)             *-LightItalic,BoldItalicFont =
-(fontspec)             *-SemiboldItalic,VerticalPosition=Superior].
-(fontspec)              
-(fontspec)              This font family consists of the following NFSS
-(fontspec)             series/shapes:
-(fontspec)              
-(fontspec)             - 'normal' (m/n) with NFSS spec.:
-(fontspec)             <->"[Ancizar/AncizarSerif-Light.otf]/OT:script=latn;lang
-uage=dflt;+sups;mapping=tex-text;"
-(fontspec)             - 'small caps'  (m/sc) with NFSS spec.:
-(fontspec)             <->"[Ancizar/AncizarSerif-Light.otf]/OT:script=latn;lang
-uage=dflt;+sups;+smcp;mapping=tex-text;"
-(fontspec)             - 'bold' (b/n) with NFSS spec.:
-(fontspec)             <->"[Ancizar/AncizarSerif-Semibold.otf]/OT:script=latn;l
-anguage=dflt;+sups;mapping=tex-text;"
-(fontspec)             - 'bold small caps'  (b/sc) with NFSS spec.:
-(fontspec)             <->"[Ancizar/AncizarSerif-Semibold.otf]/OT:script=latn;l
-anguage=dflt;+sups;+smcp;mapping=tex-text;"
-(fontspec)             - 'italic' (m/it) with NFSS spec.:
-(fontspec)             <->"[Ancizar/AncizarSerif-LightItalic.otf]/OT:script=lat
-n;language=dflt;+sups;mapping=tex-text;"
-(fontspec)             - 'italic small caps'  (m/scit) with NFSS spec.:
-(fontspec)             <->"[Ancizar/AncizarSerif-LightItalic.otf]/OT:script=lat
-n;language=dflt;+sups;+smcp;mapping=tex-text;"
-(fontspec)             - 'bold italic' (b/it) with NFSS spec.:
-(fontspec)             <->"[Ancizar/AncizarSerif-SemiboldItalic.otf]/OT:script=
-latn;language=dflt;+sups;mapping=tex-text;"
-(fontspec)             - 'bold italic small caps'  (b/scit) with NFSS spec.:
-(fontspec)             <->"[Ancizar/AncizarSerif-SemiboldItalic.otf]/OT:script=
-latn;language=dflt;+sups;+smcp;mapping=tex-text;"
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 123--124
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 125--126
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 127--128
-
- []
-
-) [5
-
-
-] [6] (main.toc [7
-
-
-
-])
-\tf@toc=\write5
-\openout5 = `main.toc'.
-
- [1]
-\openout2 = `Chapters/Chap1_Intro.aux'.
-
- (Chapters/Chap1_Intro.tex
-chapter 1.
-
-Class scrbook Warning: \float@addtolists detected!
-(scrbook)              Implementation of \float@addtolist became
-(scrbook)              deprecated in KOMA-Script v3.01 2008/11/14 and
-(scrbook)              has been replaced by several more flexible
-(scrbook)              features of package `tocbasic`.
-(scrbook)              Since Version 3.12 support for deprecated
-(scrbook)              \float@addtolist interface has been
-(scrbook)              restricted to only some of the KOMA-Script
-(scrbook)              features and been removed from others.
-(scrbook)              Loading of package `scrhack' may help to
-(scrbook)              avoid this warning, if you are using a
-(scrbook)              a package that still implements the
-(scrbook)              deprecated \float@addtolist interface.
-
-
-LaTeX Warning: Citation `Foley2011' on page 2 undefined on input line 3.
-
-File: Images/biodiversity_loss.png Graphic file (type bmp)
-<Images/biodiversity_loss.png>
-
-LaTeX Warning: Citation `save_space' on page 2 undefined on input line 9.
-
-
-LaTeX Warning: Citation `save_space' on page 2 undefined on input line 9.
-
-File: Images/ecosystem.png Graphic file (type bmp)
-<Images/ecosystem.png>
-
-LaTeX Warning: Citation `Cardinale2012' on page 2 undefined on input line 17.
-
-
-LaTeX Warning: Citation `Cardinale2012' on page 2 undefined on input line 17.
-
-[2
-
-
-]
-File: Images/security.png Graphic file (type bmp)
-<Images/security.png>
-
-
-LaTeX Warning: Citation `Cardinale2012' on page 3 undefined on input line 29.
-
-
-LaTeX Warning: Citation `Cardinale2012' on page 3 undefined on input line 29.
-
-
-LaTeX Warning: Citation `tutor' on page 3 undefined on input line 33.
-
-
-LaTeX Warning: Citation `brain_to_syllables' on page 3 undefined on input line 
-33.
-
-
-LaTeX Warning: Citation `sleep' on page 3 undefined on input line 33.
-
-
-LaTeX Warning: Citation `music_birdsongs' on page 3 undefined on input line 33.
-
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 33--34
-
- []
-
-[3]
-Underfull \hbox (badness 10000) in paragraph at lines 35--36
-
- []
-
-File: Images/bird_logo.png Graphic file (type bmp)
-<Images/bird_logo.png>
-)
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [4]
-[5]
-\openout2 = `Chapters/Chap2_LitReview.aux'.
-
- (Chapters/Chap2_LitReview.tex
-chapter 2.
-
-Underfull \hbox (badness 10000) in paragraph at lines 7--8
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 9--10
-
- []
-
-
-LaTeX Warning: Citation `book_birdsongs' on page 6 undefined on input line 18.
-
-[6
-
-
-
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 24--25
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 35--36
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 37--38
-
- []
-
-
-LaTeX Warning: Citation `book_signal_processing' on page 7 undefined on input l
-ine 39.
-
-
-LaTeX Warning: Citation `signal_book_modern' on page 7 undefined on input line 
-39.
-
-[7]
-File: Images/fs.png Graphic file (type bmp)
-<Images/fs.png>
- [8]
-Underfull \hbox (badness 10000) in paragraph at lines 73--74
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 75--76
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 84--85
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 89--91
-
- []
-
-[9]
-Underfull \hbox (badness 10000) in paragraph at lines 115--117
-
- []
-
-
-LaTeX Warning: Citation `fourier_signal' on page 10 undefined on input line 126
-.
-
-
-LaTeX Warning: Citation `fourier_math' on page 10 undefined on input line 126.
-
-[10]
-Underfull \hbox (badness 10000) in paragraph at lines 133--135
-
- []
-
-
-Overfull \hbox (12.5449pt too wide) in paragraph at lines 141--142
-\TU/AncizarSerif(0)/m/n/12 The discrete Fourier Transform (FT) transform a sequ
-ence of $\OML/cmm/m/it/12 N$ \TU/AncizarSerif(0)/m/n/12 elements,$\OMS/cmsy/m/n
-/12 f\OML/cmm/m/it/12 x[]\OMS/cmsy/m/n/12 g \OT1/cmr/m/n/12 := \OML/cmm/m/it/12
- x[]; x[]; [] ; x[]$\TU/AncizarSerif(0)/m/n/12 ,
- []
-
-
-LaTeX Warning: Citation `signal_book_modern' on page 11 undefined on input line
- 150.
-
-[11]
-Underfull \hbox (badness 10000) in paragraph at lines 198--199
-
- []
-
-[12]
-
-LaTeX Warning: Citation `yin' on page 13 undefined on input line 211.
-
-
-LaTeX Warning: Citation `librosa' on page 13 undefined on input line 211.
-
-[13]
-
-LaTeX Warning: Citation `dissimilarity_acoustic_indices' on page 14 undefined o
-n input line 276.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 284--285
-
- []
-
-
-LaTeX Warning: Citation `scholarpedia' on page 14 undefined on input line 291.
-
-[14]
-
-LaTeX Warning: Citation `bifurcation' on page 15 undefined on input line 296.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 296--297
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 298--299
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 308--309
-
- []
-
-[15]
-Underfull \hbox (badness 10000) in paragraph at lines 338--340
-
- []
-
-
-LaTeX Warning: Citation `bifurcation' on page 16 undefined on input line 341.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 354--355
-
- []
-
-[16]
-Underfull \hbox (badness 10000) in paragraph at lines 356--357
-
- []
-
-File: Images/1d.png Graphic file (type bmp)
-<Images/1d.png>
-File: Images/2d.png Graphic file (type bmp)
-<Images/2d.png>
-[17]
-Underfull \hbox (badness 10000) in paragraph at lines 427--428
-
- []
-
-[18]
-File: Images/3d.png Graphic file (type bmp)
-<Images/3d.png>
-File: Images/4d.png Graphic file (type bmp)
-<Images/4d.png>
-
-Overfull \hbox (21.1273pt too wide) in paragraph at lines 465--466
- [][] 
- []
-
-
-Underfull \hbox (badness 4505) in paragraph at lines 466--466
-[][][]\TU/AncizarSerif(0)/b/n/12 Figure 2-5[][]\TU/AncizarSerif(0)/m/n/12 : []|
-Non-hyperbolic equilibrium
- []
-
-
-Underfull \vbox (badness 6001) has occurred while \output is active []
-
- [19]
-File: Images/SubHopf.png Graphic file (type bmp)
-<Images/SubHopf.png>
-File: Images/SuperHopf.png Graphic file (type bmp)
-<Images/SuperHopf.png>
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [20]
-File: Images/saddle-node.png Graphic file (type bmp)
-<Images/saddle-node.png>
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [21]
-Underfull \hbox (badness 10000) in paragraph at lines 515--516
-
- []
-
-File: Images/cycle/cycle1.png Graphic file (type bmp)
-<Images/cycle/cycle1.png>
-<a0,fr0>
-File: Images/cycle/cycle2.png Graphic file (type bmp)
-<Images/cycle/cycle2.png>
- <a0,fr1>
-File: Images/cycle/cycle3.png Graphic file (type bmp)
-<Images/cycle/cycle3.png>
- <a0,fr2>
-File: Images/cycle/cycle4.png Graphic file (type bmp)
-<Images/cycle/cycle4.png>
- <a0,fr3>
-File: Images/cycle/cycle5.png Graphic file (type bmp)
-<Images/cycle/cycle5.png>
- <a0,fr4>
-File: Images/cycle/cycle6.png Graphic file (type bmp)
-<Images/cycle/cycle6.png>
- <a0,fr5>
-File: Images/cycle/cycle7.png Graphic file (type bmp)
-<Images/cycle/cycle7.png>
- <a0,fr6>
-File: Images/cycle/cycle8.png Graphic file (type bmp)
-<Images/cycle/cycle8.png>
- <a0,fr7>
-File: Images/cycle/cycle9.png Graphic file (type bmp)
-<Images/cycle/cycle9.png>
-
-<a0,fr8>
-File: Images/cycle/cycle10.png Graphic file (type bmp)
-<Images/cycle/cycle10.png>
- <a0,fr9>
-File: Images/cycle/cycle11.png Graphic file (type bmp)
-<Images/cycle/cycle11.png>
- <a0,fr10>
-File: Images/cycle/cycle12.png Graphic file (type bmp)
-<Images/cycle/cycle12.png>
- <a0,fr11>
-File: Images/cycle/cycle13.png Graphic file (type bmp)
-<Images/cycle/cycle13.png>
- <a0,fr12>
-File: Images/cycle/cycle14.png Graphic file (type bmp)
-<Images/cycle/cycle14.png>
- <a0,fr13>
-File: Images/cycle/cycle15.png Graphic file (type bmp)
-<Images/cycle/cycle15.png>
- <a0,fr14>
-File: Images/cycle/cycle16.png Graphic file (type bmp)
-<Images/cycle/cycle16.png>
- <a0,fr15>
-File: Images/cycle/cycle17.png Graphic file (type bmp)
-<Images/cycle/cycle17.png>
-
-<a0,fr16>
-File: Images/cycle/cycle18.png Graphic file (type bmp)
-<Images/cycle/cycle18.png>
- <a0,fr17>
-File: Images/cycle/cycle19.png Graphic file (type bmp)
-<Images/cycle/cycle19.png>
- <a0,fr18>
-File: Images/cycle/cycle20.png Graphic file (type bmp)
-<Images/cycle/cycle20.png>
- <a0,fr19> [22]
-File: Images/BogdanovTakens.png Graphic file (type bmp)
-<Images/BogdanovTakens.png>
-
-
-LaTeX Warning: Citation `bifurcations_book' on page 23 undefined on input line 
-548.
-
-
-LaTeX Warning: Citation `bifurcation' on page 23 undefined on input line 548.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 553--554
-
- []
-
-[23]
-Underfull \hbox (badness 10000) in paragraph at lines 555--556
-
- []
-
-
-LaTeX Warning: Citation `numerical_opt' on page 24 undefined on input line 557.
-
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 561--562
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 563--564
-
- []
-
-File: Images/problem_opt.png Graphic file (type bmp)
-<Images/problem_opt.png>
-
-LaTeX Warning: Citation `numerical_opt' on page 24 undefined on input line 571.
-
-
-
-LaTeX Warning: Citation `numerical_opt' on page 24 undefined on input line 571.
-
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [24]
-Underfull \hbox (badness 10000) in paragraph at lines 593--594
-
- []
-
-[25]
-File: Images/optimizers.png Graphic file (type bmp)
-<Images/optimizers.png>
- [26]
-
-LaTeX Warning: Citation `numerical_opt' on page 27 undefined on input line 638.
-
-
-
-LaTeX Warning: Citation `inverse_problem' on page 27 undefined on input line 64
-3.
-
-File: Images/invers_problem.png Graphic file (type bmp)
-<Images/invers_problem.png>
-
-Underfull \hbox (badness 10000) in paragraph at lines 655--656
-
- []
-
-[27]
-Underfull \hbox (badness 10000) in paragraph at lines 659--660
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 661--662
-
- []
-
-File: Images/linear_transformation.png Graphic file (type bmp)
-<Images/linear_transformation.png>
-
-Underfull \hbox (badness 10000) in paragraph at lines 690--691
-
- []
-
-[28]
-Underfull \hbox (badness 10000) in paragraph at lines 712--713
-
- []
-
-
-LaTeX Warning: Citation `modern_optimization' on page 29 undefined on input lin
-e 715.
-
-) [29]
-\openout2 = `Chapters/Chap4_Problem&BG.aux'.
-
- (Chapters/Chap4_Problem&BG.tex
-chapter 3.
-
-Underfull \hbox (badness 10000) in paragraph at lines 11--12
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 13--14
-
- []
-
-File: Images/quality.png Graphic file (type bmp)
-<Images/quality.png>
-[30
-
-
-
-
-]
-File: Images/pitch_trend.png Graphic file (type bmp)
-<Images/pitch_trend.png>
-File: Images/song_sections.png Graphic file (type bmp)
-<Images/song_sections.png>
- [31]
-
-LaTeX Warning: Citation `hero' on page 32 undefined on input line 51.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 55--56
-
- []
-
-File: Images/bird_sound_organs.png Graphic file (type bmp)
-<Images/bird_sound_organs.png>
-
-LaTeX Warning: Citation `birdanatomy' on page 32 undefined on input line 63.
-
-
-LaTeX Warning: Citation `birdanatomy' on page 32 undefined on input line 63.
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [32]
-File: Images/birdsong_paloma.png Graphic file (type bmp)
-<Images/birdsong_paloma.png>
-
-Overfull \hbox (28.03595pt too wide) in paragraph at lines 73--74
- [][] 
- []
-
-
-LaTeX Warning: Citation `birds_handbook' on page 33 undefined on input line 74.
-
-
-
-LaTeX Warning: Citation `birds_handbook' on page 33 undefined on input line 74.
-
-
-
-Underfull \hbox (badness 3000) in paragraph at lines 79--81
-\TU/AncizarSerif(0)/m/n/12 and unlike humans is located where the
- []
-
-
-Underfull \hbox (badness 1509) in paragraph at lines 79--81
-\TU/AncizarSerif(0)/m/n/12 trachea forks into the lungs, the junction
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 79--81
-
- []
-
-File: Images/syrinx_muscles.png Graphic file (type bmp)
-<Images/syrinx_muscles.png>
-
-LaTeX Warning: Citation `Syrinx_muscles' on page 33 undefined on input line 90.
-
-
-
-LaTeX Warning: Citation `Syrinx_muscles' on page 33 undefined on input line 90.
-
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [33]
-File: Images/spectrum/birdsong_spectrum-0.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-0.png>
-
-<a1,fr0>
-File: Images/spectrum/birdsong_spectrum-1.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-1.png>
- <a1,fr1>
-File: Images/spectrum/birdsong_spectrum-2.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-2.png>
- <a1,fr2>
-File: Images/spectrum/birdsong_spectrum-3.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-3.png>
- <a1,fr3>
-File: Images/spectrum/birdsong_spectrum-4.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-4.png>
- <a1,fr4>
-File: Images/spectrum/birdsong_spectrum-5.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-5.png>
- <a1,fr5>
-File: Images/spectrum/birdsong_spectrum-6.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-6.png>
- <a1,fr6>
-File: Images/spectrum/birdsong_spectrum-7.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-7.png>
- <a1,fr7>
-File: Images/spectrum/birdsong_spectrum-8.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-8.png>
-
-<a1,fr8>
-File: Images/spectrum/birdsong_spectrum-9.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-9.png>
- <a1,fr9>
-File: Images/spectrum/birdsong_spectrum-10.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-10.png>
- <a1,fr10>
-File: Images/spectrum/birdsong_spectrum-11.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-11.png>
- <a1,fr11>
-File: Images/spectrum/birdsong_spectrum-12.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-12.png>
- <a1,fr12>
-File: Images/spectrum/birdsong_spectrum-13.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-13.png>
- <a1,fr13>
-File: Images/spectrum/birdsong_spectrum-14.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-14.png>
- <a1,fr14>
-File: Images/spectrum/birdsong_spectrum-15.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-15.png>
- <a1,fr15>
-File: Images/spectrum/birdsong_spectrum-16.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-16.png>
-
-<a1,fr16>
-File: Images/spectrum/birdsong_spectrum-17.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-17.png>
- <a1,fr17>
-File: Images/spectrum/birdsong_spectrum-18.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-18.png>
- <a1,fr18>
-File: Images/spectrum/birdsong_spectrum-19.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-19.png>
- <a1,fr19>
-File: Images/spectrum/birdsong_spectrum-20.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-20.png>
- <a1,fr20>
-File: Images/spectrum/birdsong_spectrum-21.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-21.png>
- <a1,fr21>
-File: Images/spectrum/birdsong_spectrum-22.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-22.png>
- <a1,fr22>
-File: Images/spectrum/birdsong_spectrum-23.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-23.png>
-
-<a1,fr23>
-File: Images/spectrum/birdsong_spectrum-24.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-24.png>
- <a1,fr24>
-File: Images/spectrum/birdsong_spectrum-25.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-25.png>
- <a1,fr25>
-File: Images/spectrum/birdsong_spectrum-26.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-26.png>
- <a1,fr26>
-File: Images/spectrum/birdsong_spectrum-27.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-27.png>
- <a1,fr27>
-File: Images/spectrum/birdsong_spectrum-28.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-28.png>
- <a1,fr28>
-File: Images/spectrum/birdsong_spectrum-29.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-29.png>
- <a1,fr29>
-File: Images/spectrum/birdsong_spectrum-30.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-30.png>
-
-<a1,fr30>
-File: Images/spectrum/birdsong_spectrum-31.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-31.png>
- <a1,fr31>
-File: Images/spectrum/birdsong_spectrum-32.png Graphic file (type bmp)
-<Images/spectrum/birdsong_spectrum-32.png>
- <a1,fr32>
-
-LaTeX Warning: Citation `birdsongs_cornell' on page 34 undefined on input line 
-99.
-
-
-LaTeX Warning: Citation `birdsongs_cornell' on page 34 undefined on input line 
-99.
-
-File: Images/syrinx/birdsong_syrinx-0.png Graphic file (type bmp)
-<Images/syrinx/birdsong_syrinx-0.png>
-<a2,fr0>
-File: Images/syrinx/birdsong_syrinx-1.png Graphic file (type bmp)
-<Images/syrinx/birdsong_syrinx-1.png>
- <a2,fr1>
-File: Images/syrinx/birdsong_syrinx-2.png Graphic file (type bmp)
-<Images/syrinx/birdsong_syrinx-2.png>
- <a2,fr2>
-File: Images/syrinx/birdsong_syrinx-3.png Graphic file (type bmp)
-<Images/syrinx/birdsong_syrinx-3.png>
- <a2,fr3> <a2,fr4> <a2,fr5>
-File: Images/syrinx/birdsong_syrinx-6.png Graphic file (type bmp)
-<Images/syrinx/birdsong_syrinx-6.png>
- <a2,fr6>
-File: Images/syrinx/birdsong_syrinx-7.png Graphic file (type bmp)
-<Images/syrinx/birdsong_syrinx-7.png>
- <a2,fr7>
-<a2,fr8> <a2,fr9>
-File: Images/syrinx/birdsong_syrinx-10.png Graphic file (type bmp)
-<Images/syrinx/birdsong_syrinx-10.png>
- <a2,fr10>
-File: Images/syrinx/birdsong_syrinx-11.png Graphic file (type bmp)
-<Images/syrinx/birdsong_syrinx-11.png>
- <a2,fr11> <a2,fr12> <a2,fr13>
-Underfull \vbox (badness 6910) has occurred while \output is active []
-
- [34]
-Underfull \hbox (badness 10000) in paragraph at lines 127--128
-
- []
-
-File: Images/birdsong/birdsong-0.png Graphic file (type bmp)
-<Images/birdsong/birdsong-0.png>
-<a3,fr0>
-File: Images/birdsong/birdsong-1.png Graphic file (type bmp)
-<Images/birdsong/birdsong-1.png>
- <a3,fr1>
-File: Images/birdsong/birdsong-2.png Graphic file (type bmp)
-<Images/birdsong/birdsong-2.png>
- <a3,fr2>
-File: Images/birdsong/birdsong-3.png Graphic file (type bmp)
-<Images/birdsong/birdsong-3.png>
- <a3,fr3>
-File: Images/birdsong/birdsong-4.png Graphic file (type bmp)
-<Images/birdsong/birdsong-4.png>
- <a3,fr4>
-File: Images/birdsong/birdsong-5.png Graphic file (type bmp)
-<Images/birdsong/birdsong-5.png>
- <a3,fr5>
-File: Images/birdsong/birdsong-6.png Graphic file (type bmp)
-<Images/birdsong/birdsong-6.png>
- <a3,fr6>
-File: Images/birdsong/birdsong-7.png Graphic file (type bmp)
-<Images/birdsong/birdsong-7.png>
- <a3,fr7>
-File: Images/birdsong/birdsong-8.png Graphic file (type bmp)
-<Images/birdsong/birdsong-8.png>
-
-<a3,fr8>
-File: Images/birdsong/birdsong-9.png Graphic file (type bmp)
-<Images/birdsong/birdsong-9.png>
- <a3,fr9>
-File: Images/birdsong/birdsong-10.png Graphic file (type bmp)
-<Images/birdsong/birdsong-10.png>
- <a3,fr10>
-File: Images/birdsong/birdsong-11.png Graphic file (type bmp)
-<Images/birdsong/birdsong-11.png>
- <a3,fr11>
-File: Images/birdsong/birdsong-12.png Graphic file (type bmp)
-<Images/birdsong/birdsong-12.png>
- <a3,fr12>
-File: Images/birdsong/birdsong-13.png Graphic file (type bmp)
-<Images/birdsong/birdsong-13.png>
- <a3,fr13>
-File: Images/birdsong/birdsong-14.png Graphic file (type bmp)
-<Images/birdsong/birdsong-14.png>
- <a3,fr14>
-File: Images/birdsong/birdsong-15.png Graphic file (type bmp)
-<Images/birdsong/birdsong-15.png>
- <a3,fr15>
-File: Images/birdsong/birdsong-16.png Graphic file (type bmp)
-<Images/birdsong/birdsong-16.png>
-
-<a3,fr16>
-File: Images/birdsong/birdsong-17.png Graphic file (type bmp)
-<Images/birdsong/birdsong-17.png>
- <a3,fr17>
-
-LaTeX Warning: Citation `birdsongs_cornell' on page 35 undefined on input line 
-134.
-
-
-LaTeX Warning: Citation `birdsongs_cornell' on page 35 undefined on input line 
-134.
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [35]
-File: Images/sound_pitch.png Graphic file (type bmp)
-<Images/sound_pitch.png>
-
-
-LaTeX Warning: Citation `birdsongs_cornell' on page 36 undefined on input line 
-145.
-
-
-LaTeX Warning: Citation `birdsongs_cornell' on page 36 undefined on input line 
-145.
-
-[36]
-File: Images/complex_sound.png Graphic file (type bmp)
-<Images/complex_sound.png>
-
-
-LaTeX Warning: Citation `sound_pasco' on page 37 undefined on input line 154.
-
-
-LaTeX Warning: Citation `sound_pasco' on page 37 undefined on input line 154.
-
-File: Images/model.png Graphic file (type bmp)
-<Images/model.png>
-
-LaTeX Warning: Citation `complete_model' on page 37 undefined on input line 172
-.
-
-
-LaTeX Warning: Citation `siryx_image' on page 37 undefined on input line 172.
-
-
-LaTeX Warning: Citation `complete_model' on page 37 undefined on input line 172
-.
-
-
-LaTeX Warning: Citation `siryx_image' on page 37 undefined on input line 172.
-
-[37]
-
-LaTeX Warning: Citation `Titze1998' on page 38 undefined on input line 181.
-
-File: Images/tatzi.png Graphic file (type bmp)
-<Images/tatzi.png>
-
-LaTeX Warning: Citation `Titze1998' on page 38 undefined on input line 195.
-
-
-LaTeX Warning: Citation `Titze1998' on page 38 undefined on input line 195.
-
-
-Underfull \hbox (badness 1527) in paragraph at lines 195--195
-\TU/AncizarSerif(0)/m/n/12 cover model, vocal folds, used for
- []
-
-
-Underfull \hbox (badness 3068) in paragraph at lines 195--195
-\TU/AncizarSerif(0)/m/n/12 small-oscillation analysis [[]], a toy
- []
-
-File: Images/simple_gestures.png Graphic file (type bmp)
-<Images/simple_gestures.png>
-
-LaTeX Warning: Citation `simple_motor_gestures_2001' on page 38 undefined on in
-put line 207.
-
-
-LaTeX Warning: Citation `simple_motor_gestures_2001' on page 38 undefined on in
-put line 207.
-
-
-LaTeX Warning: Citation `simple_motor_gestures_2001' on page 38 undefined on in
-put line 212.
-
-
-LaTeX Warning: Citation `syrinx_exp' on page 38 undefined on input line 212.
-
-
-Underfull \hbox (badness 3158) in paragraph at lines 212--213
-[]\TU/AncizarSerif(0)/m/n/12 Using the Titze model and study-
- []
-
-
-Underfull \hbox (badness 2261) in paragraph at lines 212--213
-\TU/AncizarSerif(0)/m/n/12 ing its dynamical behavior, profes-
- []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [38]
-
-LaTeX Warning: Citation `Neuromuscular' on page 39 undefined on input line 216.
-
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 216--217
-
- []
-
-
-LaTeX Warning: Citation `diversity' on page 39 undefined on input line 218.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 218--219
-
- []
-
-
-LaTeX Warning: Citation `experimental_support' on page 39 undefined on input li
-ne 220.
-
-
-LaTeX Warning: Citation `electronic_syrinx' on page 39 undefined on input line 
-220.
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [39]
-File: Images/electronic_syrinx.png Graphic file (type bmp)
-<Images/electronic_syrinx.png>
-
-
-LaTeX Warning: Citation `electronic_syrinx' on page 40 undefined on input line 
-225.
-
-
-LaTeX Warning: Citation `electronic_syrinx' on page 40 undefined on input line 
-225.
-
-
-LaTeX Warning: Citation `source-source' on page 40 undefined on input line 230.
-
-
-
-LaTeX Warning: Citation `rich' on page 40 undefined on input line 230.
-
-File: Images/trachea_coupling.png Graphic file (type bmp)
-<Images/trachea_coupling.png>
-
-LaTeX Warning: Citation `source-source' on page 40 undefined on input line 237.
-
-
-
-LaTeX Warning: Citation `source-source' on page 40 undefined on input line 237.
-
-
-
-Underfull \hbox (badness 2469) in paragraph at lines 237--237
-[][][]\TU/AncizarSerif(0)/b/n/12 Figure 3-16[][]\TU/AncizarSerif(0)/m/n/12 : []
-|Coupling between sy-
- []
-
-
-Underfull \hbox (badness 1107) in paragraph at lines 237--237
-\TU/AncizarSerif(0)/m/n/12 rinx labia and vocal tract (trachea).
- []
-
-File: Images/dynamical_bihavior.png Graphic file (type bmp)
-<Images/dynamical_bihavior.png>
-
-LaTeX Warning: Citation `rich' on page 40 undefined on input line 245.
-
-
-LaTeX Warning: Citation `rich' on page 40 undefined on input line 245.
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [40]
-
-LaTeX Warning: Citation `book_birdsongs' on page 41 undefined on input line 251
-.
-
-
-LaTeX Warning: Citation `scholarpedia_syrinx' on page 41 undefined on input lin
-e 251.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 251--252
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 254--255
-
- []
-
-
-LaTeX Warning: Citation `Amador2014' on page 41 undefined on input line 257.
-
-
-LaTeX Warning: Citation `complete_model' on page 41 undefined on input line 257
-.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 257--258
-
- []
-
-[41]
-
-LaTeX Warning: Citation `vortex' on page 42 undefined on input line 259.
-
-
-LaTeX Warning: Citation `ML1' on page 42 undefined on input line 259.
-
-
-LaTeX Warning: Citation `ML2' on page 42 undefined on input line 259.
-
-
-LaTeX Warning: Citation `ML3' on page 42 undefined on input line 259.
-
-
-LaTeX Warning: Citation `complete_model' on page 42 undefined on input line 264
-.
-
-
-LaTeX Warning: Citation `syrinx_first_model' on page 42 undefined on input line
- 284.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 284--285
-
- []
-
-[42]
-
-LaTeX Warning: Citation `trachea_birdsong' on page 43 undefined on input line 3
-03.
-
-
-LaTeX Warning: Citation `OEC_units' on page 43 undefined on input line 315.
-
-
-LaTeX Warning: Citation `OEC_circuit' on page 43 undefined on input line 315.
-
-File: Images/OEC.png Graphic file (type bmp)
-<Images/OEC.png>
-
-LaTeX Warning: Citation `OEC_currents' on page 43 undefined on input line 321.
-
-
-LaTeX Warning: Citation `OEC_currents' on page 43 undefined on input line 321.
-
-File: Images/oec_new.png Graphic file (type bmp)
-<Images/oec_new.png>
-
-LaTeX Warning: Citation `OEC_circuit' on page 43 undefined on input line 327.
-
-
-LaTeX Warning: Citation `OEC_circuit' on page 43 undefined on input line 327.
-
-[43]
-File: Images/mallas.png Graphic file (type bmp)
-<Images/mallas.png>
-
-
-Package caption Warning: The option `hypcap=true' will be ignored for this
-(caption)                particular \caption on input line 336.
-See the caption package documentation for explanation.
-
-
-Overfull \hbox (1.44388pt too wide) in paragraph at lines 335--336
-[][] 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 336--336
-[][][]\TU/AncizarSerif(0)/b/n/12 Figure 3-20[][]\TU/AncizarSerif(0)/m/n/12 : []
-|[]Analog
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 339--340
-
- []
-
-
-Underfull \vbox (badness 4341) has occurred while \output is active []
-
- [44]
-Overfull \hbox (18.41216pt too wide) detected at line 385
-[]
- []
-
-
-LaTeX Warning: Citation `OEC_currents' on page 45 undefined on input line 403.
-
-
-LaTeX Warning: Citation `OEC_circuit' on page 45 undefined on input line 403.
-
-File: Images/acoustic_analog.png Graphic file (type bmp)
-<Images/acoustic_analog.png>
-
-LaTeX Warning: Citation `OEC_circuit' on page 45 undefined on input line 408.
-
-
-LaTeX Warning: Citation `OEC_circuit' on page 45 undefined on input line 408.
-
-
-LaTeX Warning: Citation `Neuromuscular' on page 45 undefined on input line 413.
-
-
-
-LaTeX Warning: Citation `birdsongs_ML_new' on page 45 undefined on input line 4
-13.
-
-
-LaTeX Warning: Citation `muscles_role' on page 45 undefined on input line 413.
-
-[45]
-Underfull \hbox (badness 10000) in paragraph at lines 421--422
-
- []
-
-
-LaTeX Warning: Citation `automatization' on page 46 undefined on input line 423
-.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 423--424
-
- []
-
-
-LaTeX Warning: Citation `NNbirds' on page 46 undefined on input line 426.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 425--427
-
- []
-
-[46]
-Underfull \hbox (badness 10000) in paragraph at lines 463--464
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 465--466
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 478--479
-
- []
-
-) [47]
-\openout2 = `Chapters/Chap3_Methodology.aux'.
-
- (Chapters/Chap3_Methodology.tex
-chapter 4.
-
-Underfull \hbox (badness 10000) in paragraph at lines 3--4
-
- []
-
-
-LaTeX Warning: Citation `poo' on page 48 undefined on input line 10.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 10--11
-
- []
-
-
-LaTeX Warning: Citation `poo_coursera' on page 48 undefined on input line 23.
-
-File: Images/objects.png Graphic file (type bmp)
-<Images/objects.png>
-[48
-
-
-
-
-]
-
-LaTeX Warning: Citation `librosa' on page 49 undefined on input line 45.
-
-
-LaTeX Warning: Citation `signal_book_modern' on page 49 undefined on input line
- 45.
-
-File: Images/methodology.png Graphic file (type bmp)
-<Images/methodology.png>
-
-Underfull \vbox (badness 1389) has occurred while \output is active []
-
- [49]
-Underfull \hbox (badness 10000) in paragraph at lines 64--65
-
- []
-
-[50]
-Underfull \hbox (badness 10000) in paragraph at lines 86--87
-
- []
-
-[51]
-Underfull \hbox (badness 10000) in paragraph at lines 127--128
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 141--142
-
- []
-
-
-LaTeX Warning: Citation `lmfit' on page 52 undefined on input line 154.
-
-
-LaTeX Warning: Citation `lmfit' on page 52 undefined on input line 155.
-
-) [52]
-\openout2 = `Chapters/Chap5_Evaluation.aux'.
-
- (Chapters/Chap5_Evaluation.tex
-chapter 5.
-
-LaTeX Warning: Reference `Poo' on page 53 undefined on input line 9.
-
-File: Images/part_chirp.png Graphic file (type bmp)
-<Images/part_chirp.png>
-File: Images/whole_chirp.png Graphic file (type bmp)
-<Images/whole_chirp.png>
-
-Underfull \hbox (badness 10000) in paragraph at lines 32--33
-
- []
-
-[53
-
-
-
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 34--35
-
- []
-
-File: Images/gamma1000.png Graphic file (type bmp)
-<Images/gamma1000.png>
-File: Images/gamma50000.png Graphic file (type bmp)
-<Images/gamma50000.png>
-File: Images/gamma100000.png Graphic file (type bmp)
-<Images/gamma100000.png>
-File: Images/gamma37000.png Graphic file (type bmp)
-<Images/gamma37000.png>
-
-Underfull \hbox (badness 10000) in paragraph at lines 68--69
-
- []
-
-[54]
-File: Images/a001_wave.png Graphic file (type bmp)
-<Images/a001_wave.png>
-File: Images/a001_param.png Graphic file (type bmp)
-<Images/a001_param.png>
-File: Images/a011_wave.png Graphic file (type bmp)
-<Images/a011_wave.png>
-File: Images/a011_param.png Graphic file (type bmp)
-<Images/a011_param.png>
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [55]
-File: Images/a125_wave.png Graphic file (type bmp)
-<Images/a125_wave.png>
-File: Images/a125_param.png Graphic file (type bmp)
-<Images/a125_param.png>
-
-[56]
-File: Images/Birdsong-XC11293.png Graphic file (type bmp)
-<Images/Birdsong-XC11293.png>
-File: Images/ScoresVariables-syllable-XC11293 - Rufous-collared Sparrow - Zonot
-richia capensis.wav-1.png Graphic file (type bmp)
-<Images/ScoresVariables-syllable-XC11293 - Rufous-collared Sparrow - Zonotrichi
-a capensis.wav-1.png>
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [57]
-File: Images/ScoresVariables-syllable-XC11293 - Rufous-collared Sparrow - Zonot
-richia capensis.wav-0.png Graphic file (type bmp)
-<Images/ScoresVariables-syllable-XC11293 - Rufous-collared Sparrow - Zonotrichi
-a capensis.wav-0.png>
-File: Images/ScoresVariables-syllable-4_short_FINCA153_Zonotrichia_capensis_tri
-med.wav-0.png Graphic file (type bmp)
-<Images/ScoresVariables-syllable-4_short_FINCA153_Zonotrichia_capensis_trimed.w
-av-0.png>
-File: Images/ScoresVariables-syllable-2_short_FINCA_H2N_180919-144222_Zonotrich
-ia_capensis.wav-0.png Graphic file (type bmp)
-<Images/ScoresVariables-syllable-2_short_FINCA_H2N_180919-144222_Zonotrichia_ca
-pensis.wav-0.png>
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [58]
-File: Images/ScoresVariables-syllable-XC11293 - Rufous-collared Sparrow - Zonot
-richia capensis.wav-0.png Graphic file (type bmp)
-<Images/ScoresVariables-syllable-XC11293 - Rufous-collared Sparrow - Zonotrichi
-a capensis.wav-0.png>
-
-Underfull \vbox (badness 1014) has occurred while \output is active []
-
- [59]
-File: Images/Figure 23.png Graphic file (type bmp)
-<Images/Figure 23.png>
-File: Images/Figure 26.png Graphic file (type bmp)
-<Images/Figure 26.png>
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [60]
-File: Images/Results/MotorGesturesParameters-chunck-synth-1-0.png Graphic file 
-(type bmp)
-<Images/Results/MotorGesturesParameters-chunck-synth-1-0.png>
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [61]
-File: Images/Results/ScoresVariables-syllable-1-1.png Graphic file (type bmp)
-<Images/Results/ScoresVariables-syllable-1-1.png>
-File: Images/1.png Graphic file (type bmp)
-<Images/1.png>
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [62]
-File: Images/2.png Graphic file (type bmp)
-<Images/2.png>
-File: Images/3.png Graphic file (type bmp)
-<Images/3.png>
-
-Underfull \vbox (badness 6032) has occurred while \output is active []
-
- [63]
-File: Images/ScoresVariables-syllable-XC104508 - Ocellated Tapaculo - Acroptern
-is orthonyx.wav-0.png Graphic file (type bmp)
-<Images/ScoresVariables-syllable-XC104508 - Ocellated Tapaculo - Acropternis or
-thonyx.wav-0.png>
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [64]
-File: Images/ScoresVariables-syllable-C527995 - Thick-billed Euphonia - Euphoni
-a laniirostris.wav-0.png Graphic file (type bmp)
-<Images/ScoresVariables-syllable-C527995 - Thick-billed Euphonia - Euphonia lan
-iirostris.wav-0.png>
-File: Images/ScoresVariables-syllable-C693679 - Tropical Mockingbird - Mimus gi
-lvus.wav-0.png Graphic file (type bmp)
-<Images/ScoresVariables-syllable-C693679 - Tropical Mockingbird - Mimus gilvus.
-wav-0.png>
-)
-[65]
-\openout2 = `Chapters/Chap6_Conclusions.aux'.
-
- (Chapters/Chap6_Conclusions.tex
-chapter 6.
-[66
-
-
-
-
-]) [67]
-No file main.bbl.
-File: Images/cover2.png Graphic file (type bmp)
-<Images/cover2.png>
-[68
-
-
-]
-
-LaTeX Warning: Hook 'shipout/lastpage' executed on wrong page (76 not 77).
-               Rerun to correct this.
-
-(main.aux (Chapters/HojaTitulo.aux) (Chapters/Chap1_Intro.aux)
-(Chapters/Chap2_LitReview.aux) (Chapters/Chap4_Problem&BG.aux)
-(Chapters/Chap3_Methodology.aux) (Chapters/Chap5_Evaluation.aux)
-(Chapters/Chap6_Conclusions.aux))
-
-LaTeX Warning: There were undefined references.
-
-
-LaTeX Warning: There were multiply-defined labels.
-
-Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
- ) 
+! Emergency stop.
+<*> ./EncabezadoTesisMSc.tex
+                            
+*** (job aborted, no legal \end found)
+
+ 
 Here is how much of TeX's memory you used:
- 35182 strings out of 410429
- 754108 string characters out of 2810472
- 1224728 words of memory out of 3000000
- 55670 multiletter control sequences out of 15000+600000
- 478953 words of font info for 104 fonts, out of 8000000 for 9000
+ 31901 strings out of 410429
+ 651837 string characters out of 2810472
+ 1206455 words of memory out of 3000000
+ 52699 multiletter control sequences out of 15000+600000
+ 469635 words of font info for 31 fonts, out of 8000000 for 9000
  1358 hyphenation exceptions out of 8191
- 113i,18n,109p,10637b,719s stack positions out of 10000i,1000n,20000p,200000b,80000s
-
-Output written on main.pdf (77 pages).
+ 108i,1n,106p,10615b,284s stack positions out of 10000i,1000n,20000p,200000b,80000s
+No pages of output.

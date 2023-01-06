@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999994 (MiKTeX 22.11.25) (preloaded format=xelatex 2022.12.6)  6 DEC 2022 14:57
+This is XeTeX, Version 3.141592653-2.6-0.999994 (MiKTeX 22.11.25) (preloaded format=xelatex 2022.12.6)  6 JAN 2023 16:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -3090,22 +3090,16 @@ chapter 6.
 
 
 
-]) [67]
-No file main.bbl.
+]) [67] (main.bbl)
 File: Images/cover2.png Graphic file (type bmp)
 <Images/cover2.png>
-[68
+ [68
 
 
-]
-
-LaTeX Warning: Hook 'shipout/lastpage' executed on wrong page (76 not 77).
-               Rerun to correct this.
-
-(main.aux (Chapters/HojaTitulo.aux) (Chapters/Chap1_Intro.aux)
-(Chapters/Chap2_LitReview.aux) (Chapters/Chap4_Problem&BG.aux)
-(Chapters/Chap3_Methodology.aux) (Chapters/Chap5_Evaluation.aux)
-(Chapters/Chap6_Conclusions.aux))
+] (main.aux (Chapters/HojaTitulo.aux)
+(Chapters/Chap1_Intro.aux) (Chapters/Chap2_LitReview.aux)
+(Chapters/Chap4_Problem&BG.aux) (Chapters/Chap3_Methodology.aux)
+(Chapters/Chap5_Evaluation.aux) (Chapters/Chap6_Conclusions.aux))
 
 LaTeX Warning: There were undefined references.
 
@@ -3116,8 +3110,8 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 35182 strings out of 410429
- 754108 string characters out of 2810472
+ 35184 strings out of 410429
+ 754124 string characters out of 2810472
  1224728 words of memory out of 3000000
  55670 multiletter control sequences out of 15000+600000
  478953 words of font info for 104 fonts, out of 8000000 for 9000

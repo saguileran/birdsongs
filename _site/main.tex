@@ -1,0 +1,47 @@
+\input{Chapters/EncabezadoTesisMSc}
+
+\cfoot{Page \thepage}
+
+\begin{document}
+\pagenumbering{roman}
+\include{Chapters/HojaTitulo}
+
+\renewcommand{\tablename}{\textbf{Table}}
+\renewcommand{\figurename}{\textbf{Figure}}
+\renewcommand{\listtablename}{Lista de Tablas}
+\renewcommand{\listfigurename}{Lista de Figuras}
+\renewcommand{\contentsname}{Contents}
+
+
+%\newcommand{\clearemptydoublepage}{\newpage{\pagestyle{empty}\cleardoublepage}}
+\tableofcontents
+
+%\include{Resumen}%\newcommand{\clearemptydoublepage}{\newpage{\pagestyle{empty}\cleardoublepage}}
+\pagenumbering{arabic}
+\include{Chapters/Chap1_Intro}
+\include{Chapters/Chap2_LitReview}
+\include{Chapters/Chap4_Problem&BG}
+\include{Chapters/Chap3_Methodology}
+\include{Chapters/Chap5_Evaluation}
+\include{Chapters/Chap6_Conclusions}
+
+
+\bibliographystyle{plaindin}
+\bibliography{references}
+
+
+\newpage
+\begingroup
+\thispagestyle{empty}
+\AddToShipoutPicture*{\put(0,0){\includegraphics[width=1.32  \linewidth]{Images/cover2.png}}} % Image background\centering
+\centering
+\vspace{0.4cm}\hspace{-3in}
+\par\normalfont\fontsize{30}{30}\sffamily\selectfont
+\textbf{   }\\
+\centering
+\endgroup
+
+
+\end{document}
+
+

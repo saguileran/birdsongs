@@ -1,0 +1,124 @@
+\documentclass[hidelinks,12pt,openany,letterpaper,pagesize]{scrbook}
+
+%\usepackage[ansinew]{inputenc}
+\usepackage{xltxtra}
+\usepackage[english]{babel}
+\usepackage{fancyhdr}
+\usepackage{epsfig, eepic, epic}
+\usepackage{amscd, amsmath, amssymb, mathrsfs, systeme}
+\usepackage{threeparttable}
+\usepackage{here}
+\usepackage{lscape}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{fancyhdr} % pstricks
+\usepackage{eso-pic} %
+%\usepackage{movie15}
+%\usepackage{subfig} %subfigure
+% \usepackage{subfigure} 
+\usepackage{animate}
+% \usepackage{titlesec} % Allows customization of titles
+\usepackage{tikz} % Required for drawing custom shapes
+\usepackage{subcaption}
+
+\usepackage{caption}
+\usepackage{graphicx, wrapfig}
+
+\usepackage{multicol}
+\usepackage[colorinlistoftodos]{todonotes}
+
+\usepackage{anysize} 
+\usepackage{dsfont}
+\usepackage[export]{adjustbox}
+\usepackage[nottoc,numbib]{tocbibind} 
+
+%\PassOptionsToPackage{dvipsnames,table}{xcolor}
+\definecolor{mygreen}{RGB}{8, 68, 36}
+\definecolor{myyellow}{RGB}{183,65,0}
+\definecolor{myblue}{RGB}{0,70,170}
+\definecolor{mypink}{RGB}{252, 24, 160}
+\definecolor{myred}{RGB}{124, 7, 7}
+\captionsetup{format=plain}
+
+\usepackage{xcolor}
+
+\usepackage[colorlinks=true, linkcolor=blue, citecolor=olive, urlcolor=blue]{hyperref}
+
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+
+
+
+% Tipografía de la Universidad Nacional de Colombia 2016.
+% http://identidad.unal.edu.co/guia-de-identidad-visual/
+
+\setmainfont[
+Path = Ancizar/,
+Extension       = .otf,
+UprightFont     = *-Light,
+BoldFont        = *-Semibold,
+ItalicFont      = *-LightItalic,
+BoldItalicFont  = *-SemiboldItalic,
+%SlantedFont     = *-⟨font name⟩,
+%BoldSlantedFont = *-⟨font name⟩,
+%SmallCapsFont   = *-⟨font name⟩,
+]{AncizarSerif}
+
+\setsansfont[
+Path = Ancizar/,
+Extension       = .otf,
+UprightFont     = *-Light,
+BoldFont        = *-Semibold,
+ItalicFont      = *-LightItalic,
+BoldItalicFont  = *-SemiboldItalic,
+%SlantedFont     = *-⟨font name⟩,
+%BoldSlantedFont = *-⟨font name⟩,
+%SmallCapsFont   = *-⟨font name⟩,
+]{AncizarSerif}
+
+\usepackage{rotating} %Para rotar texto, objetos y tablas seite. No se ve en DVI solo en PS. Seite 328 Hundebuch
+                        %se usa junto con \rotate, \sidewidestable ....
+
+
+\renewcommand{\theequation}{\thechapter-\arabic{equation}}
+\renewcommand{\thefigure}{\textbf{\thechapter-\arabic{figure}}}
+\renewcommand{\thetable}{\textbf{\thechapter-\arabic{table}}}
+
+
+\pagestyle{fancyplain}%\addtolength{\headwidth}{\marginparwidth}
+\textheight22.5cm \topmargin0cm \textwidth16.5cm
+\oddsidemargin0.5cm \evensidemargin-0.5cm%
+\renewcommand{\chaptermark}[1]{\markboth{\thechapter\; #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\; #1}}
+\lhead[\fancyplain{}{\thepage}]{\fancyplain{}{\rightmark}}
+\rhead[\fancyplain{}{\leftmark}]{\fancyplain{}{\thepage}}
+\fancyfoot{}
+\thispagestyle{fancy}%
+
+
+\addtolength{\headwidth}{0cm}
+\unitlength1mm %Define la unidad LE para Figuras
+%\mathindent0cm %Define la distancia de las formulas al texto,  fleqn las descentra
+\marginparwidth0cm
+\parindent0cm %Define la distancia de la primera linea de un parrafo a la margen
+
+%Para tablas,  redefine el backschlash en tablas donde se define la posici\'{o}n del texto en las
+%casillas (con \centering \raggedright o \raggedleft)
+\newcommand{\PreserveBackslash}[1]{\let\temp=\\#1\let\\=\temp}
+\let\PBS=\PreserveBackslash
+
+%Espacio entre lineas
+\renewcommand{\baselinestretch}{1.1}
+
+%Neuer Befehl f\"{u}r die Tabelle Eigenschaften der Aktivkohlen
+\newcommand{\arr}[1]{\raisebox{1.5ex}[0cm][0cm]{#1}}
+
+%Neue Kommandos
+% \usepackage{Befehle}
+
+
+%Trennungsliste
+\hyphenation {Reaktor-ab-me-ssun-gen Gas-zu-sa-mmen-set-zung
+Raum-gesch-win-dig-keit Durch-fluss Stick-stoff-gemisch
+Ad-sorp-tions-tem-pe-ra-tur Klein-schmidt
+Kohlen-stoff-Mole-kular-siebe Py-rolysat-aus-beu-te
+Trans-port-vor-gan-ge}

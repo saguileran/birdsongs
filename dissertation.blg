@@ -1,0 +1,67 @@
+This is BibTeX, Version 0.99d
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: dissertation.aux
+Reallocating 'name_of_file' (item size: 1) to 24 items.
+A level-1 auxiliary file: Chapters/HojaTitulo.aux
+Reallocating 'name_of_file' (item size: 1) to 25 items.
+A level-1 auxiliary file: Chapters/Chap1_Intro.aux
+Reallocating 'name_of_file' (item size: 1) to 29 items.
+A level-1 auxiliary file: Chapters/Chap2_LitReview.aux
+Reallocating 'name_of_file' (item size: 1) to 30 items.
+A level-1 auxiliary file: Chapters/Chap4_Problem&BG.aux
+Reallocating 'name_of_file' (item size: 1) to 31 items.
+A level-1 auxiliary file: Chapters/Chap3_Methodology.aux
+Reallocating 'name_of_file' (item size: 1) to 30 items.
+A level-1 auxiliary file: Chapters/Chap5_Evaluation.aux
+Reallocating 'name_of_file' (item size: 1) to 31 items.
+A level-1 auxiliary file: Chapters/Chap6_Conclusions.aux
+Reallocating 'name_of_file' (item size: 1) to 9 items.
+The style file: plaindin.bst
+Reallocating 'name_of_file' (item size: 1) to 11 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'wiz_functions' (item size: 4) to 6000 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Database file #1: references.bib
+You've used 56 entries,
+            4335 wiz_defined-function locations,
+            1288 strings with 20528 characters,
+and the built_in function-call counts, 55124 in all, are:
+= -- 5911
+> -- 1228
+< -- 2081
++ -- 2281
+- -- 519
+* -- 4336
+:= -- 9022
+add.period$ -- 112
+call.type$ -- 56
+change.case$ -- 327
+chr.to.int$ -- 0
+cite$ -- 56
+duplicate$ -- 1011
+empty$ -- 3583
+format.name$ -- 860
+if$ -- 10633
+int.to.chr$ -- 0
+int.to.str$ -- 56
+missing$ -- 302
+newline$ -- 419
+num.names$ -- 112
+pop$ -- 447
+preamble$ -- 1
+purify$ -- 327
+quote$ -- 0
+skip$ -- 2441
+stack$ -- 0
+substring$ -- 6719
+swap$ -- 389
+text.length$ -- 293
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 214
+warning$ -- 0
+while$ -- 404
+width$ -- 58
+write$ -- 926

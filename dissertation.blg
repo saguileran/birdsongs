@@ -26,24 +26,24 @@ Reallocating 'singl_function' (item size: 4) to 100 items.
 Database file #1: references.bib
 You've used 56 entries,
             4335 wiz_defined-function locations,
-            1288 strings with 20528 characters,
-and the built_in function-call counts, 55124 in all, are:
-= -- 5911
+            1288 strings with 20518 characters,
+and the built_in function-call counts, 55034 in all, are:
+= -- 5901
 > -- 1228
 < -- 2081
 + -- 2281
 - -- 519
-* -- 4336
-:= -- 9022
+* -- 4326
+:= -- 9012
 add.period$ -- 112
 call.type$ -- 56
 change.case$ -- 327
 chr.to.int$ -- 0
 cite$ -- 56
 duplicate$ -- 1011
-empty$ -- 3583
+empty$ -- 3573
 format.name$ -- 860
-if$ -- 10633
+if$ -- 10613
 int.to.chr$ -- 0
 int.to.str$ -- 56
 missing$ -- 302
@@ -55,7 +55,7 @@ purify$ -- 327
 quote$ -- 0
 skip$ -- 2441
 stack$ -- 0
-substring$ -- 6719
+substring$ -- 6689
 swap$ -- 389
 text.length$ -- 293
 text.prefix$ -- 0

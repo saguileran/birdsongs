@@ -21,7 +21,7 @@ github: [metadata]
 locale                   : "en-US"
 title                    : &title "BirdSongs"
 title_separator          : "-"
-subtitle                 : &description "A python package to analyze, visualizeand generate synthetic birdsongs." # site tagline that appears below site title in masthead
+subtitle                 : &description "A python package to analyze, visualize and generate synthetic birdsongs." # site tagline that appears below site title in masthead
 name                     : &name "Sebastian Aguilera Novoa"
 description              : *description #"A python package to analyze, visualize and generate synthetic birdsongs."
 url                      : "https://saguileran.github.io/birdsongs/" # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"

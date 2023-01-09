@@ -83,12 +83,27 @@ Results obtained by the `birdsongs` package using the following audios
 {% include gallery id="results" caption="Scored Variables: Fundamental Frequency (FF) and Spectral Content Index (SCI)" %}
 
 
-
+<!-- 
 <div class="embed-responsive embed-responsive-16by9">
   <iframe class="embed-responsive-item" src="//www.youtube.com/embed/1tDwkHAHZQ0" allowfullscreen></iframe>
 </div>
-
+-->
 asdasd
+
+
+{% include embed-audio.html src="\assets\audios\C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-birdsong-0.wav" %}
+
+
+<figure>
+    <figcaption>Listen to the T-Rex:</figcaption>
+    <audio
+        controls
+        src="\assets\audios\C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-birdsong-0.wav">
+            <a href="\assets\audios\C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-birdsong-0.wav">
+                Download audio
+            </a>
+    </audio>
+</figure>
 
 
 ---

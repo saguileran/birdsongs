@@ -2,6 +2,7 @@
 layout: default
 ---
 
+
 {% if page.header.overlay_color or page.header.overlay_image or page.header.image %}
   {% include page__hero.html %}
 {% elsif page.header.video.id and page.header.video.provider %}
@@ -34,6 +35,9 @@ layout: default
             <a href="{{ page.url | absolute_url }}" class="u-url" itemprop="url">{{ page.title | markdownify | remove: "<p>" | remove: "</p>" }}</a>
           </h1>{% endif %}
           {% include page__meta.html %}
+          
+          {% include head.html %}
+          {% include head/custom.html %}
         </header>
       {% endunless %}
 

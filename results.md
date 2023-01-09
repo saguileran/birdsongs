@@ -132,6 +132,13 @@ video
 </video>
 
 
+
+
+https://user-images.githubusercontent.com/42812846/211382847-70ef6b9b-1434-4fd5-a075-141340841a81.mp4
+
+https://user-images.githubusercontent.com/42812846/211382858-452217bd-b7e2-4e79-ade9-6cc70cef208c.mp4
+
+
 ## Waveforms and Spectrograms
 
 {% include gallery id="gallery_sounds" caption="Waveforms and spectrograms" %}

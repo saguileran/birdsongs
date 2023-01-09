@@ -44,6 +44,8 @@ A python package to analyze, visualize and generate synthetic birdsongs.
 
 birdsong is implemented in python 3.8. It requires:
 
+
+
 - librosa
 - lmfit
 - scipy
@@ -283,10 +285,7 @@ Simple syllable of a birdsong of the Ocellated Tapaculo - Acropternis
 </center>
 -->
 
-The PDF of the thesis is located in the `dissertation` brach of this repository, <a href="https://github.com/saguileran/birdsongs/blob/dissertation/main.pdf">Design, development, and evaluation of a computational physical model to generate synthetic birdsongs from recorded samples</a>, 
-
-<br><br>
-
+The PDF of the thesis is located in the `dissertation` brach of this repository, <a href="https://github.com/saguileran/birdsongs/blob/dissertation/main.pdf">Design, development, and evaluation of a computational physical model to generate synthetic birdsongs from recorded samples</a>. 
 
 <p align="center">
   <img src="https://github.com/saguileran/birdsongs/blob/gh-pages/assets/img/cover.jpg" width="300" height="400">

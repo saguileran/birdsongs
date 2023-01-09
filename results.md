@@ -69,6 +69,15 @@ results:
     alt: "C693679 results"
     title: "C693679 - Tropical Mockingbird "
 last_modified_at: 2023-01-05T11:59:26-04:00
+
+# Podcast
+listen_time: true
+#episode_cover: /assets/podcasts/cover-stemmer.png
+subtitle: "... hendes oplevelser som datter, elev og lærer"
+description: "Interview med Birte Christensen som var fem år, da højskolen blev etableret, og som datter af Svend Aage Thomsen har hun naturligvis mange minder fra sine år på Den Jyske Idrætsskole."
+#image: /assets/podcasts/cover-stemmer.jpg
+media: # requires a mp3-entry
+  mp3: https://saguileran.github.io/birdsongs/assets/audios/XC688576%20-%20African%20River%20Martin%20-%20Pseudochelidon%20eurystomina.mp3
 ---
 
 Results obtained with the `birdsongs` package for some birds, humman whistles, and frogs audios.
@@ -128,15 +137,20 @@ audio
 video 
 
 <video width="480" height="320" controls="controls">
-  <source src="C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-birdsong-synth-0.mp4" type="video/mp4">
+  <source src="\assets\audios\C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-birdsong-synth-0.mp4" type="video/mp4">
 </video>
 
 
 
 
-https://user-images.githubusercontent.com/42812846/211382847-70ef6b9b-1434-4fd5-a075-141340841a81.mp4
+[cc](https://user-images.githubusercontent.com/42812846/211382847-70ef6b9b-1434-4fd5-a075-141340841a81.mp4)
 
 https://user-images.githubusercontent.com/42812846/211382858-452217bd-b7e2-4e79-ade9-6cc70cef208c.mp4
+
+
+
+
+{% include podcast-player.html %}
 
 
 ## Waveforms and Spectrograms
@@ -171,12 +185,14 @@ asd
 
 asdasd
 
+
 -->
 
+asdasdsa
 
-
-
-
+<video width="480" height="50" controls="controls">
+  <source src="\assets\audios\C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-birdsong-synth-0.mp4" type="video/mp4">
+</video>
 
 ---
 

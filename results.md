@@ -78,6 +78,7 @@ description: "Interview med Birte Christensen som var fem år, da højskolen ble
 #image: /assets/podcasts/cover-stemmer.jpg
 media: # requires a mp3-entry
   mp3: https://saguileran.github.io/birdsongs/assets/audios/XC688576%20-%20African%20River%20Martin%20-%20Pseudochelidon%20eurystomina.mp3
+  
 ---
 
 Results obtained with the `birdsongs` package for some birds, humman whistles, and frogs audios.
@@ -147,7 +148,19 @@ video
 
 https://user-images.githubusercontent.com/42812846/211382858-452217bd-b7e2-4e79-ade9-6cc70cef208c.mp4
 
+audiooo
 
+
+<audio controls class="audiplay" >
+ <source src="\assets\audios\C541457 - Thick-billed Euphonia - Euphonia laniirostris crassirostris.wav-syllable-0.wav" type="audio/wav">
+</audio>
+
+
+<audio controls class="audio" >
+ <source src="\assets\audios\C541457 - Thick-billed Euphonia - Euphonia laniirostris crassirostris.wav-syllable-0.wav" type="audio/wav">
+</audio>
+
+<script src="https://cdn.jsdelivr.net/gh/sh20raj/AudiPlay/audiplay.min.js"></script>
 
 
 {% include podcast-player.html %}

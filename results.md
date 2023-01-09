@@ -56,7 +56,11 @@ results:
 last_modified_at: 2023-01-05T11:59:26-04:00
 ---
 
-Results obtained by the `birdsongs` package using the following audios 
+Results obtained by the `birdsongs` package for some birds, humman whistles, and frogs.
+
+## Data Used
+
+ The audios used were 
 
 
 | Scientific Name  |  Common Name  | Location | Pitch Complexity | Animal | Results Quality* 
@@ -68,6 +72,37 @@ Results obtained by the `birdsongs` package using the following audios
 | Humman 	Whistle | Whistle | Anywhere | Easy-Medium-Complex | Human Being  |
 
 *It means how good is the quality of synthetic bird songs compared to real samples.
+
+## Sounds
+
+Sounds obtained: the left side is synthetic birdsong while righ side is real recorded birdsongs.
+
+<div class="row">
+  <div class="column">
+  <center>
+  Ocellated Tapaculo - XC104508 <br>
+  <audio src="\assets\audios\XC104508 - Ocellated Tapaculo - Acropternis orthonyx.wav-syllable-synth-0.wav" controls preload></audio>
+  <audio src="\assets\audios\XC104508 - Ocellated Tapaculo - Acropternis orthonyx.wav-syllable-0.wav" controls preload></audio>
+  
+  Euphonia Laniirostris - C527995 <br>
+  <audio src="\assets\audios\C527995 - Thick-billed Euphonia - Euphonia laniirostris.wav-syllable-synth-0.wav" controls preload></audio>
+  <audio src="\assets\audios\C527995 - Thick-billed Euphonia - Euphonia laniirostris.wav-syllable-0.wav" controls preload></audio>
+  
+  </center>
+  </div>
+  <div class="column">
+  <center>
+  Zonotrichia capensis - XC11293 <br>
+  <audio src="\assets\audios\XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav-syllable-0-synth.wav" controls preload></audio>
+  <audio src="\assets\audios\XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav-syllable-0.wav" controls preload></audio>
+  
+  Euphonia Laniirostris Crassirostris - C541457 <br>
+  <audio src="\assets\audios\C541457 - Thick-billed Euphonia - Euphonia laniirostris crassirostris.wav-syllable-synth-0.wav" controls preload></audio>
+  <audio src="\assets\audios\C541457 - Thick-billed Euphonia - Euphonia laniirostris crassirostris.wav-syllable-0.wav" controls preload></audio>
+  
+  </center>
+  </div>
+</div>
 
 ## Waveforms and Spectrograms
 
@@ -87,23 +122,25 @@ Results obtained by the `birdsongs` package using the following audios
 <div class="embed-responsive embed-responsive-16by9">
   <iframe class="embed-responsive-item" src="//www.youtube.com/embed/1tDwkHAHZQ0" allowfullscreen></iframe>
 </div>
--->
-asdasd
-
-
-{% include embed-audio.html src="\assets\audios\C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-birdsong-0.wav" %}
-
-
+asd
 <figure>
     <figcaption>Listen to the T-Rex:</figcaption>
     <audio
         controls
-        src="\assets\audios\C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-birdsong-0.wav">
-            <a href="\assets\audios\C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-birdsong-0.wav">
+        src="/assets/audios/C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-birdsong-0.wav">
+            <a href="">
                 Download audio
             </a>
     </audio>
 </figure>
+
+asdasd
+
+-->
+
+
+
+
 
 
 ---

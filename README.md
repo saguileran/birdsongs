@@ -270,7 +270,30 @@ Simple syllable of a birdsong of the Ocellated Tapaculo - Acropternis
 
 <p align="center">  <img src="./examples/results/ScoresVariables-syllable-XC104508 - Ocellated Tapaculo - Acropternis orthonyx.wav-0.png" width="1000" alt="methodology"></p>
 
+<!--
+<center>
+  Zonotrichia capensis - XC11293 <br>
+  <audio src="\examples\results\audios\XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav-syllable-0-synth.wav" controls preload></audio>
+  <audio src="\examples\results\audios\XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav-syllable-0.wav" controls preload></audio>
+  
+  Euphonia Laniirostris Crassirostris - C541457 <br>
+  <audio src="\examples\results\audios\C541457 - Thick-billed Euphonia - Euphonia laniirostris crassirostris.wav-syllable-synth-0.wav" controls preload></audio>
+  <audio src="\examples\results\audios\C541457 - Thick-billed Euphonia - Euphonia laniirostris crassirostris.wav-syllable-0.wav" controls preload></audio>
+  
+</center>
+-->
+
 The PDF of the thesis is located in the `dissertation` brach of this repository, <a href="https://github.com/saguileran/birdsongs/blob/dissertation/main.pdf">Design, development, and evaluation of a computational physical model to generate synthetic birdsongs from recorded samples</a>, 
+
+<br><br>
+
+
+<p align="center">
+  <img src="https://github.com/saguileran/birdsongs/blob/gh-pages/assets/img/cover.jpg" width="300" height="400">
+  <img src="https://github.com/saguileran/birdsongs/blob/gh-pages/assets/img/under-cover.png" width="300" height="400">
+</p>
+
+
 # References
 
 ## Literature

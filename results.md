@@ -106,9 +106,15 @@ Sounds obtained: the left side is synthetic birdsong while righ side is real rec
 
 audio
 
-<audio controls>
+<audio controls="controls">
   <source src="\assets\audios\C541457 - Thick-billed Euphonia - Euphonia laniirostris crassirostris.wav-syllable-0.wav" type="audio/mp3">
 </audio>
+
+video 
+
+<video width="300" height="50" controls="controls">
+  <source src="/assets/audios/C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-birdsong-synth-0.mp4" type="video/mp4">
+</video>
 
 
 ## Waveforms and Spectrograms

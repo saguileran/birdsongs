@@ -56,7 +56,7 @@ results:
 last_modified_at: 2023-01-05T11:59:26-04:00
 ---
 
-Results obtained by the `birdsongs` package for some birds, humman whistles, and frogs.
+Results obtained with the `birdsongs` package for some birds, humman whistles, and frogs audios.
 
 ## Data Used
 
@@ -103,6 +103,13 @@ Sounds obtained: the left side is synthetic birdsong while righ side is real rec
   </center>
   </div>
 </div>
+
+audio
+
+<audio controls>
+  <source src="\assets\audios\C541457 - Thick-billed Euphonia - Euphonia laniirostris crassirostris.wav-syllable-0.wav" type="audio/mp3">
+</audio>
+
 
 ## Waveforms and Spectrograms
 

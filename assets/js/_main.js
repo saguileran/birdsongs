@@ -135,6 +135,3 @@ $(function() {
   });
 });
 
-
-
-audio.src = URL.createObjectURL(document.getElementsByTagName('input')[0].files[0]);

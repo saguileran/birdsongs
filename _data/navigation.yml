@@ -6,7 +6,9 @@ main:
     url: /results/
   - title: "Home"
     url: /
-  # - title: "Sample Collections"
+  - title: "GitHub"
+    url: https://github.com/saguileran/birdsongs
+    # - title: "Sample Collections"
   #   url: /collection-archive/
   # - title: "Sitemap"
   #   url: /sitemap/

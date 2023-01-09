@@ -262,7 +262,7 @@ Using the previous objects defined, the optimization problem is solved by follow
 
 # Results
 
-The model is tested with different syllables of the birdsong of the rufous collared sparrow . Results are located at [examples/examples](./examples/results), images and audios. 
+The model is tested with different syllables of the birdsong of the rufous collared sparrow . Results are located at [examples/examples](./examples/results), images and audios. For more information visit the project website [birdsongs](https://saguileran.github.io/birdsongs/) and enter to [results](https://saguileran.github.io/birdsongs/results/) page. 
 
 Simple syllable of a birdsong of the Rufous Collared Sparrow
 

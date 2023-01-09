@@ -83,10 +83,17 @@ Results obtained by the `birdsongs` package using the following audios
 
 
 <div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="https://github.com/saguileran/birdsongs/blob/main/examples/results/audios/C428484%20-%20Ocellated%20Tapaculo%20-%20Acropternis%20orthonyx.wav-birdsong-0.mp4"></iframe>
+  <iframe class="embed-responsive-item" src="https://github.com/saguileran/birdsongs/blob/main/examples/results/audios/C428484%20-%20Ocellated%20Tapaculo%20-%20Acropternis%20orthonyx.wav-birdsong-synth-0.mp4"></iframe>
+</div>
+
+
+
+<div class="embed-responsive embed-responsive-16by9">
   <iframe class="embed-responsive-item" src="//www.youtube.com/embed/1tDwkHAHZQ0" allowfullscreen></iframe>
 </div>
 ---
 
-Try it!
+Try it! 
 
 [Use birdsongs Package]({{ "https://github.com/saguileran/birdsongs" | relative_url }}){: .btn .btn--success .btn--large .btn--mx-auto}

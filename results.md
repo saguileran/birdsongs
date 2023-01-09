@@ -9,50 +9,65 @@ gallery_sounds:
   - url: "/assets/img/results/AllSongAndSyllable-C527995 - Thick-billed Euphonia - Euphonia laniirostris.wav-0.png"
     image_path: "/assets/img/results/AllSongAndSyllable-C527995 - Thick-billed Euphonia - Euphonia laniirostris.wav-0.png"
     alt: "C527995"
+    title: "C527995 - Thick-billed Euphonia"
   - url: "/assets/img/results/AllSongAndSyllable-C589632 - Rufous-collared Sparrow - Zonotrichia capensis.wav-0.png"
     image_path: "/assets/img/results/AllSongAndSyllable-C589632 - Rufous-collared Sparrow - Zonotrichia capensis.wav-0.png"
     alt: "C589632"
+    title: "C589632 - Rufous-collared Sparrow - Zonotrichia capensis"
   - url: "/assets/img/results/AllSongAndSyllable-XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav-100.png"
     image_path: "/assets/img/results/AllSongAndSyllable-XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav-100.png"
     alt: "XC11293"
+    title: "XC11293 - Rufous-collared Sparrow"
   - url: "/assets/img/results/AllSongAndSyllable-C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-0.png"
     image_path: "/assets/img/results/AllSongAndSyllable-C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-0.png"
     alt: "C428484"
+    title: "C428484 - Ocellated Tapaculo"
   - url: "/assets/img/results/AllSongAndSyllable-C693679 - Tropical Mockingbird - Mimus gilvus.wav-0.png"
     image_path: "/assets/img/results/AllSongAndSyllable-C693679 - Tropical Mockingbird - Mimus gilvus.wav-0.png"
     alt: "C693679"
+    title: "C693679 - Tropical Mockingbird"
 gallery_parameters_space:
   - url: "/assets/img/results/MotorGesturesParameters-syllable-synth-C527995 - Thick-billed Euphonia - Euphonia laniirostris.wav-0.png"
     image_path: "/assets/img/results/MotorGesturesParameters-syllable-synth-C527995 - Thick-billed Euphonia - Euphonia laniirostris.wav-0.png"
     alt: "C527995 parameter space"
+    title: "C527995 - Thick-billed Euphonia"
   - url: ""
     image_path: ""
     alt: ""
+    title: ""
   - url: "/assets/img/results/MotorGesturesParameters-syllable-synth-XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav-0.png"
     image_path: "/assets/img/results/MotorGesturesParameters-syllable-synth-XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav-0.png"
     alt: "XC11293 parameter space"
+    title: "XC11293 - Rufous-collared Sparrow"
   - url: "/assets/img/results/MotorGesturesParameters-birdsong-synth-C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-0.png"
     image_path: "/assets/img/results/MotorGesturesParameters-birdsong-synth-C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-0.png"
     alt: "C428484 parameter space"
+    title: "C428484 - Ocellated Tapaculo - Acropternis"
   - url: ""
     image_path: ""
     alt: ""
+    title: ""
 results:
   - url: "/assets/img/results/ScoresVariables-syllable-C527995 - Thick-billed Euphonia - Euphonia laniirostris.wav-0.png"
     image_path: "/assets/img/results/ScoresVariables-syllable-C527995 - Thick-billed Euphonia - Euphonia laniirostris.wav-0.png"
     alt: "C527995 results"
+    title: "C527995 - Thick-billed Euphonia"
   - url: "/assets/img/results/ScoresVariables-syllable-C589632 - Rufous-collared Sparrow - Zonotrichia capensis.wav-0.png"
     image_path: "/assets/img/results/ScoresVariables-syllable-C589632 - Rufous-collared Sparrow - Zonotrichia capensis.wav-0.png"
     alt: "C589632 results"
+    title: "C589632 - Rufous-collared Sparrow"
   - url: "/assets/img/results/ScoresVariables-syllable-XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav-1.png"
     image_path: "/assets/img/results/ScoresVariables-syllable-XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav-1.png"
     alt: "XC11293 results"
+    title: "XC11293 - Rufous-collared Sparrow"
   - url: "/assets/img/results/ScoresVariables-syllable-C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-0.png"
     image_path: "/assets/img/results/ScoresVariables-syllable-C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-0.png"
     alt: "C428484 results"
+    title: "C428484 - Ocellated Tapaculo"
   - url: "/assets/img/results/ScoresVariables-syllable-C693679 - Tropical Mockingbird - Mimus gilvus.wav-0.png"
     image_path: "/assets/img/results/ScoresVariables-syllable-C693679 - Tropical Mockingbird - Mimus gilvus.wav-0.png"
     alt: "C693679 results"
+    title: "C693679 - Tropical Mockingbird "
 last_modified_at: 2023-01-05T11:59:26-04:00
 ---
 
@@ -112,8 +127,8 @@ audio
 
 video 
 
-<video width="300" height="50" controls="controls">
-  <source src="/assets/audios/C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-birdsong-synth-0.mp4" type="video/mp4">
+<video width="480" height="320" controls="controls">
+  <source src="C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-birdsong-synth-0.mp4" type="video/mp4">
 </video>
 
 

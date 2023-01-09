@@ -59,14 +59,15 @@ last_modified_at: 2023-01-05T11:59:26-04:00
 Results obtained by the `birdsongs` package using the following audios 
 
 
-| Scientific Name  |  Common Name  | Location | Pitch Complexity | Animal | 
-| ------------------ | :------------------: | :------------------: | :------------------: | :------------------: |
-| Zonotrichia Capensis| Copeton | South America | Simple pitch | Bird |
-| Rhinocryptidae | Tapaculos | South America  <br /> southern Central America.| Medium | Bird |
-| Mimus Gilvus | Sinsonte | Central America <br /> eastern South America | Complex | Bird |
+| Scientific Name  |  Common Name  | Location | Pitch Complexity | Animal | Results Quality* 
+| ------------------ | :------------------: | :------------------: | :------------------: | :------------------: |:------------------: |
+| Zonotrichia Capensis| Copeton | South America | Simple pitch | Bird | Good
+| Rhinocryptidae | Tapaculos | South America  <br /> southern Central America.| Medium | Bird | Good
+| Mimus Gilvus | Sinsonte | Central America <br /> eastern South America | Complex | Bird |Medium
 | Physalaemus Cuvieri | Rana Llorona | South America | Medium | Amphibian  |
 | Humman 	Whistle | Whistle | Anywhere | Easy-Medium-Complex | Human Being  |
 
+*It means how good is the quality of synthetic bird songs compared to real samples.
 
 ## Waveforms and Spectrograms
 
@@ -82,16 +83,14 @@ Results obtained by the `birdsongs` package using the following audios
 {% include gallery id="results" caption="Scored Variables: Fundamental Frequency (FF) and Spectral Content Index (SCI)" %}
 
 
-<div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://github.com/saguileran/birdsongs/blob/main/examples/results/audios/C428484%20-%20Ocellated%20Tapaculo%20-%20Acropternis%20orthonyx.wav-birdsong-0.mp4"></iframe>
-  <iframe class="embed-responsive-item" src="https://github.com/saguileran/birdsongs/blob/main/examples/results/audios/C428484%20-%20Ocellated%20Tapaculo%20-%20Acropternis%20orthonyx.wav-birdsong-synth-0.mp4"></iframe>
-</div>
-
-
 
 <div class="embed-responsive embed-responsive-16by9">
   <iframe class="embed-responsive-item" src="//www.youtube.com/embed/1tDwkHAHZQ0" allowfullscreen></iframe>
 </div>
+
+asdasd
+
+
 ---
 
 Try it! 

@@ -2,10 +2,10 @@
     window.playerConfiguration = {
         "episode": {
             "media": {
-    {% for audio in page.media %}
-    "{{ audio[0] }}": "{{ audio[1] }}"{% if forloop.last != true %},{% endif %}
-    {% endfor %}
-    },
+            {% for audio in page.media %}
+            "{{ audio[0] }}": "{{ audio[1] }}"{% if forloop.last != true %},{% endif %}
+            {% endfor %}
+            },
     "title": "{{ page.title }}",
     {% if page.subtitle %}
     "subtitle": "{{ page.subtitle }}",

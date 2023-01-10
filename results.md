@@ -150,12 +150,13 @@ video
 audiooo
 
 <audio controls class="audio" >
- <source src="\assets\audios\C541457 - Thick-billed Euphonia - Euphonia laniirostris crassirostris.wav-syllable-0.wav" type="audio/wav">
+ <source src="/assets/audios/C541457 - Thick-billed Euphonia - Euphonia laniirostris crassirostris.wav-syllable-0.wav" type="audio/wav">
 </audio>
 
 
 
 {% include podcast-player.html %}
+
 
 
 ## Waveforms and Spectrograms
@@ -196,8 +197,21 @@ asdasd
 asdasdsa
 
 <video width="480" height="50" controls="controls">
-  <source src="\assets\audios\C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-birdsong-synth-0.mp4" type="video/mp4">
+  <source src="/assets/audios/C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-birdsong-synth-0.mp4" type="video/mp4">
 </video>
+
+
+exmaple 3
+
+<audio controls>
+  <source src="https://saguileran.github.io/birdsongs/assets/audios/XC688576%20-%20African%20River%20Martin%20-%20Pseudochelidon%20eurystomina.mp3" type="audio/mp3" />
+  <source src="viper.ogg" type="audio/ogg" />
+  <p>
+    Your browser doesn't support this audio file. Here is a
+    <a href="viper.mp3">link to the audio</a> instead.
+  </p>
+</audio>
+
 
 ---
 

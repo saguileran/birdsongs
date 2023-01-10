@@ -1,0 +1,7 @@
+window.playerConfiguration = {
+    "episode": {
+    {"mp3": "https://github.com/saguileran/birdsongs/blob/gh-pages/assets/audios/XC688576%20-%20African%20River%20Martin%20-%20Pseudochelidon%20eurystomina.mp3"},
+    "title": "Transcript Test"
+    }
+}
+<script class="podigee-podcast-player" src="https://cdn.podigee.com/podcast-player/javascripts/podigee-podcast-player.js" data-configuration="playerConfiguration"></script>

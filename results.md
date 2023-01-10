@@ -106,20 +106,48 @@ Sounds obtained: the left side is synthetic birdsong while righ side is real rec
   <div class="column">
   <center>
   Ocellated Tapaculo - XC104508 <br>
-  <audio src="\assets\audios\XC104508 - Ocellated Tapaculo - Acropternis orthonyx.wav-syllable-synth-0.wav" controls preload></audio>
-  <audio src="\assets\audios\XC104508 - Ocellated Tapaculo - Acropternis orthonyx.wav-syllable-0.wav" controls preload></audio>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/assets/audios/XC104508 - Ocellated Tapaculo - Acropternis orthonyx.wav-syllable-synth-0.wav" type="audio/wav" />
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/assets/audios/XC104508 - Ocellated Tapaculo - Acropternis orthonyx.wav-syllable-0.wav" type="audio/wav" />
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
   
   Euphonia Laniirostris - C527995 <br>
-  <audio src="\assets\audios\C527995 - Thick-billed Euphonia - Euphonia laniirostris.wav-syllable-synth-0.wav" controls preload></audio>
-  <audio src="\assets\audios\C527995 - Thick-billed Euphonia - Euphonia laniirostris.wav-syllable-0.wav" controls preload></audio>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/assets/audios/C527995 - Thick-billed Euphonia - Euphonia laniirostris.wav-syllable-synth-0.wav" type="audio/wav" />
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/assets/audios/C527995 - Thick-billed Euphonia - Euphonia laniirostris.wav-syllable-0.wav" type="audio/wav" />
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
   
   </center>
   </div>
   <div class="column">
   <center>
   Zonotrichia capensis - XC11293 <br>
-  <audio src="\assets\audios\XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav-syllable-0-synth.wav" controls preload></audio>
-  <audio src="\assets\audios\XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav-syllable-0.wav" controls preload></audio>
+  <audio src="https://saguileran.github.io/birdsongs/assets/audios/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav-syllable-0-synth.wav" controls preload></audio>
+  <audio src="https://saguileran.github.io/birdsongs/assets/audios/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav-syllable-0.wav" controls preload></audio>
   
   Euphonia Laniirostris Crassirostris - C541457 <br>
   <audio src="\assets\audios\C541457 - Thick-billed Euphonia - Euphonia laniirostris crassirostris.wav-syllable-synth-0.wav" controls preload></audio>
@@ -212,14 +240,7 @@ exmaple 3
   </p>
 </audio>
 
-<audio controls>
-  <source src="https://saguileran.github.io/birdsongs//assets/audios/C527995 - Thick-billed Euphonia - Euphonia laniirostris.wav-syllable-0.wav" type="audio/wav" />
-  <source src="viper.ogg" type="audio/wav" />
-  <p>
-    Your browser doesn't support this audio file. Here is a
-    <a href="viper.mp3">link to the audio</a> instead.
-  </p>
-</audio>
+
 
 ---
 

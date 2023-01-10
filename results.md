@@ -205,13 +205,21 @@ exmaple 3
 
 <audio controls>
   <source src="https://saguileran.github.io/birdsongs/assets/audios/XC688576%20-%20African%20River%20Martin%20-%20Pseudochelidon%20eurystomina.mp3" type="audio/mp3" />
-  <source src="viper.ogg" type="audio/ogg" />
+  <source src="viper.ogg" type="audio/mp3" />
   <p>
     Your browser doesn't support this audio file. Here is a
     <a href="viper.mp3">link to the audio</a> instead.
   </p>
 </audio>
 
+<audio controls>
+  <source src="https://saguileran.github.io/birdsongs//assets/audios/C527995 - Thick-billed Euphonia - Euphonia laniirostris.wav-syllable-0.wav" type="audio/wav" />
+  <source src="viper.ogg" type="audio/wav" />
+  <p>
+    Your browser doesn't support this audio file. Here is a
+    <a href="viper.mp3">link to the audio</a> instead.
+  </p>
+</audio>
 
 ---
 

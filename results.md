@@ -80,15 +80,17 @@ last_modified_at: 2023-01-05T11:59:26-04:00
 #  mp3: https://saguileran.github.io/birdsongs/assets/audios/XC688576%20-%20African%20River%20Martin%20-%20Pseudochelidon%20eurystomina.mp3
   
 ---
+<br>
 
 Results obtained with the `birdsongs` package for some birds, humman whistles, and frogs audios.
+
 
 ## Data Used
 
  The audios used were 
 
 
-| Scientific Name  |  Common Name  | Location | Pitch Complexity | Animal | Results Quality* 
+| Scientific Name  |  Common Name  | Location | Pitch Complexity | Animal | Comparability* 
 | ------------------ | :------------------: | :------------------: | :------------------: | :------------------: |:------------------: |
 | Zonotrichia Capensis| Copeton | South America | Simple pitch | Bird | Good
 | Rhinocryptidae | Tapaculos | South America  <br /> southern Central America.| Medium | Bird | Good
@@ -216,6 +218,5 @@ asdasd
 
 ---
 
-Try it! 
 
-[Use birdsongs Package]({{ "https://github.com/saguileran/birdsongs" | relative_url }}){: .btn .btn--success .btn--large .btn--mx-auto}
+[Try birdsongs Package!]({{ "https://github.com/saguileran/birdsongs" | relative_url }}){: .btn .btn--success .btn--large .btn--mx-auto}

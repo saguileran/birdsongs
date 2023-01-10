@@ -71,13 +71,13 @@ results:
 last_modified_at: 2023-01-05T11:59:26-04:00
 
 # Podcast
-listen_time: true
+#listen_time: true
 #episode_cover: /assets/podcasts/cover-stemmer.png
-subtitle: "... hendes oplevelser som datter, elev og lærer"
-description: "Interview med Birte Christensen som var fem år, da højskolen blev etableret, og som datter af Svend Aage Thomsen har hun naturligvis mange minder fra sine år på Den Jyske Idrætsskole."
+#subtitle: "... hendes oplevelser som datter, elev og lærer"
+#description: "Interview med Birte Christensen som var fem år, da højskolen blev etableret, og som datter af Svend Aage Thomsen har hun naturligvis mange minder fra sine år på Den Jyske Idrætsskole."
 #image: /assets/podcasts/cover-stemmer.jpg
-media: # requires a mp3-entry
-  mp3: https://saguileran.github.io/birdsongs/assets/audios/XC688576%20-%20African%20River%20Martin%20-%20Pseudochelidon%20eurystomina.mp3
+#media: # requires a mp3-entry
+#  mp3: https://saguileran.github.io/birdsongs/assets/audios/XC688576%20-%20African%20River%20Martin%20-%20Pseudochelidon%20eurystomina.mp3
   
 ---
 
@@ -100,7 +100,7 @@ Results obtained with the `birdsongs` package for some birds, humman whistles, a
 
 ## Sounds
 
-Sounds obtained: the left side is synthetic birdsong while righ side is real recorded birdsongs.
+Sounds obtained, the left side is the synthetic birdsong while righ side is real recorded birdsongs.
 
 <div class="row">
   <div class="column">
@@ -150,40 +150,31 @@ Sounds obtained: the left side is synthetic birdsong while righ side is real rec
   <audio src="https://saguileran.github.io/birdsongs/assets/audios/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav-syllable-0.wav" controls preload></audio>
   
   Euphonia Laniirostris Crassirostris - C541457 <br>
-  <audio src="\assets\audios\C541457 - Thick-billed Euphonia - Euphonia laniirostris crassirostris.wav-syllable-synth-0.wav" controls preload></audio>
-  <audio src="\assets\audios\C541457 - Thick-billed Euphonia - Euphonia laniirostris crassirostris.wav-syllable-0.wav" controls preload></audio>
+  <audio src="https://saguileran.github.io/birdsongs/assets/audios/C541457 - Thick-billed Euphonia - Euphonia laniirostris crassirostris.wav-syllable-synth-0.wav" controls preload></audio>
+  <audio src="https://saguileran.github.io/birdsongs/assets/audios/C541457 - Thick-billed Euphonia - Euphonia laniirostris crassirostris.wav-syllable-0.wav" controls preload></audio>
   
   </center>
   </div>
 </div>
 
+
+<!-- 
 audio
 
 <audio controls="controls">
-  <source src="\assets\audios\C541457 - Thick-billed Euphonia - Euphonia laniirostris crassirostris.wav-syllable-0.wav" type="audio/mp3">
+  <source src="https://saguileran.github.io/birdsongs/assets/audios/C541457 - Thick-billed Euphonia - Euphonia laniirostris crassirostris.wav-syllable-0.wav" type="audio/mp3">
 </audio>
 
 video 
 
-<video width="480" height="320" controls="controls">
-  <source src="\assets\audios\C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-birdsong-synth-0.mp4" type="video/mp4">
+<video width="480" height="50" controls="controls">
+  <source src="https://saguileran.github.io/birdsongs/assets/audios/C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-birdsong-synth-0.mp4" type="video/mp4">
 </video>
 
 
 
-
-[cc](https://user-images.githubusercontent.com/42812846/211382847-70ef6b9b-1434-4fd5-a075-141340841a81.mp4)
-
-
-audiooo
-
-<audio controls class="audio" >
- <source src="/assets/audios/C541457 - Thick-billed Euphonia - Euphonia laniirostris crassirostris.wav-syllable-0.wav" type="audio/wav">
-</audio>
-
-
-
-{% include podcast-player.html %}
+{% include podcast-player.html %} 
+-->
 
 
 
@@ -221,25 +212,6 @@ asdasd
 
 
 -->
-
-asdasdsa
-
-<video width="480" height="50" controls="controls">
-  <source src="/assets/audios/C428484 - Ocellated Tapaculo - Acropternis orthonyx.wav-birdsong-synth-0.mp4" type="video/mp4">
-</video>
-
-
-exmaple 3
-
-<audio controls>
-  <source src="https://saguileran.github.io/birdsongs/assets/audios/XC688576%20-%20African%20River%20Martin%20-%20Pseudochelidon%20eurystomina.mp3" type="audio/mp3" />
-  <source src="viper.ogg" type="audio/mp3" />
-  <p>
-    Your browser doesn't support this audio file. Here is a
-    <a href="viper.mp3">link to the audio</a> instead.
-  </p>
-</audio>
-
 
 
 ---

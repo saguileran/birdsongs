@@ -8,6 +8,15 @@ class Syllable(object):
         fs = sampling rate
         t0 = initial time of the syllable
     """ 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        #del state[''] # remove the unpicklable progress attribute
+        return state
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        # restore the progress from the progress integer
+        #self.progress = make_progress(self.progress_int)
+    
     def __init__(self, birdsong=None, t0=0, Nt=200, llambda=1.5, NN=0, overlap=0.5, flim=(1.5e3,2e4), n_mels=4, umbral_FF=1, tlim=[], sfs=[], no_syllable=0, ide="", file_name="total synth"):
         ## The bifurcation can be cahge modifying the self.f2 and self.f1 functions
         ## ------------- Bogdanov–Takens bifurcation ------------------
@@ -212,7 +221,7 @@ class Syllable(object):
             self.beta = np.dot(b, t_par);
             
         
-            
+    ##  ------------------------- BIRDS -------------------------
     def MotorGestures(self, alpha, beta, gamma, ovfs=20, prct_noise=0):  # ovfs:oversamp
         t, tmax, dt = 0, int(self.s.size)*ovfs-1, 1./(ovfs*self.fs) # t0, tmax, td
         # pback and pin vectors initialization
@@ -282,6 +291,59 @@ class Syllable(object):
         delattr(self,"alpha"); delattr(self,"beta")
         
         return synth
+
+
+    ##  --------------- Anphibius -------------------------
+    def MotorGesturesAnphibius(self, alpha, beta, gamma, ovfs=20, prct_noise=0):  # ovfs:oversamp
+        t, tmax, dt = 0, int(self.s.size)*ovfs-1, 1./(ovfs*self.fs) # t0, tmax, td
+        # pback and pin vectors initialization
+        pi, pb, out = np.zeros(tmax), np.zeros(tmax), np.zeros(int(self.s.size))
+        # initial vector ODEs (v0), it is not too relevant
+        v = 1e-4*np.array([1e2, 1e1, 1]);  self.Vs = [v];
+        # ------------- BIRD PARAMETERS -----------
+        c, L, r = 3.43E+02, 2.50E-02, 6.50E-01 
+        # , Ch, MG, MB, RB, Rh = BirdData['value'] # c, L, r, c, L1, L2, r2, rd 
+        # BirdData = pd.read_csv(self.paths.auxdata/'ZonotrichiaData.csv')
+        # - Trachea:
+        #           r: reflection coeficient    [adimensionelss]
+        #           L: trachea length           [m]
+        #           c: speed of sound in media  [m/s]
+        def ODEs(v):
+            dv, [x, y, pout] = np.zeros(3), v  # (x, y, pout)'
+            # ----------------- direct implementation of the EDOs -----------
+            # dv[0] = y
+            # dv[1] = (-self.alpha[t//ovfs]-self.beta[t//ovfs]*x-x**3+x**2)*self.p["gm"].value**2 - (x**2*y+x*y)*self.p["gm"].value
+            dv[0] = self.f1(x, y, alpha[t//ovfs], beta[t//ovfs], gamma)
+            dv[1] = self.f2(x, y, alpha[t//ovfs], beta[t//ovfs], gamma)
+            # ------------------------- trachea ------------------------
+            pbold = pb[t]                                 # pressure back before
+            # Pin(t) = Ay(t)+pback(t-L/C) = envelope_Signal*v[1]+pb[t-L/C/dt]
+            pi[t] = (.5*self.envelope[t//ovfs])*dv[1] + pb[t-int(L/c/dt)] 
+            pb[t] = -r*pi[t-int(L/c/dt)]                          # pressure back after: -rPin(t-L/C) 
+            pout  = (1-r)*pi[t-int(L/c/dt)]                       # pout
+            # ---------------------------------------------------------------
+            dv[2] = (pb[t]-pbold)/dt                      # dpout
+            return dv        
+        # ----------------------- Solving EDOs ----------------------
+        while t < tmax: # and v[1] > -5e6:  # labia velocity not too fast
+            v = rk4(ODEs, v, dt);  self.Vs.append(v)  # RK4 - step
+            out[t//ovfs] = v[-1]               # output signal (synthetic) 
+            t += 1;
+        # ------------------------------------------------------------
+        self.Vs = np.array(self.Vs)
+        # define solution (synthetic syllable) as a Syllable object 
+        synth = Syllable(Nt=self.Nt, llambda=self.llambda, NN=self.NN, overlap=0.5, flim=self.flim, sfs=[out, self.fs])
+        
+        synth.id          = self.id+"-synth"
+        synth.Vs          = self.Vs
+        synth.alpha       = self.alpha
+        synth.beta        = self.beta
+        synth.timesVs     = np.linspace(0, len(self.s)/self.fs, len(self.s)*ovfs)
+        
+        delattr(self,"alpha"); delattr(self,"beta");
+        
+        return synth
+
         
     # def Enve(self, out, fs, Nt):
     #     time = np.linspace(0, len(out)/fs, len(out))

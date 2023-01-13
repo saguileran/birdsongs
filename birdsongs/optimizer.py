@@ -3,6 +3,8 @@ from .birdsong import *
 from .utils import *
 
 class Optimizer(Syllable, object):
+    
+
     def __init__(self, obj, method_kwargs):
         self.obj    = obj
         self.obj0   = obj
@@ -30,7 +32,7 @@ class Optimizer(Syllable, object):
         # return syllable_synth.scoreFF -np.mean(syllable_synth.correlation+syllable_synth.Df+syllable_synth.scoreSKL)
 
     # making peackeable
-    def residualCorrelation_p(p): return Optimizer, (p.a,)
+    #def residualCorrelation_p(p): return Optimizer, (p.a,)
     # print("pickling a C instance...")
     
     

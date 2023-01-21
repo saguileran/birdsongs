@@ -1,6 +1,8 @@
-from .utils import *
+from .util import *
+from pathlib import Path
 
 class Syllable(object):
+    #%%
     """
     Store and define a syllable and its properties
     INPUT:
@@ -17,7 +19,8 @@ class Syllable(object):
         # restore the progress from the progress integer
         #self.progress = make_progress(self.progress_int)
     
-    def __init__(self, birdsong=None, t0=0, Nt=200, llambda=1.5, NN=0, overlap=0.5, flim=(1.5e3,2e4), n_mels=4, umbral_FF=1, tlim=[], sfs=[], no_syllable=0, ide="", file_name="total synth"):
+    #%%
+    def __init__(self, birdsong=None, t0=0, Nt=200, llambda=1.5, NN=0, overlap=0.5, flim=(1.5e3,2e4), n_mels=4, umbral_FF=1, tlim=[], sfs=[], no_syllable=0, ide="", file_name="syllable"):
         ## The bifurcation can be cahge modifying the self.f2 and self.f1 functions
         ## ------------- Bogdanov–Takens bifurcation ------------------
         self.beta_bif = np.linspace(-2.5, 1/3, 1000)  # mu2:beta,  mu1:alpha
@@ -203,6 +206,7 @@ class Syllable(object):
         self.FF_fun = interp1d(self.timeFF, self.FF)
         self.SCI    = self.f_msf / self.FF_fun(self.time)
     
+    #%%
     def AlphaBeta(self):
         a = np.array([self.p["a0"].value, self.p["a1"].value, self.p["a2"].value]);   
         b = np.array([self.p["b0"].value, self.p["b1"].value, self.p["b2"].value])
@@ -220,7 +224,7 @@ class Syllable(object):
         elif "chunck" in self.id: 
             self.beta = np.dot(b, t_par);
             
-        
+    #%%
     ##  ------------------------- BIRDS -------------------------
     def MotorGestures(self, alpha, beta, gamma, ovfs=20, prct_noise=0):  # ovfs:oversamp
         t, tmax, dt = 0, int(self.s.size)*ovfs-1, 1./(ovfs*self.fs) # t0, tmax, td
@@ -286,13 +290,18 @@ class Syllable(object):
         synth.Vs          = self.Vs
         synth.alpha       = self.alpha
         synth.beta        = self.beta
+        
+        df_MotorGestures = pd.DataFrame(data={"time":self.time_s, "alpha":self.alpha, "beta":self.beta})
+        name = self.file_name[:-4] + "-MG.csv"
+        df_MotorGestures.to_csv(self.paths.results / Path("MotorGestures-parameters") / name, index=False)
+
         synth.timesVs     = np.linspace(0, len(self.s)/self.fs, len(self.s)*ovfs)
         
         delattr(self,"alpha"); delattr(self,"beta")
         
         return synth
 
-
+    #%%
     ##  --------------- Anphibius -------------------------
     def MotorGesturesAnphibius(self, alpha, beta, gamma, ovfs=20, prct_noise=0):  # ovfs:oversamp
         t, tmax, dt = 0, int(self.s.size)*ovfs-1, 1./(ovfs*self.fs) # t0, tmax, td
@@ -352,11 +361,13 @@ class Syllable(object):
     #     t_env[-1] = time[-1] 
     #     fun_s = interp1d(t_env, out_env)
     #     return fun_s(time)
-        
+
+    #%%    
     def WriteAudio(self):
-        name = '{}/{}-{}-{}.wav'.format(self.paths.examples, self.file_name, self.id, self.no_syllable)
+        name = '{}/{}-{}-{}.wav'.format(self.paths.examples, self.file_name[:-4], self.id, self.no_syllable)
         WriteAudio(name, fs=self.fs, s=self.s)
-        
+
+    #%%    
     def Solve(self, p, orde=2):
         self.p = p;  # define parameteres to optimize
         self.ord = orde; 
@@ -368,8 +379,10 @@ class Syllable(object):
         synth = self.MotorGestures(self.alpha, self.beta, self.p["gm"].value) # solve the problem and define the synthetic syllable
         synth = self.SynthScores(synth, orde=orde) # compute differences and score variables
         synth.paths = self.paths
+        synth.file_name = self.file_name[:-4]# + "-synth    "
         return synth
     
+    #%%
     def SolveAB(self, alpha, beta, gamma, orde=2):
         self.alpha = alpha; self.beta  = beta;
         
@@ -379,8 +392,10 @@ class Syllable(object):
         
         return synth
     
+    #%%
     def Play(self): playsound(self.file_name)
     
+    #%%
     def SynthScores(self, synth, orde=2):
         synth.ord=self.ord=orde;  # order of score norms
         # deltaNOP    = np.abs(synth.NOP-self.NOP).astype(float)
@@ -446,3 +461,12 @@ class Syllable(object):
         synth.SCIFF = synth.scoreSCI + synth.scoreFF
         
         return synth
+
+    #%%
+    def Set(self, p_array):
+        self.p["a0"].set(value=p_array[0])
+        self.p["a1"].set(value=p_array[1])
+        self.p["a2"].set(value=p_array[2])
+        self.p["b0"].set(value=p_array[3])
+        self.p["b1"].set(value=p_array[4])
+        self.p["b2"].set(value=p_array[5])

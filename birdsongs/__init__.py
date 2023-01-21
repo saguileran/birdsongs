@@ -1,4 +1,32 @@
-import lazy_loader as lazy
-from .version import version as __version__
+from .version import __version__
+from .birdsong import BirdSong
+from .syllable import Syllable
+from .optimizer import Optimizer
+from .paths import Paths
+from .ploter import Ploter
+from .util import (   
+                    rk4, 
+                    WriteAudio, 
+                    Enve, 
+                    AudioPlay, 
+                    Klicker, 
+                    Positions, 
+                    Print, 
+                    smoothstep
+                  )
 
-__getattr__, __dir__, __all__ = lazy.attach_stub(__name__, __file__)
+__all__ = [ 
+            'BirdSong', 
+            'Syllable',
+            'Optimizer',
+            'Paths',
+            'Ploter',
+            'rk4', 
+            'WriteAudio', 
+            'Enve', 
+            'AudioPlay', 
+            'Klicker', 
+            'Positions', 
+            'Print', 
+            'smoothstep'
+          ]

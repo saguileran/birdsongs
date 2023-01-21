@@ -1,7 +1,8 @@
 from .syllable import *
-from .utils import *
+from .util import *
 
 class BirdSong(Syllable, object):
+    #%%
     """
     Store a song and its properties in a class 
     INPUT:
@@ -78,7 +79,8 @@ class BirdSong(Syllable, object):
         
         self.no_syllables = len(self.syllables)
         print('The son has {} syllables'.format(self.no_syllables))
-        
+    
+    #%%
     def Syllables(self, method="freq"):
         if method=="amplitud":
             supra      = np.where(self.envelope > self.umbral)[0]
@@ -115,7 +117,7 @@ class BirdSong(Syllable, object):
         elif "maad":
             im_bin = rois.create_mask(self.Sxx_dB, bin_std=1.5, bin_per=0.5, mode='relative')
         
-    
+    #%%
     def Syllable(self, no_syllable, NN=1024):
         self.no_syllable   = no_syllable
         ss                 = self.syllables[self.no_syllable-1]  # syllable indexes 
@@ -123,7 +125,7 @@ class BirdSong(Syllable, object):
         self.time_syllable = self.time_s[ss]
         self.t0            = self.time_syllable[0]
         
-        self.syllable      = Syllable(self, tlim=(self.time_syllable[0], self.time_syllable[-1]), flim=self.flim, NN=NN)
+        self.syllable      = Syllable(self, tlim=(self.time_syllable[0], self.time_syllable[-1]), flim=self.flim, NN=NN, file_name=self.file_name+"synth")
             
         self.syllable.no_syllable  = self.no_syllable
         self.syllable.no_file      = self.no_file
@@ -140,10 +142,11 @@ class BirdSong(Syllable, object):
         
         return self.syllable
     
+    #%%
     def Chunck(self, no_chunck, Nt=int(256/10), llambda=1.5, NN=256, overlap=0.5):
         self.no_chunck     = no_chunck
         
-        self.chunck        = Syllable(self, t0 = self.times_chun[0,self.no_chunck-1], NN=NN, llambda=llambda, Nt=Nt, overlap=overlap, flim=self.flim, out=self.chuncks[:,self.no_chunck-1])
+        self.chunck        = Syllable(self, t0 = self.times_chun[0,self.no_chunck-1], NN=NN, llambda=llambda, Nt=Nt, overlap=overlap, flim=self.flim, out=self.chuncks[:,self.no_chunck-1], file_name=self.file_name+"-chunck")
         
         self.chunck.no_syllable  = self.no_chunck
         #self.chunck.no_file      = self.no_file
@@ -156,6 +159,7 @@ class BirdSong(Syllable, object):
         name = '{}/{}-{}.wav'.format(self.paths.examples,self.file_name, self.id)
         WriteAudio(name, fs=self.fs, s=self.s)
     
+    #%%
     # ------------- solver for some parameters -----------------
     def WholeSong(self, method_kwargs, plot=False, syll_max=0):
         self.OptGamma = self.AllGammas(method_kwargs)
@@ -171,9 +175,20 @@ class BirdSong(Syllable, object):
                 self.syllable.PlotSynth()
                 self.syllable.Plot(0)
 
+    #%%
     def SyntheticSyllable(self):
         self.s_synth = np.empty_like(self.s)
         for i in range(self.syllables.size):
             self.s_synth[self.SylInd[i][1]] = self.syllables[i]
-            
+
+    #%%
     def Play(self): playsound(self.file_path)
+
+    #%%
+    def Set(self, p_array):
+        self.p["a0"].set(value=p_array[0])
+        self.p["a1"].set(value=p_array[1])
+        self.p["a2"].set(value=p_array[2])
+        self.p["b0"].set(value=p_array[3])
+        self.p["b1"].set(value=p_array[4])
+        self.p["b2"].set(value=p_array[5])

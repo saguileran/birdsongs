@@ -1,0 +1,15 @@
+librosa
+lmfit
+scipy
+sympy
+numpy<1.24
+pandas
+matplotlib
+playsound
+PeakUtils
+mpl_pan_zoom
+mpl_point_clicker
+scikit_learn
+scikit_maad
+setuptools
+ipython

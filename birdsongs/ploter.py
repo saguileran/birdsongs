@@ -1,11 +1,12 @@
-from .utils import *
+from .util import *
 
 class Ploter(object): 
+    #%%
     def __init__(self, save=False, cmap="magma", figsize=(8,3)): #" gray_r afmhot_r"
         self.save = save
         self.cmap = cmap
         self.figsize = figsize
-    
+    #%%
     def PlotAlphaBeta(self, obj, xlim=(-0.05,.2), ylim=(-0.2,0.9)):
         plt.close()
         if "synth" in obj.id:
@@ -54,13 +55,13 @@ class Ploter(object):
             fig.suptitle("Air-Sac Pressure (α) and Labial Tension (β) Parameters", fontsize=20)#, family='fantasy')
             plt.show()
             
-            if self.save: fig.savefig(obj.paths.results/"MotorGesturesParameters-{}-{}-{}.png".format(obj.id,obj.file_name,obj.no_syllable), transparent=True)
+            if self.save: fig.savefig(obj.paths.results/ "Images" / "{}-{}-{}-MotorGesturesParameters.png".format(obj.file_name[:-4],obj.id,obj.no_syllable), transparent=True)
             
             return fig#, gs
         else: 
             print("This  is not a synthetic object, try with otherone.")
     
-    
+    #%%
     def PlotVs(self,obj, xlim=()):
         plt.close()
         if "synth" in obj.id:
@@ -88,17 +89,16 @@ class Ploter(object):
             ax[1,1].set_title(r"Labial Velocity ($y(t)$)")
             ax[1,1].set_xlim(xlim); ax[1,1].sharex(ax[1,0]); 
 
-            fig.suptitle('Motor Gestures Parameters\nAudio:'+str(obj.file_name), fontsize=20)
+            fig.suptitle('System Variables', fontsize=20)#\nAudio:'+str(obj.file_name), fontsize=20)
             fig.tight_layout()
             plt.show()
             
-            if self.save: fig.savefig(obj.paths.results/"MotorGesturesParameters-{}-{}-{}.png".format(obj.id,obj.file_name,obj.no_syllable), transparent=True)
+            if self.save: fig.savefig(obj.paths.results/ "Images" / "{}-{}-{}-System-Variables.png".format(obj.file_name[:-4],obj.id,obj.no_syllable), transparent=True)
             return fig #, gs
         
         else:  print("This is not a synthetic object, there is not motor gestures variables asociated to it.")
             
-    
-    
+    #%%
     def Plot(self, obj, syllable=None, chunck=None, FF_on=False, SelectTime_on=False): 
         ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*1e-3))
         plt.close()
@@ -151,10 +151,10 @@ class Ploter(object):
                 
                 ax[0].legend(loc='upper right', title="FF")
                 fig.tight_layout()
-                path_save = obj.paths.results/"AllSongAndSyllable-{}-{}.png".format(obj.file_name, syllable.no_syllable)
-            else: path_save = obj.paths.results/"AllSongAndSyllable-{}.png".format(obj.file_name)
+                path_save = obj.paths.results/ "Images" / "{}-{}-AllSongAndSyllable.png".format(obj.file_name[:-4], syllable.no_syllable)
+            else: path_save = obj.paths.results/ "Images" / "{}-AllSongAndSyllable.png".format(obj.file_name[:-4])
 
-            fig.suptitle('Audio:\n{}'.format(obj.file_name), fontsize=18)
+            fig.suptitle("Audio Sound Wave and Spectrogram", fontsize=18) # 'Audio:\n{}'.format(obj.file_name[:-4])
             if SelectTime_on==True:  self.klicker = Klicker(fig, ax[0])
             fig.tight_layout()
             plt.show()
@@ -191,16 +191,17 @@ class Ploter(object):
             ax[1].set_xlabel('t (s)'); ax[1].set_ylabel('Amplitud normalaized');
             ax[1].sharex(ax[0])
 
-            fig.suptitle('id: {}, NoFile: {}, NoSyllable: {}'.format(obj.id, obj.no_file, obj.no_syllable), fontsize=16)
+            #fig.suptitle('id: {}, NoFile: {}, NoSyllable: {}'.format(obj.id, obj.no_file, obj.no_syllable), fontsize=16)
+            fig.suptitle('Sound Wave and Spectrogram - {}-{}'.format(obj.id, obj.no_syllable), fontsize=16)
             fig.tight_layout()
             plt.show()
 
-            path_save = obj.paths.results/"AllSongAndSyllable-{}-{}.png".format(obj.file_name,obj.no_syllable)
+            path_save = obj.paths.results/ "Images" / "{}-{}-{}.png".format(obj.file_name[:-4], obj.id, obj.no_syllable)
             
             if self.save: fig.savefig(path_save, transparent=True)
             return fig, ax
 
-        
+    #%%    
     def Syllables(self, obj, obj_synth, FF_on=False): #PlotSyllables
         plt.close()
         ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*1e-3))
@@ -245,17 +246,17 @@ class Ploter(object):
         fig.suptitle('Sound Waves and Spectrograms', fontsize=20)
         plt.show()
         
-        if self.save: fig.savefig(obj.paths.results/"SoundAndSpectros-{}-Syl-{}.png".format(obj.file_name,obj.no_syllable), transparent=True)
+        if self.save: fig.savefig(obj.paths.results/ "Images" / "{}-{}-{}-SoundAndSpectros.png".format(obj.file_name[:-4],obj.id,obj.no_syllable), transparent=True)
         
         return fig, ax
 
-    
+    #%%
     def Result(self, obj, obj_synth, cmp="afmhot_r"):
         plt.close()
         if not("synth" in obj.id) and "synth" in obj_synth.id:
             ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*1e-3))
             fig = plt.figure(constrained_layout=False, figsize=(5*self.figsize[0], 4*self.figsize[1]))
-            gs  = fig.add_gridspec(nrows=4, ncols=5, wspace=0.05, hspace=0.05, width_ratios=[1,1,1,1.2,1.2], left=0.05, right=0.98,)
+            gs  = fig.add_gridspec(nrows=4, ncols=5, wspace=0.15, hspace=0.5, width_ratios=[1,1,1,1.,1.], left=0.05, right=0.98,)
             vmin, vmax = obj.Sxx_dB.min(), obj.Sxx_dB.max()
             # ----- FF ---------------
             ax1 = fig.add_subplot(gs[0:2, :3])
@@ -273,23 +274,24 @@ class Ploter(object):
             ax1.plot(obj.time,        obj.FF,       'b*-', label=r'FF real',ms=25)
             ax1.plot(obj_synth.time,  obj_synth.FF, 'go-', label=r'FF synt', ms=12)
 
-            ax1.legend(borderpad=0.6, labelspacing=0.7, title="Feature"); ax1.set_ylim(obj.flim); 
+            ax1.legend(borderpad=0.6, labelspacing=0.7, title="Feature"); ax1.set_ylim(obj.flim); # bbox_to_anchor=(1.05, 1)
             ax1.set_xlim((obj.time[0], obj.time[-1]))
             ax1.set_ylabel('f (khz)'); ax1.set_xlabel('time (s)');
             ax1.yaxis.set_major_formatter(ticks)
             ax1.set_title('Spectrogram - Fundamental Frequency (FF)')
             
             ax2 = fig.add_subplot(gs[0:2, 3:])
-            ax2.plot(obj_synth.time,  obj_synth.deltaFF ,      "*-", color="k",  ms=12, lw=3, label=r' $||ΔFF||_{}$= {:.4f}, mean={:.4f}'.format(obj_synth.ord, obj_synth.scoreFF, obj_synth.deltaFF_mean)); 
-            ax2.plot(obj_synth.time, obj_synth.deltaRMS,      "-p", color="r",  label=r' $|| ΔF_{{ rms }}||_{}$= {:.4f}, mean={:.4f}'.format(obj_synth.ord,  obj_synth.scoreRMS, obj_synth.scoreRMS_mean)); 
-            ax2.plot(obj.time,       obj_synth.deltaCentroid,  "-o", color="y", label=r'$ || \Delta F_{{ centroid }}||_{}$ = {:.4f}, mean={:.4f}'.format(obj_synth.ord, obj_synth.scoreCentroid, obj_synth.scoreCentroid_mean)); 
-            ax2.plot(obj.time,       obj_synth.deltaF_msf,     "D-", color="purple", label=r'$ || \Delta F_{{ msf }}||_{}$ = {:.4f}, mean={:.4f}'.format(obj_synth.ord, obj_synth.scoreF_msf, obj_synth.scoreF_msf_mean)); 
+            ax2.plot(obj_synth.time,  obj_synth.deltaFF ,      "*-", color="k",  ms=12, lw=3, label=r' $||ΔFF||_{}$={:.4f},'.format(obj_synth.ord, obj_synth.scoreFF)+"\n"+'    mean={:.4f}'.format(obj_synth.deltaFF_mean)); 
+            ax2.plot(obj_synth.time, obj_synth.deltaRMS,      "-p", color="r",  label=r' $|| ΔF_{{ rms }}||_{}$={:.4f},'.format(obj_synth.ord,  obj_synth.scoreRMS)+"\n"+'      mean={:.4f}'.format(obj_synth.scoreRMS_mean)); 
+            ax2.plot(obj.time,       obj_synth.deltaCentroid,  "-o", color="y", label=r'$ || \Delta F_{{ centroid }}||_{}$={:.4f},'.format(obj_synth.ord, obj_synth.scoreCentroid, obj_synth.scoreCentroid_mean)+"\n"+'          mean={:.4f}'.format(obj_synth.scoreCentroid_mean)); 
+            ax2.plot(obj.time,       obj_synth.deltaF_msf,     "D-", color="purple", label=r'$ || \Delta F_{{ msf }}||_{}$={:.4f},'.format(obj_synth.ord, obj_synth.scoreF_msf)+"\n"+'     mean={:.4f}'.format(obj_synth.scoreF_msf_mean)); 
 
 
             ax2.plot(obj_synth.time, obj_synth.rms*1e-3, 'p-', color="darkred", label=r'$F_{rms}$ synth', ms=7)
             ax2.plot(obj.time,       obj.rms*1e-3,       'rv-', label=r'$F_{rms}$ real', ms=9)
 
-            ax2.set_xlabel('time (s)'); ax2.set_ylabel('f (kHz)'); ax2.legend(title="Features")
+            ax2.set_xlabel('time (s)'); ax2.set_ylabel('f (kHz)'); 
+            ax2.legend(title="Feature", bbox_to_anchor=(1.03, 1), borderpad=0.6, labelspacing=0.7,)
             ax2.set_title('Fundamental Frequency Error (ΔFF)'); 
             if obj_synth.deltaFF.max() > 1.2: ax2.set_ylim((-0.5,10))
             else:                            ax2.set_ylim((-0.1,1))
@@ -373,7 +375,7 @@ class Ploter(object):
             ax9.set_title("Sound Waves")
 
             ax10 = fig.add_subplot(gs[3, 3:4])
-            ax10.plot(obj_synth.time_s, obj_synth.deltaEnv, 'ko-', label=r' $||env||_{}$ = {:.4f},'.format(obj_synth.ord, obj_synth.scoreEnv)+'\nmean={:.4f}'.format(obj_synth.deltaEnv_mean))
+            ax10.plot(obj_synth.time_s, obj_synth.deltaEnv, 'ko-', label=r' $||env||_{}$ = {:.4f},'.format(obj_synth.ord, obj_synth.scoreEnv)+'\n    mean={:.4f}'.format(obj_synth.deltaEnv_mean))
             ax10.set_xlabel("t (s)"); ax10.set_ylabel("Amplitud (a.u.)"); 
             ax10.set_title("Envelope Difference (Δ env)"); 
             ax10.set_ylim((0,1)); ax10.legend()
@@ -381,18 +383,18 @@ class Ploter(object):
 
             # ------------------ SIC -------------------------
             ax11 = fig.add_subplot(gs[2, 4])
-            ax11.plot(obj.time, obj.SCI, 'go-', label='SCI real,   mean={:.2f}'.format(obj.SCI.mean()))
-            ax11.plot(obj.time, obj_synth.SCI, 'bo-', label='SCI synth, mean={:.2f} '.format(obj_synth.SCI.mean()))
+            ax11.plot(obj.time, obj.SCI, 'bo-', label='real,\nmean={:.2f}'.format(obj.SCI.mean()))
+            ax11.plot(obj.time, obj_synth.SCI, 'go-', label='synth,\nmean={:.2f} '.format(obj_synth.SCI.mean()))
 
             ax11.set_xlabel("t (s)"); ax11.set_ylabel("SCI (adimensionless)"); 
             ax11.set_title("Spectral Content Index (SCI)"); 
-            ax11.set_ylim((0,5)); ax11.legend()
+            ax11.set_ylim((0,5)); ax11.legend(bbox_to_anchor=(1.28, 1))
 
 
             ax12 = fig.add_subplot(gs[3, 4])
             
             ax12.plot(obj.time, obj_synth.Df, 'H', label=r'$||DF||_{}$={:.3f},'.format(obj_synth.ord, obj_synth.scoreDF)+'\n  mean={:.3f} '.format(obj_synth.Df.mean()), ms=7)
-            ax12.plot(obj.time, obj_synth.SKL, 's', color="purple", label=r'$||SKL||_{}$={:.3f},'.format(obj_synth.ord, obj_synth.scoreSKL)+'\n  mean={:.3f}'.format(obj_synth.SKL.mean()), ms=7)
+            ax12.plot(obj.time, obj_synth.SKL, 's', color="purple", label=r'$||SKL||_{}$={:.3f},'.format(obj_synth.ord, obj_synth.scoreSKL)+'\n   mean={:.3f}'.format(obj_synth.SKL.mean()), ms=7)
             ax12.plot(obj.time, obj_synth.correlation, 'p', label=r'$||cor||_{}$={:.3f},'.format(obj_synth.ord, obj_synth.scoreCorrelation)+'\n   mean={:.3f} '.format(obj_synth.correlation.mean()))
             ax12.plot(obj_synth.time, obj_synth.deltaSCI, 'ko', label=r'$||SCI||_{}$={:.4f},'.format(obj_synth.ord, obj_synth.scoreSCI)+'\n   mean={:.3f}'.format(obj_synth.deltaSCI_mean))
             
@@ -400,18 +402,18 @@ class Ploter(object):
             ax12.set_title("SCI Error and Acoustic Dissimilarity (ΔSCI & ADI)"); 
             if obj_synth.deltaSCI.max()>1.2: ax12.set_ylim((0,2)); 
             else:                            ax12.set_ylim((0,1)); 
-            ax12.legend(bbox_to_anchor= (1.05, 1))
+            ax12.legend(bbox_to_anchor=(1.05, 1))
 
 
-            fig.suptitle(obj.file_name+"\nSCORES", fontsize=20)
+            fig.suptitle("Scoring Variables", fontsize=30)#\nAudio: {}-{}-{}".format(obj.file_name[:-4],obj.id,obj.no_syllable))
             plt.show()
             
-            if self.save: fig.savefig(obj.paths.results/"ScoresVariables-{}-{}-{}.png".format(obj.id,obj.file_name,obj.no_syllable), transparent=True) 
+            if self.save: fig.savefig(obj.paths.results/ "Images" / "{}-{}-{}-Scoring-Variables.png".format(obj.file_name[:-4],obj.id,obj.no_syllable), transparent=True, bbox_inches='tight') 
             return fig, gs
         
         else: print("Remember you must enter the object in the defined order: obj, obj_synth. \nEnter the objects again.")   
         
-        
+    #%%    
     def FindTimes(self, obj, FF_on=False):
         plt.close()
         ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*1e-3))
@@ -436,7 +438,7 @@ class Ploter(object):
         
         return klicker
     
-    
+    #%%
     def Plot3d(self, obj):
         plt.close()
         

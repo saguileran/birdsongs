@@ -1,6 +1,6 @@
 from .syllable import *
 from .birdsong import *
-from .utils import *
+from .util import *
 
 class Optimizer(Syllable, object):
     

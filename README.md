@@ -61,7 +61,7 @@ birdsong is implemented in python 3.8. It requires:
 - scikit_maad
 - setuptools
 - ipython
-- lazy_loader
+- pygobject
 
     
 ## Downloading
@@ -78,24 +78,24 @@ The next step is to install the required packages, any of the following commands
 
 ```bat
 pip install -r ./requirements.txt
-python -m pip install -r ./requirements.txt
+# python -m pip install -r ./requirements.txt  # (equivalent)
 ```
-
+<!--
 You can now use the package in a python terminal opened at the birdsongs folder. 
 
-
-<!--
 To use the package from any folder install the repository, this can be done with any of the two following lines
+-->
+
+Install the birdsong package
 
 ```bat
 python .\setup.py install
-pip install .
 ```
--->
+
 That's all! 
 
-Take a look at the tutorials notebooks for basic uses: physical model implementation, [motor-gestures.ipynb](./motor-gestures.ipynb); define and generate a syllable from a recorded birdsong, [syllable.ipynb](./syllable.ipynb);
-or to generate a whole birdsong, several syllables, [birdsong.ipynb](./birdsong.ipynb),
+Take a look at the tutorials notebooks for basic uses: physical model implementation, [motor-gestures.ipynb](./tutorials/motor-gestures.ipynb); define and generate a syllable from a recorded birdsong, [syllable.ipynb](./tutorials/syllable.ipynb);
+or to generate a whole birdsong, several syllables, [birdsong.ipynb](./tutorials/birdsong.ipynb),
 
 ## Use
 

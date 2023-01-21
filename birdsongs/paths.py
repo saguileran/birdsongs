@@ -4,17 +4,18 @@ from pathlib import Path
 
 class Paths(object):
     def __init__(self, root_path=None, audios_path=None, bird_name=None):
-        if root_path==None: self.root = Path("./examples")
+        if root_path==None: self.root = Path("../examples/")
         else:               self.root = Path(root_path)
-        #self.base     = "{}birdsongs\\".format(self.root) 
+        
         self.auxdata  = self.root / 'auxiliar_data'
         self.results  = self.root / 'results'
-        self.examples = self.results / 'audios'  # write audios folder
+        self.examples = self.results / 'Audios'  # write audios folder
         
         if audios_path==None:
             self.audios      = self.root / 'audios'     # wav folder
             self.sound_files = list(self.audios.glob("*.wav"))
             self.files_names = [str(f)[len(str(self.audios))+1:] for f in self.sound_files]
+            self.data = pd.Series(self.files_names)
         else:
             if "ebird" in audios_path: 
                 search_by, name_col = "Scientific Name", "ML Catalog Number"
@@ -44,9 +45,10 @@ class Paths(object):
         
         self.no_files    = len(self.sound_files)
             
-        self.results.mkdir(parents=True, exist_ok=True)
-        self.examples.mkdir(parents=True, exist_ok=True)
+        #self.results.mkdir(parents=True, exist_ok=True)
+        #self.examples.mkdir(parents=True, exist_ok=True)
         
     def ShowFiles(self):
         print("The folder has {} songs:".format(self.no_files))
-        [print(str(i)+"-"+str(self.files_names[i])) for i in range(self.no_files)];
+        print(self.data)
+        #[print(str(i)+"-"+str(self.files_names[i])) for i in range(self.no_files)];

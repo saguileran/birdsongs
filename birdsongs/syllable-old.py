@@ -1,4 +1,4 @@
-from .utils import *
+from .util import *
 
 class Syllable(object):
     """

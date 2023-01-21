@@ -13,4 +13,4 @@ scikit_learn
 scikit_maad
 setuptools
 ipython
-lazy_loader
+pygobject

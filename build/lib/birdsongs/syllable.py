@@ -20,7 +20,8 @@ class Syllable(object):
         #self.progress = make_progress(self.progress_int)
     
     #%%
-    def __init__(self, birdsong=None, t0=0, Nt=200, llambda=1.5, NN=0, overlap=0.5, flim=(1.5e3,2e4), n_mels=4, umbral_FF=1, tlim=[], sfs=[], no_syllable=0, ide="", file_name="syllable"):
+    def __init__(self, birdsong=None, t0=0, Nt=200, llambda=1.5, NN=0, overlap=0.5, flim=(1.5e3,2e4), 
+                n_mels=4, umbral_FF=1, tlim=[], sfs=[], no_syllable=0, ide="", file_name="syllable", paths=None):
         ## The bifurcation can be cahge modifying the self.f2 and self.f1 functions
         ## ------------- Bogdanov–Takens bifurcation ------------------
         self.beta_bif = np.linspace(-2.5, 1/3, 1000)  # mu2:beta,  mu1:alpha
@@ -79,6 +80,7 @@ class Syllable(object):
             self.no_file    = 0
             self.file_name  = file_name
             self.umbral     = 0.05
+            self.paths      = paths
         
         
         # ------ define syllable by time interval [tini, tend] --------
@@ -86,7 +88,7 @@ class Syllable(object):
             self.s  = sound.normalize(s, max_amp=1.0)
             self.t0 = t0
         elif len(tlim)==0 and t0==0: 
-            self.t0 = 0
+            self.t0 = t0
             self.s  = sound.normalize(s, max_amp=1.0)
         elif len(tlim)!=0:
             self.s  = sound.normalize(s[int(tlim[0]*self.fs):int(tlim[1]*self.fs)], max_amp=1.0)
@@ -279,23 +281,25 @@ class Syllable(object):
         # ------------------------------------------------------------
         self.Vs = np.array(self.Vs)
         # define solution (synthetic syllable) as a Syllable object 
-        synth = Syllable(Nt=self.Nt, llambda=self.llambda, NN=self.NN, overlap=0.5, flim=self.flim, sfs=[out, self.fs])
+        synth = Syllable(Nt=self.Nt, llambda=self.llambda, NN=self.NN, overlap=0.5, 
+                         flim=self.flim, sfs=[out, self.fs], umbral_FF=self.umbral_FF)
         
-        
-        # synth.no_syllable = self.no_syllable
-        # synth.no_file     = self.no_file
-        # synth.p           = self.p
-        # synth.paths       = self.paths
         synth.id          = self.id+"-synth"
         synth.Vs          = self.Vs
         synth.alpha       = self.alpha
         synth.beta        = self.beta
         
+        # ------------ export p values and alpha-beta arrays ------------
         df_MotorGestures = pd.DataFrame(data={"time":self.time_s, "alpha":self.alpha, "beta":self.beta})
-        name = self.file_name[:-4] + "-MG.csv"
-        df_MotorGestures.to_csv(self.paths.results / Path("MotorGestures-parameters") / name, index=False)
+        df_MotorGestures_coef = pd.DataFrame(data=np.concatenate((list(self.p.valuesdict().values()),self.tlim, [self.NN, self.umbral_FF])), 
+                                             index=np.concatenate((list(self.p.valuesdict().keys()), ["t_ini", "t_end", "NN", "umbral_FF"])), 
+                                             columns=["value"])
+        name  = self.file_name[:-4] + "-"+str(self.id)+"-"+str(self.no_syllable)+ "-MG.csv"
+        name1 =  self.file_name[:-4] +"-"+str(self.id)+"-"+str(self.no_syllable)+ "-MG-coef.csv"
+        df_MotorGestures.to_csv(self.paths.MG_param / name, index=True)
+        df_MotorGestures_coef.to_csv(self.paths.MG_param / name1, index=True)
 
-        synth.timesVs     = np.linspace(0, len(self.s)/self.fs, len(self.s)*ovfs)
+        synth.timesVs = np.linspace(0, len(self.s)/self.fs, len(self.s)*ovfs)
         
         delattr(self,"alpha"); delattr(self,"beta")
         
@@ -353,14 +357,6 @@ class Syllable(object):
         
         return synth
 
-        
-    # def Enve(self, out, fs, Nt):
-    #     time = np.linspace(0, len(out)/fs, len(out))
-    #     out_env = sound.envelope(out, Nt=Nt) 
-    #     t_env = np.arange(0,len(out_env),1)*len(out)/fs/len(out_env)
-    #     t_env[-1] = time[-1] 
-    #     fun_s = interp1d(t_env, out_env)
-    #     return fun_s(time)
 
     #%%    
     def WriteAudio(self):
@@ -469,4 +465,4 @@ class Syllable(object):
         self.p["a2"].set(value=p_array[2])
         self.p["b0"].set(value=p_array[3])
         self.p["b1"].set(value=p_array[4])
-        self.p["b2"].set(value=p_array[4])
+        self.p["b2"].set(value=p_array[5])

@@ -10,7 +10,8 @@ class BirdSong(Syllable, object):
         no_file = number of the file to analyze
         umbral = threshold to detect a syllable, less than one
     """
-    def __init__(self, paths, no_file, sfs=[], umbral=0.05, llambda=1., NN=1024, overlap=0.5, umbral_FF=1.5, flim=(1.5e3,2e4), center=False, tlim=[], split_method="freq", Nt=500, syll_times=[]):
+    def __init__(self, paths, no_file, sfs=[], umbral=0.05, llambda=1., NN=1024, overlap=0.5, center=False,
+                umbral_FF=1.5, flim=(1.5e3,2e4),  tlim=[], split_method="freq", Nt=500, syll_times=[]):
         self.no_file = no_file
         self.paths   = paths
         self.llambda = llambda

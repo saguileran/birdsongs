@@ -36,19 +36,19 @@ setup(
         url = 'https://github.com/saguileran/birdsongs',
         license = 'GPL-3.0',
         keywords = ['numerical-optimization', 'bioacustics', 'syrinx', 'signal processing'],
-        description = 'A python package to analyze, visualize and generate synthetic birdsongs.',
+        description = 'A python package for analyzing, visualizing and generating synthetic bird songs from recorded audio.',
         long_description = long_description,
         long_description_content_type = 'text/markdown',
         license_file = 'LICENSE',
         cmdclass= {'clean': CleanCommand},
         python_requires = '>=3.5',
         install_requires = [  
-                            "librosa",
+                            "librosa>0.9",
                             "lmfit",
                             "scipy",
                             "sympy",
                             "numpy<1.24",
-                            "pandas",
+                            "pandas>1.5",
                             "matplotlib",
                             "playsound",
                             "PeakUtils",
@@ -57,7 +57,8 @@ setup(
                             "scikit_learn",
                             "scikit_maad",
                             "setuptools",
-                            "ipython"
+                            "ipython",
+                            "ffmpeg"
                             ]
      )
 

@@ -1,9 +1,9 @@
-librosa
+librosa>0.9
 lmfit
 scipy
 sympy
 numpy<1.24
-pandas
+pandas>1.5
 matplotlib
 playsound
 PeakUtils
@@ -13,3 +13,4 @@ scikit_learn
 scikit_maad
 setuptools
 ipython
+ffmpeg

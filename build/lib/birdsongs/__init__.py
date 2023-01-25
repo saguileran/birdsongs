@@ -12,7 +12,9 @@ from .util import (
                     Klicker, 
                     Positions, 
                     Print, 
-                    smoothstep
+                    smoothstep,
+                    DownloadXenoCanto,
+                    grab_audio
                   )
 
 __all__ = [ 
@@ -28,5 +30,7 @@ __all__ = [
             'Klicker', 
             'Positions', 
             'Print', 
-            'smoothstep'
+            'smoothstep',
+            'DownloadXenoCanto',
+            'grab_audio'
           ]

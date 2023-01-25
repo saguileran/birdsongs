@@ -1,10 +1,11 @@
-import peakutils, time, warnings, lmfit, pickle, copyreg #emcee,
+import peakutils, time, warnings, lmfit, pickle, copyreg, sys, os #emcee,
 import numpy as np
 import pandas as pd
 import sympy as sym
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+from pathlib import Path
 
 from playsound import playsound
 
@@ -40,6 +41,7 @@ from IPython.display import Audio # reproduce audio
 Pool() # crea pool to parallel programming for optimization
 #warnings.filterwarnings(action='once') # omite warnings spam
 
+#%%
 def rk4(f, v, dt):
     """
     Implent of Runge-Kuta 4th order
@@ -56,9 +58,11 @@ def rk4(f, v, dt):
     k4 = f(v + dt*k3)
     return v + dt*(2.0*(k2+k3)+k1+k4)/6.0
 
+#%%
 def WriteAudio(name, fs, s):
     sound.write(name, fs, np.asarray(s,  dtype=np.float32))
-    
+
+#%% 
 def Enve(out, fs, Nt):
     time = np.linspace(0, len(out)/fs, len(out))
     out_env = sound.envelope(out, Nt=Nt) 
@@ -67,9 +71,11 @@ def Enve(out, fs, Nt):
     fun_s = interp1d(t_env, out_env)
     return fun_s(time)
 
+#%%
 def AudioPlay(obj):
     return Audio(data=obj.s, rate=obj.fs)
 
+#%%
 def Klicker(fig, ax):
     zoom_factory(ax)
     pm = PanManager(fig, button=MouseButton.MIDDLE)
@@ -82,7 +88,8 @@ def Klicker(fig, ax):
 
     #ax.legend(title="Interval Points", bbox_to_anchor=(1.1, 1.05))
     return klicker
-    
+
+#%%    
 def Positions(klicker):
     tinis = np.array([tini[0] for tini in klicker._positions[r"$t_{ini}$"]])
     tends = np.array([tend[0] for tend in klicker._positions[r"$t_{end}$"]])
@@ -91,10 +98,11 @@ def Positions(klicker):
         return np.array([[tinis[i], tends[i]] for i in range(len(tinis))])
     else:
         return np.array([tinis, tends])
-    
+ 
+#%%   
 def Print(string): return display(Math(string))
 
-
+#%%
 def smoothstep(x, x_min=0, x_max=1, N=1):
     x = np.clip((x - x_min) / (x_max - x_min), 0, 1)
 
@@ -105,3 +113,93 @@ def smoothstep(x, x_min=0, x_max=1, N=1):
     result *= x**(N+1)
 
     return result
+
+#%%
+def grab_audio(path, audio_format='mp3'):
+    filelist = []
+    for root, dirs, files in os.walk(path, topdown=False):
+        for name in files:
+            if name[-3:].casefold() == audio_format and name[:2] != '._':
+                filelist.append(os.path.join(root, name))
+    return filelist
+
+#%%
+def DownloadXenoCanto(data, XC_ROOTDIR="./examples/", XC_DIR="Audios/", filters=['english name', 'scientific name'],
+                        type=None, area=None, cnt=None, loc=None, nr=None, q='">C"', len=None, len_limits=['00:00', '01:00'],
+                        max_nb_files=20, verbose=False, min_quality="B"):
+    """
+    data = [['Rufous-collared Sparrow', 'Zonotrichia capensis'],
+            ['White-backed',        'Dendrocopos leucotos']]
+    len = '"5-60"'
+    len_limits = ['00:00', '01:00']
+    XC_ROOTDIR = './files/'
+    XC_DIR = 'zonotrichia_dataset' 
+    """
+    
+    df_species = pd.DataFrame(data,columns=filters)
+    sp, gen = [], []
+
+    for name in df_species['scientific name']:
+        gen.append(name.rpartition(' ')[0])
+        sp.append(name.rpartition(' ')[2])
+
+    df_query = pd.DataFrame()
+    df_query['param1'] = gen
+    df_query['param2'] = sp
+    df_query['param3'] = 'q:'+q
+    if type is not None: df_query['param4'] ='type:'+type
+    if area is not None: df_query['param5'] ='area:'+area
+    if cnt is not None:  df_query['param6'] ='cnt:'+cnt
+    if loc is not None:  df_query['param7'] ='loc:'+loc
+    if nr is not None:   df_query['param8'] ='nr:'+nr
+    if len is not None:  df_query['param9'] ='len:'+len
+
+    # Get recordings metadata corresponding to the query
+    df_dataset= util.xc_multi_query(df_query, 
+                                    format_time = False,
+                                    format_date = False,
+                                    verbose = verbose)
+    if df_dataset.size!=0:
+        df_dataset = util.xc_selection(df_dataset,
+                                        max_nb_files=max_nb_files,
+                                        min_length=len_limits[0],
+                                        max_length=len_limits[1],
+                                        min_quality=min_quality,
+                                        verbose = verbose )
+            
+        # download audio files
+        util.xc_download(df_dataset,
+                        rootdir = XC_ROOTDIR,
+                        dataset_name= XC_DIR,
+                        overwrite=True,
+                        save_csv= True,
+                        verbose = verbose)
+
+        filelist = grab_audio(XC_ROOTDIR+XC_DIR)
+        df = pd.DataFrame()
+        for file in filelist:
+            df = df.append({'fullfilename': file,
+                            'filename': Path(file).parts[-1][:-4],
+                            'species': Path(file).parts[-2]},
+                            ignore_index=True)
+
+        for i in range(df_species.shape[0]):
+            df = df_dataset["en"].str.contains(df_species["english name"][i], case=False)
+            spec = df_dataset[df]["gen"][0] +" "+ df_dataset[df]["sp"][0] #df_species["scientific name"][i]
+            scientific = df_dataset[df]["en"][0]#df_species["english name"][i]
+            df_dataset[df].to_csv(XC_ROOTDIR+XC_DIR+spec+"_"+scientific+"/spreadsheet-XC.csv")
+
+        return df_dataset#["en"][df]
+    else:
+        raise ValueError("No sounds were found with your specifications. Try again with other parameters.")
+
+
+
+
+# def Enve(self, out, fs, Nt):
+#     time = np.linspace(0, len(out)/fs, len(out))
+#     out_env = sound.envelope(out, Nt=Nt) 
+#     t_env = np.arange(0,len(out_env),1)*len(out)/fs/len(out_env)
+#     t_env[-1] = time[-1] 
+#     fun_s = interp1d(t_env, out_env)
+#     return fun_s(time)

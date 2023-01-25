@@ -55,7 +55,7 @@ class Ploter(object):
             fig.suptitle("Air-Sac Pressure (α) and Labial Tension (β) Parameters", fontsize=20)#, family='fantasy')
             plt.show()
             
-            if self.save: fig.savefig(obj.paths.results/ "Images" / "{}-{}-{}-MotorGesturesParameters.png".format(obj.file_name[:-4],obj.id,obj.no_syllable), transparent=True)
+            if self.save: fig.savefig(obj.paths.images / "{}-{}-{}-MotorGesturesParameters.png".format(obj.file_name[:-4],obj.id,obj.no_syllable), transparent=True, bbox_inches='tight')
             
             return fig#, gs
         else: 
@@ -93,7 +93,7 @@ class Ploter(object):
             fig.tight_layout()
             plt.show()
             
-            if self.save: fig.savefig(obj.paths.results/ "Images" / "{}-{}-{}-System-Variables.png".format(obj.file_name[:-4],obj.id,obj.no_syllable), transparent=True)
+            if self.save: fig.savefig(obj.paths.images / "{}-{}-{}-System-Variables.png".format(obj.file_name[:-4],obj.id,obj.no_syllable), transparent=True, bbox_inches='tight')
             return fig #, gs
         
         else:  print("This is not a synthetic object, there is not motor gestures variables asociated to it.")
@@ -151,8 +151,8 @@ class Ploter(object):
                 
                 ax[0].legend(loc='upper right', title="FF")
                 fig.tight_layout()
-                path_save = obj.paths.results/ "Images" / "{}-{}-AllSongAndSyllable.png".format(obj.file_name[:-4], syllable.no_syllable)
-            else: path_save = obj.paths.results/ "Images" / "{}-AllSongAndSyllable.png".format(obj.file_name[:-4])
+                path_save = obj.paths.images / "{}-{}-AllSongAndSyllable.png".format(obj.file_name[:-4], syllable.no_syllable)
+            else: path_save = obj.paths.images / "{}-AllSongAndSyllable.png".format(obj.file_name[:-4])
 
             fig.suptitle("Audio Sound Wave and Spectrogram", fontsize=18) # 'Audio:\n{}'.format(obj.file_name[:-4])
             if SelectTime_on==True:  self.klicker = Klicker(fig, ax[0])
@@ -160,7 +160,7 @@ class Ploter(object):
             plt.show()
             
         
-            if self.save: fig.savefig(path_save, transparent=True)
+            if self.save: fig.savefig(path_save, transparent=True, bbox_inches='tight')
         else:  # syllable ------------------------------------------------
             fig, ax = plt.subplots(2, 1, figsize=(self.figsize[0], self.figsize[1]*(2+int(syllable_on))))
             fig.subplots_adjust(hspace=0.4, wspace=0.4)
@@ -196,9 +196,9 @@ class Ploter(object):
             fig.tight_layout()
             plt.show()
 
-            path_save = obj.paths.results/ "Images" / "{}-{}-{}.png".format(obj.file_name[:-4], obj.id, obj.no_syllable)
+            path_save = obj.paths.images / "{}-{}-{}.png".format(obj.file_name[:-4], obj.id, obj.no_syllable)
             
-            if self.save: fig.savefig(path_save, transparent=True)
+            if self.save: fig.savefig(path_save, transparent=True, bbox_inches='tight')
             return fig, ax
 
     #%%    
@@ -244,9 +244,9 @@ class Ploter(object):
             ax[0,1].legend(); ax[1,1].legend();
         
         fig.suptitle('Sound Waves and Spectrograms', fontsize=20)
-        plt.show()
+        plt.show();
         
-        if self.save: fig.savefig(obj.paths.results/ "Images" / "{}-{}-{}-SoundAndSpectros.png".format(obj.file_name[:-4],obj.id,obj.no_syllable), transparent=True)
+        if self.save: fig.savefig(obj.paths.images / "{}-{}-{}-SoundAndSpectros.png".format(obj.file_name[:-4],obj.id,obj.no_syllable), transparent=True, bbox_inches='tight')
         
         return fig, ax
 
@@ -408,7 +408,7 @@ class Ploter(object):
             fig.suptitle("Scoring Variables", fontsize=30)#\nAudio: {}-{}-{}".format(obj.file_name[:-4],obj.id,obj.no_syllable))
             plt.show()
             
-            if self.save: fig.savefig(obj.paths.results/ "Images" / "{}-{}-{}-Scoring-Variables.png".format(obj.file_name[:-4],obj.id,obj.no_syllable), transparent=True, bbox_inches='tight') 
+            if self.save: fig.savefig(obj.paths.images / "{}-{}-{}-Scoring-Variables.png".format(obj.file_name[:-4],obj.id,obj.no_syllable), transparent=True, bbox_inches='tight') 
             return fig, gs
         
         else: print("Remember you must enter the object in the defined order: obj, obj_synth. \nEnter the objects again.")   

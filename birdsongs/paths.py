@@ -128,6 +128,7 @@ class Paths(object):
         name = [x[1]+"-"+x[2] for x in MG_param_splited]
         audios = [list(self.audios.glob(id+"*"))[0]  for id  in id_XC]
         ss, fss = [], []
+        
         for audio in audios:
             s, fs = sound.load(audio)
             ss.append(s); fss.append(fs);

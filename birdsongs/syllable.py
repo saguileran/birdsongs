@@ -291,13 +291,12 @@ class Syllable(object):
         
         # ------------ export p values and alpha-beta arrays ------------
         df_MotorGestures = pd.DataFrame(data={"time":self.time_s, "alpha":self.alpha, "beta":self.beta})
-        df_MotorGestures_coef = pd.DataFrame(data=np.concatenate((list(self.p.valuesdict().values()),self.tlim, [self.NN, self.umbral_FF])), 
+        df_MotorGestures_coef = pd.DataFrame(data=np.concatenate((list(self.p.valuesdict().values()),self.tlim, [self.NN, int(self.umbral_FF)])), 
                                              index=np.concatenate((list(self.p.valuesdict().keys()), ["t_ini", "t_end", "NN", "umbral_FF"])), 
                                              columns=["value"])
-        name  = self.file_name[:-4] + "-"+str(self.id)+"-"+str(self.no_syllable)+ "-MG.csv"
-        name1 =  self.file_name[:-4] +"-"+str(self.id)+"-"+str(self.no_syllable)+ "-MG-coef.csv"
-        df_MotorGestures.to_csv(self.paths.MG_param / name, index=True)
-        df_MotorGestures_coef.to_csv(self.paths.MG_param / name1, index=True)
+        name  = self.file_name[:-4] + "-"+str(self.id)+"-"+str(self.no_syllable) 
+        df_MotorGestures.to_csv(self.paths.MG_param / name / "-MG.csv", index=True)
+        df_MotorGestures_coef.to_csv(self.paths.MG_param / name / "-MG-coef.csv", index=True)
 
         synth.timesVs = np.linspace(0, len(self.s)/self.fs, len(self.s)*ovfs)
         

@@ -70,6 +70,27 @@ results:
     title: "C693679 - Tropical Mockingbird "
 last_modified_at: 2023-01-05T11:59:26-04:00
 
+Zonotrichia_WV:
+  - url: "https://github.com/saguileran/birdsongs/blob/main/examples/results/Images/XC11293%20-%20Rufous-collared%20Sparrow%20-%20Zonotrichia%20capensis-syllable-1.png"
+    image_path: "https://github.com/saguileran/birdsongs/blob/main/examples/results/Images/XC11293%20-%20Rufous-collared%20Sparrow%20-%20Zonotrichia%20capensis-syllable-1.png"
+    alt: "XC11293 - Wave and Sepectrogram - syllable 1"
+    title: "XC11293 - Wave and Sepectrogram - syllable 1"
+
+
+Zonotrichia_MG:
+  - url: "https://github.com/saguileran/birdsongs/blob/main/examples/results/Images/XC11293%20-%20Rufous-collared%20Sparrow%20-%20Zonotrichia%20cape-syllable-synth-1-MotorGesturesParameters.png"
+    image_path: "https://github.com/saguileran/birdsongs/blob/main/examples/results/Images/XC11293%20-%20Rufous-collared%20Sparrow%20-%20Zonotrichia%20cape-syllable-synth-1-MotorGesturesParameters.png"
+    alt: "XC11293 - Motor Gesture Curve - syllable 1"
+    title: "XC11293 - Motor Gestures Curve - syllable 1"
+
+
+Zonotrichia_results:
+  - url: "https://github.com/saguileran/birdsongs/blob/main/examples/results/Images/XC11293%20-%20Rufous-collared%20Sparrow%20-%20Zonotrichia%20capensis-syllable-1-Scoring-Variables.png"
+    image_path: "https://github.com/saguileran/birdsongs/blob/main/examples/results/Images/XC11293%20-%20Rufous-collared%20Sparrow%20-%20Zonotrichia%20capensis-syllable-1-Scoring-Variables.png"
+    alt: "XC11293 - Scoring Variables - syllable 1"
+    title: "XC11293 - Scoring Variables - syllable 1"
+
+
 # Podcast
 #listen_time: true
 #episode_cover: /assets/podcasts/cover-stemmer.png
@@ -214,6 +235,50 @@ asdasd
 
 
 -->
+
+
+---
+Are all the motor gesture curve of Zonotrichia Capensis the same?
+
+<div class="row">
+  <div class="column">
+  <center>
+  XC104508 - syllable 1 <br>
+  <audio controls>
+    <source src="https://github.com/saguileran/birdsongs/blob/main/examples/results/Audios/XC11293%20-%20Rufous-collared%20Sparrow%20-%20Zonotrichia%20cape-syllable-synth-1.wav" type="audio/wav" />
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  <audio controls>
+    <source src="https://github.com/saguileran/birdsongs/blob/main/examples/results/Audios/XC11293%20-%20Rufous-collared%20Sparrow%20-%20Zonotrichia%20capensis-syllable-1.wav" />
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+ 
+  </center>
+  </div>
+</div>
+
+
+
+## Waveforms and Spectrograms
+
+{% include gallery id="Zonotrichia_WV" caption="Waveforms and spectrograms" %}
+
+
+## Parameter Space
+
+{% include gallery id="Zonotrichia_MG" caption="Motor gestures paths, paths found in the paramter space" %}
+
+## Scored Variables
+
+{% include gallery id="Zonotrichia_results" caption="Scored Variables: Fundamental Frequency (FF) and Spectral Content Index (SCI)" %}
 
 
 ---

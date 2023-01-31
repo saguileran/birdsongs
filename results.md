@@ -475,7 +475,7 @@ asdasd
   <center>
   XC11293<br>
   <audio controls>
-    <source src="https://saguileran.github.io/birdsongs/assests/audios/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav"/>
+    <source src="https://saguileran.github.io/birdsongs/assets/audios/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav"/>
     <source src="viper.ogg" type="audio/wav" />
     <p>
       Your browser doesn't support this audio file. Here is a
@@ -489,7 +489,7 @@ asdasd
   <center>
   XC338156<br>
   <audio controls>
-    <source src="https://saguileran.github.io/birdsongs/assests/audios/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis.wav"/>
+    <source src="https://saguileran.github.io/birdsongs/assets/audios/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis.wav"/>
     <source src="viper.ogg" type="audio/wav" />
     <p>
       Your browser doesn't support this audio file. Here is a
@@ -503,7 +503,7 @@ asdasd
   <center>
   XC462515<br>
   <audio controls>
-    <source src="https://saguileran.github.io/birdsongs/assests/audios/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis.wav"/>
+    <source src="https://saguileran.github.io/birdsongs/assets/audios/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis.wav"/>
     <source src="viper.ogg" type="audio/wav" />
     <p>
       Your browser doesn't support this audio file. Here is a
@@ -522,7 +522,7 @@ asdasd
   <center>
   XC391056<br>
   <audio controls>
-    <source src="https://saguileran.github.io/birdsongs/assests/audios/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis.wav"/>
+    <source src="https://saguileran.github.io/birdsongs/assets/audios/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis.wav"/>
     <source src="viper.ogg" type="audio/wav" />
     <p>
       Your browser doesn't support this audio file. Here is a
@@ -536,7 +536,7 @@ asdasd
   <center>
   XC428484<br>
   <audio controls>
-    <source src="https://saguileran.github.io/birdsongs/assests/audios/XC428484 - Ocellated Tapaculo - Acropternis orthonyx.wav"/>
+    <source src="https://saguileran.github.io/birdsongs/assets/audios/XC428484 - Ocellated Tapaculo - Acropternis orthonyx.wav"/>
     <source src="viper.ogg" type="audio/wav" />
     <p>
       Your browser doesn't support this audio file. Here is a

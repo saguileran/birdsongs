@@ -3,13 +3,14 @@ permalink: /use/
 layout: single
 search: true
 author_profile: false
-#title: "Use"
+title: "Use"
 excerpt: "Installation and use of birdsongs."
 last_modified_at: 2023-01-05T11:59:26-04:00
 toc: true
 ---
 
-  
+Here you can find a tutorial of how to download, install and use the `birdsongs` package.
+
 # Installation
 
 ## Requirments
@@ -163,15 +164,17 @@ birdsong.WriteAudio();  synth_syllable.WriteAudio(); # write both audios at ./ex
   
 To generate a single synthetic syllable (chunck) you must have defined a birdsong (syllable), the process is as follows:
 
-1. Define a paths object.
-2. Use the previous path obeject to define a birdsong (syllable) object, it also requeries the file number (birdsong for a syllable). Here you can define the window FFT length and the umbral threshold to compute the pitch 
+1. Define a paths and ploter object.
+2. Use the previous path obeject to define a birdsong (syllable) object, it also requeries the file number (birdsong for a syllable). Here you can define the window FFT length and the umbral threshold to compute the pitch.
 3. Define an optimization object with a dictionary of the method name and its parameters.
-4. Find the optimal gamma, for a single syllable or for a set of syllables defined from time intervals.
-5. Find the optimal labia parameters, the motor gesture curve.
+4. Find the optimal gamma (γ), for a single syllable or for a set of syllables defined from time intervals.
+5. Find the optimal labia parameters, the motor gesture curve: air-sac pressure (α) and labia tension (β).
 6. Generate the synthetic birdsong from the previous control parameters found.
 7. Plot and save all the syrinx, scoring, and result variables.
 8. Write the syllable audios defined both synthetic and real.
+
 <!--
+
 ```python
 syllable  = bs.Syllable(birdsong)           # additional options: flim=(fmin,fmax), tlim=(t0,tend) 
 
@@ -196,18 +199,6 @@ bird.WriteAudio();  synth_bird.WriteAudio() # write both objects, real and synth
 The repository has some audio examples, in [./examples/audios](https://github.com/saguileran/birdsongs/tree/main/examples/audios) folder. You can download and store your own audios in the same folder or enter the audio folder path to the Paths object, the package also has a function to download audios from Xeno-Canto: birdsong.util.DownloadXenoCanto().
 
 The audios **must** be in WAV format or birdosngs will not import them, we suggest use [Audacity](https://www.audacityteam.org/) to convert the audios without any problem.
-
-    
-<!---
-and then add to python 
-
-```bat
-pip install -e birdsongs
-python -m pip install -e birdsongs
-```
--->
-
-
 
 ---
 

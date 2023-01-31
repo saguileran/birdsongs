@@ -68,7 +68,8 @@ results:
     image_path: "/assets/img/results/ScoresVariables-syllable-C693679 - Tropical Mockingbird - Mimus gilvus.wav-0.png"
     alt: "C693679 results"
     title: "C693679 - Tropical Mockingbird "
-last_modified_at: 2023-01-05T11:59:26-04:00
+    
+
 
 Zonotrichia_WV:
   - url: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1.png"
@@ -84,6 +85,61 @@ Zonotrichia_WV:
     alt: "XC11293 - Wave and Sepectrogram - syllable 3"
     title: "XC11293 - Wave and Sepectrogram - syllable 3"
 
+  - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-1.png"
+    image_path: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-1.png"
+    alt: "XC338156 - Wave and Sepectrogram - syllable 1"
+    title: "XC338156 - Wave and Sepectrogram - syllable 1"
+  - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-2.png"
+    image_path: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-2.png"
+    alt: "XC338156 - Wave and Sepectrogram - syllable 2"
+    title: "XC338156 - Wave and Sepectrogram - syllable 2"
+  - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-3.png"
+    image_path: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-3.png"
+    alt: "XC338156 - Wave and Sepectrogram - syllable 3"
+    title: "XC338156 - Wave and Sepectrogram - syllable 3"
+
+  - url: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1.png"
+    image_path: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1.png"
+    alt: "XC462515 - Wave and Spectrogram - syllable 1"
+    title: "XC462515 - Wave and Spectrogram - syllable 1"
+  - url: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-2.png"
+    image_path: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-2.png"
+    alt: "XC462515 - Wave and Spectrogram - syllable 2"
+    title: "XC462515 - Wave and Spectrogram - syllable 2"
+  - url: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-3.png"
+    image_path: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-3.png"
+    alt: "XC462515 - Wave and Spectrogram - syllable 3"
+    title: "XC462515 - Wave and Spectrogram - syllable 3"
+  - url: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-4.png"
+    image_path: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-4.png"
+    alt: "XC462515 - Wave and Spectrogram - syllable 4"
+    title: "XC462515 - Wave and Spectrogram - syllable 4"
+
+  - url: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1.png"
+    image_path: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1.png"
+    alt: "XC391056 - Wave and Spectrogram - syllable 1"
+    title: "XC391056 - Wave and Spectrogram - syllable 1"
+  - url: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-2.png"
+    image_path: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-2.png"
+    alt: "XC391056 - Wave and Spectrogram - syllable 2"
+    title: "XC391056 - Wave and Spectrogram - syllable 2"
+  - url: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-3.png"
+    image_path: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-3.png"
+    alt: "XC391056 - Wave and Spectrogram - syllable 3"
+    title: "XC391056 - Wave and Spectrogram - syllable 3"
+  - url: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-4.png"
+    image_path: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-4.png"
+    alt: "XC391056 - Wave and Spectrogram - syllable 4"
+    title: "XC391056 - Wave and Spectrogram - syllable 4"
+
+  - url: "/results/Images/XC428484 - Ocellated Tapaculo - Acropternis orthonyx-syllable-1.png"
+    image_path: "/results/Images/XC428484 - Ocellated Tapaculo - Acropternis orthonyx-syllable-1.png"
+    alt: "XC391056 - Wave and Spectrogram - syllable 1"
+    title: "XC391056 - Wave and Spectrogram - syllable 1"
+  - url: "/results/Images/XC428484 - Ocellated Tapaculo - Acropternis orthonyx-syllable-2.png"
+    image_path: "/results/Images/XC428484 - Ocellated Tapaculo - Acropternis orthonyx-syllable-2.png"
+    alt: "XC391056 - Wave and Spectrogram - syllable 2"
+    title: "XC391056 - Wave and Spectrogram - syllable 2"
 
 Zonotrichia_MG:
   - url: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-1-MotorGesturesParameters.png"
@@ -97,8 +153,63 @@ Zonotrichia_MG:
   - url: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-3-MotorGesturesParameters.png"
     image_path: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-3-MotorGesturesParameters.png"
     alt: "XC11293 - Motor Gesture Curve - syllable 3"
-    title: "XC11293 - Motor Gestures Curve - syllable 3".
+    title: "XC11293 - Motor Gestures Curve - syllable 3"
 
+  - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costarice-syllable-synth-1-MotorGesturesParameters.png"
+    image_path: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costarice-syllable-synth-1-MotorGesturesParameters.png"
+    alt: "XC338156 - Motor Gesture Curve - syllable 1"
+    title: "XC338156 - Motor Gestures Curve - syllable 1"
+  - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costarice-syllable-synth-2-MotorGesturesParameters.png"
+    image_path: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costarice-syllable-synth-2-MotorGesturesParameters.png"
+    alt: "XC338156 - Motor Gesture Curve - syllable 2"
+    title: "XC338156 - Motor Gestures Curve - syllable 2"
+  - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costarice-syllable-synth-3-MotorGesturesParameters.png"
+    image_path: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costarice-syllable-synth-3-MotorGesturesParameters.png"
+    alt: "XC338156 - Motor Gesture Curve - syllable 3"
+    title: "XC338156 - Motor Gestures Curve - syllable 3"
+  
+  - url: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-1-MotorGesturesParameters.png"
+    image_path: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-1-MotorGesturesParameters.png"
+    alt: "XC462515 - Motor Gesture Curve - syllable 1"
+    title: "XC462515 - Motor Gestures Curve - syllable 1"
+  - url: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-2-MotorGesturesParameters.png"
+    image_path: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-2-MotorGesturesParameters.png"
+    alt: "XC462515 - Motor Gesture Curve - syllable 2"
+    title: "XC462515 - Motor Gestures Curve - syllable 2"
+  - url: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-3-MotorGesturesParameters.png"
+    image_path: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-3-MotorGesturesParameters.png"
+    alt: "XC462515 - Motor Gesture Curve - syllable 3"
+    title: "XC462515 - Motor Gestures Curve - syllable 3"
+  - url: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-4-MotorGesturesParameters.png"
+    image_path: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-4-MotorGesturesParameters.png"
+    alt: "XC462515 - Motor Gesture Curve - syllable 4"
+    title: "XC462515 - Motor Gestures Curve - syllable 4"
+
+  - url: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-1-MotorGesturesParameters.png"
+    image_path: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-1-MotorGesturesParameters.png"
+    alt: "XC391056 - Motor Gesture Curve - syllable 1"
+    title: "XC391056 - Motor Gestures Curve - syllable 1"
+  - url: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-2-MotorGesturesParameters.png"
+    image_path: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-2-MotorGesturesParameters.png"
+    alt: "XC391056 - Motor Gesture Curve - syllable 2"
+    title: "XC391056 - Motor Gestures Curve - syllable 2"
+  - url: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-3-MotorGesturesParameters.png"
+    image_path: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-3-MotorGesturesParameters.png"
+    alt: "XC391056 - Motor Gesture Curve - syllable 3"
+    title: "XC338156 - Motor Gestures Curve - syllable 3"
+  - url: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-4-MotorGesturesParameters.png"
+    image_path: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-4-MotorGesturesParameters.png"
+    alt: "XC391056 - Motor Gesture Curve - syllable 4"
+    title: "XC391056 - Motor Gestures Curve - syllable 4"
+
+  - url: "/results/Images/XC428484 - Ocellated Tapaculo - Acropternis orth-syllable-synth-1-MotorGesturesParameters.png"
+    image_path: "/results/Images/XC428484 - Ocellated Tapaculo - Acropternis orth-syllable-synth-1-MotorGesturesParameters.png"
+    alt: "XC428484 - Motor Gesture Curve - syllable 1"
+    title: "XC428484 - Motor Gestures Curve - syllable 1"
+  - url: "/results/Images/XC428484 - Ocellated Tapaculo - Acropternis orth-syllable-synth-2-MotorGesturesParameters.png"
+    image_path: "/results/Images/XC428484 - Ocellated Tapaculo - Acropternis orth-syllable-synth-2-MotorGesturesParameters.png"
+    alt: "XC428484 - Motor Gesture Curve - syllable 2"
+    title: "XC428484 - Motor Gestures Curve - syllable 2"
 
 Zonotrichia_results:
   - url: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1-Scoring-Variables.png"
@@ -113,8 +224,65 @@ Zonotrichia_results:
     image_path: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-3-Scoring-Variables.png"
     alt: "XC11293 - Scoring Variables - syllable 3"
     title: "XC11293 - Scoring Variables - syllable 3"
-  
-  
+
+  - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-1-Scoring-Variables.png"
+    image_path: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-1-Scoring-Variables.png"
+    alt: "XC338156 - Scoring Variables - syllable 1"
+    title: "XC338156 - Scoring Variables - syllable 1"
+  - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-2-Scoring-Variables.png"
+    image_path: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-2-Scoring-Variables.png"
+    alt: "XC338156 - Scoring Variables - syllable 2"
+    title: "XC338156 - Scoring Variables - syllable 2"
+  - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-3-Scoring-Variables.png"
+    image_path: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-3-Scoring-Variables.png"
+    alt: "XC338156 - Scoring Variables - syllable 3"
+    title: "XC338156 - Scoring Variables - syllable 3"
+
+  - url: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1-Scoring-Variables.png"
+    image_path: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1-Scoring-Variables.png"
+    alt: "XC462515 - Scoring Variables - syllable 1"
+    title: "XC462515 - Scoring Variables - syllable 1"
+  - url: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-2-Scoring-Variables.png"
+    image_path: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-2-Scoring-Variables.png"
+    alt: "XC462515 - Scoring Variables - syllable 2"
+    title: "XC462515 - Scoring Variables - syllable 2"
+  - url: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-3-Scoring-Variables.png"
+    image_path: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-3-Scoring-Variables.png"
+    alt: "XC462515 - Scoring Variables - syllable 3"
+    title: "XC462515 - Scoring Variables - syllable 3"
+  - url: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-4-Scoring-Variables.png"
+    image_path: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-4-Scoring-Variables.png"
+    alt: "XC462515 - Scoring Variables - syllable 4"
+    title: "XC462515 - Scoring Variables - syllable 4"
+
+  - url: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1-Scoring-Variables.png"
+    image_path: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1-Scoring-Variables.png"
+    alt: "XC391056 - Scoring Variables - syllable 1"
+    title: "XC391056 - Scoring Variables - syllable 1"
+  - url: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-2-Scoring-Variables.png"
+    image_path: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-2-Scoring-Variables.png"
+    alt: "XC391056 - Scoring Variables - syllable 2"
+    title: "XC391056 - Scoring Variables - syllable 2"
+  - url: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-3-Scoring-Variables.png"
+    image_path: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-3-Scoring-Variables.png"
+    alt: "XC391056 - Scoring Variables - syllable 3"
+    title: "XC391056 - Scoring Variables - syllable 3"
+  - url: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-4-Scoring-Variables.png"
+    image_path: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-4-Scoring-Variables.png"
+    alt: "XC391056 - Scoring Variables - syllable 4"
+    title: "XC391056 - Scoring Variables - syllable 4"
+
+  - url: "/results/Images/XC428484 - Ocellated Tapaculo - Acropternis orthonyx-syllable-1-Scoring-Variables.png"
+    image_path: "/results/Images/XC428484 - Ocellated Tapaculo - Acropternis orthonyx-syllable-1-Scoring-Variables.png"
+    alt: "XC428484 - Scoring Variables - syllable 1"
+    title: "XC428484 - Scoring Variables - syllable 1"
+  - url: "/results/Images/XC428484 - Ocellated Tapaculo - Acropternis orthonyx-syllable-2-Scoring-Variables.png"
+    image_path: "/results/Images/XC428484 - Ocellated Tapaculo - Acropternis orthonyx-syllable-2-Scoring-Variables.png"
+    alt: "XC428484 - Scoring Variables - syllable 2"
+    title: "XC428484 - Scoring Variables - syllable 2"
+    
+
+last_modified_at: 2023-01-05T11:59:26-04:00
 # Podcast
 #listen_time: true
 #episode_cover: /assets/podcasts/cover-stemmer.png
@@ -262,22 +430,39 @@ asdasd
 
 
 ---
-Are all the motor gesture curve of Zonotrichia Capensis the same?
+# Are all the motor gesture curves of Zonotrichia Capensis the same?
+
+## Used Audios
 
 | Scientific Name  |  XC id  | Country | Location | Number of Syllables |
 | ------------------ | :------------------: | :------------------: | :------------------: | :------------------: |
+| Zonotrichia Capensis | 11293  | Colombia | Quebrada la Vieja, Bogota  | 3
 | Zonotrichia Capensis | 338156 | Colombia | Universidad Pedagógica Nacional <br />Sede Parque Nacional, Bogotá  | 3
 | Zonotrichia Capensis | 462515 | Argentina | Estancia La Candelaria, <br />Buenos Aires | 4
 | Zonotrichia Capensis | 391056 | Argentina | Victoria, Entre Ríos | 4
-| Zonotrichia Capensis | 11293  | Colombia | Quebrada la Vieja, Bogota  | 3
 | Acropternis orthonyx | 428484 | Colombia |  Reserva Rio Blanco, <br />Aguas de Manizales, Manizales | 2
 
+## Whole Audio Sound Wave and Spectrograms
+
+<center><img src="https://raw.githubusercontent.com/saguileran/birdsongs/main/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-AllSongAndSyllable - labeled.png" class="center" alt="Several Zonotrichia Capensis XC11293s" width="1000" height="600" ></center>
+
+<center><img src="https://raw.githubusercontent.com/saguileran/birdsongs/main/results/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-AllSongAndSyllable - labeled.png" class="center" alt="Several Zonotrichia Capensis XC11293s" width="1000" height="600" ></center>
+
+<center><img src="https://raw.githubusercontent.com/saguileran/birdsongs/main/results/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-AllSongAndSyllable - labeled.png" class="center" alt="Several Zonotrichia Capensis XC11293s" width="700" height="700" ></center>
+
+<center><img src="https://raw.githubusercontent.com/saguileran/birdsongs/main/results/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-AllSongAndSyllable - labeled.png" class="center" alt="Several Zonotrichia Capensis XC11293s" width="1000" height="600" ></center>
+
+<center><img src="https://raw.githubusercontent.com/saguileran/birdsongs/main/results/XC428484 - Ocellated Tapaculo - Acropternis orthonyx-AllSongAndSyllable - labeled.png" class="center" alt="Several Zonotrichia Capensis XC11293s" width="1000" height="600" ></center>
 
 
+
+## Audio Sounds
+
+<center><b>XC11293 - Zonotrichia capensis</b></center>
 <div class="row">
   <div class="column">
   <center>
-  XC104508 - syllable 1 <br>
+  syllable 1 <br>
   <audio controls>
     <source src="https://saguileran.github.io/birdsongs/results/Audios/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1.wav"/>
     <source src="viper.ogg" type="audio/wav" />
@@ -299,7 +484,7 @@ Are all the motor gesture curve of Zonotrichia Capensis the same?
 
   <div class="column">
   <center>
-  XC104508 - syllable 2 <br>
+  syllable 2 <br>
   <audio controls>
     <source src="https://saguileran.github.io/birdsongs/results/Audios/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-2.wav"/>
     <source src="viper.ogg" type="audio/wav" />
@@ -321,7 +506,7 @@ Are all the motor gesture curve of Zonotrichia Capensis the same?
 
   <div class="column">
   <center>
-  XC104508 - syllable 3 <br>
+  syllable 3 <br>
   <audio controls>
     <source src="https://saguileran.github.io/birdsongs/results/Audios/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-3.wav"/>
     <source src="viper.ogg" type="audio/wav" />
@@ -342,10 +527,11 @@ Are all the motor gesture curve of Zonotrichia Capensis the same?
   </div>
 </div>
 
+<center><b>XC338156 - Zonotrichia capensis</b></center>
 <div class="row">
   <div class="column">
   <center>
-  XC338156 - syllable 1 <br>
+  syllable 1 <br>
   <audio controls>
     <source src="https://saguileran.github.io/birdsongs/results/Audios/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-1.wav"/>
     <source src="viper.ogg" type="audio/wav" />
@@ -367,7 +553,7 @@ Are all the motor gesture curve of Zonotrichia Capensis the same?
 
   <div class="column">
   <center>
-  XC338156 - syllable 2 <br>
+  syllable 2 <br>
   <audio controls>
     <source src="https://saguileran.github.io/birdsongs/results/Audios/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-2.wav"/>
     <source src="viper.ogg" type="audio/wav" />
@@ -389,7 +575,7 @@ Are all the motor gesture curve of Zonotrichia Capensis the same?
 
   <div class="column">
   <center>
-  XC338156 - syllable 3 <br>
+  syllable 3 <br>
   <audio controls>
     <source src="https://saguileran.github.io/birdsongs/results/Audios/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-3.wav"/>
     <source src="viper.ogg" type="audio/wav" />
@@ -410,6 +596,236 @@ Are all the motor gesture curve of Zonotrichia Capensis the same?
   </div>
 </div>
 
+<center><b>XC462515 - Zonotrichia capensis</b></center>
+<div class="row">
+  <div class="column">
+  <center>
+  syllable 1 <br>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1.wav"/>
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC462515 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-1.wav" />
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  </center>
+  </div>
+
+  <div class="column">
+  <center>
+  syllable 2 <br>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-2.wav"/>
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC462515 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-2.wav" />
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  </center>
+  </div>
+
+  <div class="column">
+  <center>
+  syllable 3 <br>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-3.wav"/>
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC462515 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-3.wav" />
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  </center>
+  </div>
+
+
+  <div class="column">
+  <center>
+  syllable 4 <br>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-4.wav"/>
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC462515 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-4.wav" />
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  </center>
+  </div>
+</div>
+
+<center><b>XC391056 - Zonotrichia capensis</b></center>
+<div class="row">
+  <div class="column">
+  <center>
+  syllable 1 <br>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1.wav"/>
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC391056 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-1.wav" />
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  </center>
+  </div>
+
+  <div class="column">
+  <center>
+  syllable 2 <br>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-2.wav"/>
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC391056 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-2.wav" />
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  </center>
+  </div>
+
+  <div class="column">
+  <center>
+  syllable 3 <br>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-3.wav"/>
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC391056 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-3.wav" />
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  </center>
+  </div>
+
+  <div class="column">
+  <center>
+  syllable 4 <br>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-4.wav"/>
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC391056 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-4.wav" />
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  </center>
+  </div>
+</div>
+
+<center><b>XC428484 - Ocellated Tapaculo</b></center>
+<div class="row">
+  <div class="column">
+  <center>
+  syllable 1 <br>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC428484 - Ocellated Tapaculo - Acropternis orthonyx-syllable-1.wav"/>
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC428484 - Ocellated Tapaculo - Acropternis orth-syllable-synth-1.wav" />
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  </center>
+  </div>
+
+  <div class="column">
+  <center>
+  syllable 2 <br>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC428484 - Ocellated Tapaculo - Acropternis orthonyx-syllable-2.wav"/>
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/results/Audios/XC428484 - Ocellated Tapaculo - Acropternis orth-syllable-synth-2.wav" />
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  </center>
+  </div>
+
+</div>
 
 
 ## Waveforms and Spectrograms
@@ -425,8 +841,9 @@ Are all the motor gesture curve of Zonotrichia Capensis the same?
 
 {% include gallery id="Zonotrichia_results" caption="Scored Variables: Fundamental Frequency (FF) and Spectral Content Index (SCI)" %}
 
+## Motor Gestures
 
+<center><img src="https://raw.githubusercontent.com/saguileran/birdsongs/main/tutorials/MotorGestures.png" class="center" alt="Several Zonotrichia Capensis motor gestures" width="700" height="700" ></center>
 ---
-
 
 [Try birdsongs Package!]({{ "https://github.com/saguileran/birdsongs" | relative_url }}){: .btn .btn--success .btn--large .btn--mx-auto}

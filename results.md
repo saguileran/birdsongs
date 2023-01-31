@@ -281,8 +281,29 @@ Zonotrichia_results:
     alt: "XC428484 - Scoring Variables - syllable 2"
     title: "XC428484 - Scoring Variables - syllable 2"
     
+whole_songs:
+  - url: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-AllSongAndSyllable - labeled.png"
+    image_path: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-AllSongAndSyllable - labeled.png"
+    alt: "XC11293 - Wave and Sepectrogram"
+    title: "XC11293 - Wave and Sepectrogram"
+  - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-AllSongAndSyllable - labeled.png"
+    image_path: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-AllSongAndSyllable - labeled.png"
+    alt: "XC338156 - Wave and Sepectrogram"
+    title: "XC338156 - Wave and Sepectrogram"
+  - url: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-AllSongAndSyllable - labeled.png"
+    image_path: "/results/Images/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-AllSongAndSyllable - labeled.png"
+    alt: "XC462515 - Wave and Sepectrogram"
+    title: "XC462515 - Wave and Sepectrogram"
+  - url: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-AllSongAndSyllable - labeled.png"
+    image_path: "/results/Images/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-AllSongAndSyllable - labeled.png"
+    alt: "XC391056 - Wave and Sepectrogram"
+    title: "XC391056 - Wave and Sepectrogram"
+  - url: "/results/Images/XC428484 - Ocellated Tapaculo - Acropternis orthonyx-AllSongAndSyllable - labeled.png"
+    image_path: "/results/Images/XC428484 - Ocellated Tapaculo - Acropternis orthonyx-AllSongAndSyllable - labeled.png"
+    alt: "XC428484 - Wave and Sepectrogram"
+    title: "XC428484 - Wave and Sepectrogram"
 
-last_modified_at: 2023-01-05T11:59:26-04:00
+last_modified_at: 2023-01-31T11:59:26-04:00
 # Podcast
 #listen_time: true
 #episode_cover: /assets/podcasts/cover-stemmer.png
@@ -444,16 +465,88 @@ asdasd
 
 ## Whole Audio Sound Wave and Spectrograms
 
-<center><img src="https://raw.githubusercontent.com/saguileran/birdsongs/main/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-AllSongAndSyllable - labeled.png" class="center" alt="Several Zonotrichia Capensis XC11293s" width="1000" height="600" ></center>
 
-<center><img src="https://raw.githubusercontent.com/saguileran/birdsongs/main/results/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-AllSongAndSyllable - labeled.png" class="center" alt="Several Zonotrichia Capensis XC11293s" width="1000" height="600" ></center>
+{% include gallery id="whole_songs" caption="Waveforms and spectrograms of whole audio songs" %}
 
-<center><img src="https://raw.githubusercontent.com/saguileran/birdsongs/main/results/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis-AllSongAndSyllable - labeled.png" class="center" alt="Several Zonotrichia Capensis XC11293s" width="700" height="700" ></center>
 
-<center><img src="https://raw.githubusercontent.com/saguileran/birdsongs/main/results/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis-AllSongAndSyllable - labeled.png" class="center" alt="Several Zonotrichia Capensis XC11293s" width="1000" height="600" ></center>
+<div class="row">
 
-<center><img src="https://raw.githubusercontent.com/saguileran/birdsongs/main/results/XC428484 - Ocellated Tapaculo - Acropternis orthonyx-AllSongAndSyllable - labeled.png" class="center" alt="Several Zonotrichia Capensis XC11293s" width="1000" height="600" ></center>
+  <div class="column">
+  <center>
+  XC11293<br>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/assests/audios/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis.wav"/>
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  </center>
+  </div>
+  
+  <div class="column">
+  <center>
+  XC338156<br>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/assests/audios/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis.wav"/>
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  </center>
+  </div>
 
+  <div class="column">
+  <center>
+  XC462515<br>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/assests/audios/XC462515 - Rufous-collared Sparrow - Zonotrichia capensis.wav"/>
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  </center>
+  </div>
+
+</div>
+
+
+<div class="row">
+  
+  <div class="column">
+  <center>
+  XC391056<br>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/assests/audios/XC391056 - Rufous-collared Sparrow - Zonotrichia capensis.wav"/>
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  </center>
+  </div>
+
+  <div class="column">
+  <center>
+  XC428484<br>
+  <audio controls>
+    <source src="https://saguileran.github.io/birdsongs/assests/audios/XC428484 - Ocellated Tapaculo - Acropternis orthonyx.wav"/>
+    <source src="viper.ogg" type="audio/wav" />
+    <p>
+      Your browser doesn't support this audio file. Here is a
+      <a href="viper.mp3">link to the audio</a> instead.
+    </p>
+  </audio>
+  </center>
+  </div>
+  
+</div>
 
 
 ## Audio Sounds

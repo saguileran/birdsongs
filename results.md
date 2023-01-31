@@ -83,18 +83,7 @@ Zonotrichia_WV:
     image_path: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-3.png"
     alt: "XC11293 - Wave and Sepectrogram - syllable 3"
     title: "XC11293 - Wave and Sepectrogram - syllable 3"
-  - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-1.png"
-    image_path: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-1.png"
-    alt: "XC338156 - Wave and Sepectrogram - syllable 1"
-    title: "XC338156 - Wave and Sepectrogram - syllable 1"
-  - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-2.png"
-    image_path: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-2.png"
-    alt: "XC338156 - Wave and Sepectrogram - syllable 2"
-    title: "XC338156 - Wave and Sepectrogram - syllable 2"
-  - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-3.png"
-    image_path: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-3.png"
-    alt: "XC338156 - Wave and Sepectrogram - syllable 3"
-    title: "XC338156 - Wave and Sepectrogram - syllable 3"
+
 
 Zonotrichia_MG:
   - url: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-1-MotorGesturesParameters.png"
@@ -109,18 +98,7 @@ Zonotrichia_MG:
     image_path: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-3-MotorGesturesParameters.png"
     alt: "XC11293 - Motor Gesture Curve - syllable 3"
     title: "XC11293 - Motor Gestures Curve - syllable 3".
-  - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costarice-syllable-synth-1-MotorGesturesParameters.png"
-    image_path: "XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costarice-syllable-synth-1-MotorGesturesParameters.png"
-    alt: "XC338156 - Motor Gesture Curve - syllable 1"
-    title: "XC338156 - Motor Gestures Curve - syllable 1"
-  - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costarice-syllable-synth-2-MotorGesturesParameters.png"
-    image_path: "XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costarice-syllable-synth-2-MotorGesturesParameters.png"
-    alt: "XC338156 - Motor Gesture Curve - syllable 2"
-    title: "XC338156 - Motor Gestures Curve - syllable 2"
-  - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costarice-syllable-synth-3-MotorGesturesParameters.png"
-    image_path: "XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costarice-syllable-synth-3-MotorGesturesParameters.png"
-    alt: "XC338156 - Motor Gesture Curve - syllable 3"
-    title: "XC338156 - Motor Gestures Curve - syllable 3"
+
 
 Zonotrichia_results:
   - url: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1-Scoring-Variables.png"
@@ -135,18 +113,7 @@ Zonotrichia_results:
     image_path: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-3-Scoring-Variables.png"
     alt: "XC11293 - Scoring Variables - syllable 3"
     title: "XC11293 - Scoring Variables - syllable 3"
-  - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-1-Scoring-Variables.png"
-    image_path: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-1-Scoring-Variables.png"
-    alt: "XC338156 - Scoring Variables - syllable 1"
-    title: "XC338156 - Scoring Variables - syllable 1"
-  - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-2-Scoring-Variables.png"
-    image_path: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-2-Scoring-Variables.png"
-    alt: "XC338156 - Scoring Variables - syllable 2"
-    title: "XC338156 - Scoring Variables - syllable 2"
-  - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-3-Scoring-Variables.png"
-    image_path: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-3-Scoring-Variables.png"
-    alt: "XC338156 - Scoring Variables - syllable 3"
-    title: "XC338156 - Scoring Variables - syllable 3"
+  
   
 # Podcast
 #listen_time: true
@@ -444,7 +411,7 @@ Are all the motor gesture curve of Zonotrichia Capensis the same?
 </div>
 
 
-<!--
+
 ## Waveforms and Spectrograms
 
 {% include gallery id="Zonotrichia_WV" caption="Waveforms and spectrograms" %}
@@ -457,7 +424,7 @@ Are all the motor gesture curve of Zonotrichia Capensis the same?
 ## Scored Variables
 
 {% include gallery id="Zonotrichia_results" caption="Scored Variables: Fundamental Frequency (FF) and Spectral Content Index (SCI)" %}
--->
+
 
 ---
 

@@ -444,7 +444,7 @@ Are all the motor gesture curve of Zonotrichia Capensis the same?
 </div>
 
 
-
+<!--
 ## Waveforms and Spectrograms
 
 {% include gallery id="Zonotrichia_WV" caption="Waveforms and spectrograms" %}
@@ -457,7 +457,7 @@ Are all the motor gesture curve of Zonotrichia Capensis the same?
 ## Scored Variables
 
 {% include gallery id="Zonotrichia_results" caption="Scored Variables: Fundamental Frequency (FF) and Spectral Content Index (SCI)" %}
-
+-->
 
 ---
 

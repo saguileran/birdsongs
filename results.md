@@ -240,12 +240,22 @@ asdasd
 ---
 Are all the motor gesture curve of Zonotrichia Capensis the same?
 
+| Scientific Name  |  XC id  | Country | Location | Number of Syllables 
+| ------------------ | :------------------: | :------------------: | :------------------: | :------------------: |:------------------: |
+| Zonotrichia Capensis | 338156 | Colombia | Bogotá  | 3
+| Zonotrichia Capensis | 462515 | Argentina |  | 3
+| Zonotrichia Capensis | 391056 | Argentina |  | 3
+| Zonotrichia Capensis | 11293  | Colombia |   | 3
+| Acropternis orthonyx | 428484 | Colombia |   | 3
+
+
+
 <div class="row">
   <div class="column">
   <center>
   XC104508 - syllable 1 <br>
   <audio controls>
-    <source src="/results/Audios/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1" type="audio/wav" />
+    <source src="https://github.com/saguileran/birdsongs/blob/gh-pages/results/Audios/XC11293%20-%20Rufous-collared%20Sparrow%20-%20Zonotrichia%20capensis-syllable-1.wav"/>
     <source src="viper.ogg" type="audio/wav" />
     <p>
       Your browser doesn't support this audio file. Here is a
@@ -253,7 +263,7 @@ Are all the motor gesture curve of Zonotrichia Capensis the same?
     </p>
   </audio>
   <audio controls>
-    <source src="/results/Audios/XC11293 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-1.wav" />
+    <source src="https://github.com/saguileran/birdsongs/blob/gh-pages/results/Audios/XC11293%20-%20Rufous-collared%20Sparrow%20-%20Zonotrichia%20cape-syllable-synth-1.wav" />
     <source src="viper.ogg" type="audio/wav" />
     <p>
       Your browser doesn't support this audio file. Here is a

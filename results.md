@@ -71,22 +71,22 @@ results:
 last_modified_at: 2023-01-05T11:59:26-04:00
 
 Zonotrichia_WV:
-  - url: "https://github.com/saguileran/birdsongs/blob/main/examples/results/Images/XC11293%20-%20Rufous-collared%20Sparrow%20-%20Zonotrichia%20capensis-syllable-1.png"
-    image_path: "https://github.com/saguileran/birdsongs/blob/main/examples/results/Images/XC11293%20-%20Rufous-collared%20Sparrow%20-%20Zonotrichia%20capensis-syllable-1.png"
+  - url: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1.png"
+    image_path: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1.png"
     alt: "XC11293 - Wave and Sepectrogram - syllable 1"
     title: "XC11293 - Wave and Sepectrogram - syllable 1"
 
 
 Zonotrichia_MG:
-  - url: "https://github.com/saguileran/birdsongs/blob/main/examples/results/Images/XC11293%20-%20Rufous-collared%20Sparrow%20-%20Zonotrichia%20cape-syllable-synth-1-MotorGesturesParameters.png"
-    image_path: "https://github.com/saguileran/birdsongs/blob/main/examples/results/Images/XC11293%20-%20Rufous-collared%20Sparrow%20-%20Zonotrichia%20cape-syllable-synth-1-MotorGesturesParameters.png"
+  - url: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-1-MotorGesturesParameters.png"
+    image_path: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-1-MotorGesturesParameters.png"
     alt: "XC11293 - Motor Gesture Curve - syllable 1"
     title: "XC11293 - Motor Gestures Curve - syllable 1"
 
 
 Zonotrichia_results:
-  - url: "https://github.com/saguileran/birdsongs/blob/main/examples/results/Images/XC11293%20-%20Rufous-collared%20Sparrow%20-%20Zonotrichia%20capensis-syllable-1-Scoring-Variables.png"
-    image_path: "https://github.com/saguileran/birdsongs/blob/main/examples/results/Images/XC11293%20-%20Rufous-collared%20Sparrow%20-%20Zonotrichia%20capensis-syllable-1-Scoring-Variables.png"
+  - url: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1-Scoring-Variables.png"
+    image_path: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1-Scoring-Variables.png"
     alt: "XC11293 - Scoring Variables - syllable 1"
     title: "XC11293 - Scoring Variables - syllable 1"
 
@@ -245,7 +245,7 @@ Are all the motor gesture curve of Zonotrichia Capensis the same?
   <center>
   XC104508 - syllable 1 <br>
   <audio controls>
-    <source src="https://github.com/saguileran/birdsongs/blob/main/examples/results/Audios/XC11293%20-%20Rufous-collared%20Sparrow%20-%20Zonotrichia%20cape-syllable-synth-1.wav" type="audio/wav" />
+    <source src="/results/Audios/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1" type="audio/wav" />
     <source src="viper.ogg" type="audio/wav" />
     <p>
       Your browser doesn't support this audio file. Here is a
@@ -253,7 +253,7 @@ Are all the motor gesture curve of Zonotrichia Capensis the same?
     </p>
   </audio>
   <audio controls>
-    <source src="https://github.com/saguileran/birdsongs/blob/main/examples/results/Audios/XC11293%20-%20Rufous-collared%20Sparrow%20-%20Zonotrichia%20capensis-syllable-1.wav" />
+    <source src="/results/Audios/XC11293 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-1.wav" />
     <source src="viper.ogg" type="audio/wav" />
     <p>
       Your browser doesn't support this audio file. Here is a

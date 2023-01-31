@@ -83,7 +83,6 @@ Zonotrichia_WV:
     image_path: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-3.png"
     alt: "XC11293 - Wave and Sepectrogram - syllable 3"
     title: "XC11293 - Wave and Sepectrogram - syllable 3"
-
   - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-1.png"
     image_path: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-1.png"
     alt: "XC338156 - Wave and Sepectrogram - syllable 1"
@@ -110,7 +109,6 @@ Zonotrichia_MG:
     image_path: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia cape-syllable-synth-3-MotorGesturesParameters.png"
     alt: "XC11293 - Motor Gesture Curve - syllable 3"
     title: "XC11293 - Motor Gestures Curve - syllable 3".
-
   - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costarice-syllable-synth-1-MotorGesturesParameters.png"
     image_path: "XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costarice-syllable-synth-1-MotorGesturesParameters.png"
     alt: "XC338156 - Motor Gesture Curve - syllable 1"
@@ -123,8 +121,6 @@ Zonotrichia_MG:
     image_path: "XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costarice-syllable-synth-3-MotorGesturesParameters.png"
     alt: "XC338156 - Motor Gesture Curve - syllable 3"
     title: "XC338156 - Motor Gestures Curve - syllable 3"
-  
-
 
 Zonotrichia_results:
   - url: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-1-Scoring-Variables.png"
@@ -139,7 +135,6 @@ Zonotrichia_results:
     image_path: "/results/Images/XC11293 - Rufous-collared Sparrow - Zonotrichia capensis-syllable-3-Scoring-Variables.png"
     alt: "XC11293 - Scoring Variables - syllable 3"
     title: "XC11293 - Scoring Variables - syllable 3"
-
   - url: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-1-Scoring-Variables.png"
     image_path: "/results/Images/XC338156 - Rufous-collared Sparrow - Zonotrichia capensis costaricensis-syllable-1-Scoring-Variables.png"
     alt: "XC338156 - Scoring Variables - syllable 1"

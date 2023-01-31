@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from pathlib import Path
 from maad import sound
+from librosa import load
 import numpy as np
 from os.path import relpath
 
@@ -33,12 +34,16 @@ class Paths(object):
             elif "xeno" in audios_path:
                 search_by, name_col = "Scientific Name", "File Name"
             
-            self.audios = audios_path
+            self.audios = Path(audios_path)
 
             if bird_name!=None:
                     data_bird = self.data[search_by].str.contains(bird_name, case=False)
                     self.indexes   = data_bird[data_bird==True].index
-            else:   self.indexes   = self.data.index
+            else:   
+                data = pd.read_csv(self.audios/'spreadsheet.csv', encoding_errors='ignore')
+                data.dropna(axis = 0, how = 'all', inplace = True)
+                self.data = data.convert_dtypes()
+                self.indexes   = self.data.index
             
             files_names = self.data[name_col][self.indexes].astype(str).str.cat([".wav"]*self.indexes.size)
             audios_paths = pd.Series([audios_path]*files_names.size)
@@ -59,8 +64,8 @@ class Paths(object):
         #self.examples.mkdir(parents=True, exist_ok=True)
     
     #%%
-    def AudioFiles(self):
-        print("The folder has {} songs:".format(self.no_files))
+    def AudioFiles(self, verbose=False):
+        if verbose: print("The folder has {} songs:".format(self.no_files))
         return self.data
         #[print(str(i)+"-"+str(self.files_names[i])) for i in range(self.no_files)];
 
@@ -85,41 +90,45 @@ class Paths(object):
             df = df[df['no_syllable'] == str(no_syllable)]
             coef = pd.read_csv(df["coef_path"].values[0]).rename(columns={"Unnamed: 0":"parameter"})
             tlim = pd.Series({"t_ini":coef.iloc[-2].value, "t_end":coef.iloc[-1].value})
-            df = pd.concat([df, tlim])
-            motor_gesture = pd.read_csv(df["param_path"].values[0]).drop(columns="Unnamed: 0")
+            df = pd.concat([df, tlim]).reset_index()
+            #motor_gesture = pd.read_csv(df["param_path"].values[0]).drop(columns="Unnamed: 0")
             
-            return df, coef, motor_gesture
+            return df#, coef#, motor_gesture
         else:                               # if syllables is None
-            out, tlim, NN, umbral_FF = list(), list(), list(), list()
+            out, tlim, NN, umbral_FF = [], [], [], []
+            motor_gestures, coefs = [], []
             for i in df.index:
                 coef = pd.read_csv(self.data_param.iloc[i]["coef_path"]).rename(columns={"Unnamed: 0":"parameter"})
                 tlim.append([coef.iloc[-4].value, coef.iloc[-3].value])
                 NN.append(int(coef.iloc[-2].value))
                 umbral_FF.append(coef.iloc[-1].value)
                 #self.data_param.iloc[i] = pd.concat([self.data_param.iloc[i], tlim])
+                coefs.append(coef)
 
-                motor_gesture = pd.read_csv(self.data_param.iloc[i]["param_path"]).drop(columns="Unnamed: 0")
+                motor_gestures.append(pd.read_csv(self.data_param.iloc[i]["param_path"]).drop(columns="Unnamed: 0"))
             
             tlim = np.array(tlim)
             df["t_ini"] = tlim[:,0]; df["t_end"] = tlim[:,1];
             df["NN"] = NN;  df["umbral_FF"] = umbral_FF; 
-            
+            df["motor_gesture"] = motor_gestures
+            df["coef"] = coefs
             #df = pd.DataFrame(df, index=np.arange(len(df)))
-            for i in range(len(df.index)):
-                out.append([df.iloc[i]["no_syllable"], df.iloc[i], coef, motor_gesture])
-            self.df = df #.reindex(np.arange(len(df.index)))
+            out = [df.iloc[i] for i in range(len(df.index))]
+            #for i in range(len(df.index)):
+            #    out.append(df.iloc[i])#, coef, motor_gestures[i]])
+            self.df = df.reset_index(drop=True, inplace=False)#.drop(["index"], axis=1)#np.arange(len(df.index)))
             #self.df1 = self.df.copy(self.df, index=np.arange(len(df.index)))
 
             print("{} files were found.".format(len(df.index)))
-            return out
+            return out, df
         
 
     #%% 
     def MG_Files(self): 
         self.MG_coef = list(self.MG_param.glob("*MG-coef.csv"))
-        self.MG_par = list(self.MG_param.glob("*MG.csv"))
+        self.MG_par = [str(path)[:-9]+".csv" for path in self.MG_coef]
         
-        MG_coef_splited  = [relpath(MG, self.MG_param).replace(" ","").split("-") for MG in self.MG_coef]
+        #MG_coef_splited  = [relpath(MG, self.MG_param).replace(" ","").split("-") for MG in self.MG_coef]
         MG_param_splited = [relpath(MG, self.MG_param).replace(" ","").split("-") for MG in self.MG_par]
 
         id_XC = [x[0] for x in MG_param_splited]
@@ -127,13 +136,15 @@ class Paths(object):
         id = [x[-3] for x in MG_param_splited]
         name = [x[1]+"-"+x[2] for x in MG_param_splited]
         audios = [list(self.audios.glob(id+"*"))[0]  for id  in id_XC]
+        file_name = [relpath(audio, self.audios) for audio in audios]
         ss, fss = [], []
         
         for audio in audios:
-            s, fs = sound.load(audio)
+            #s, fs = sound.load(audio)
+            s, fs = load(audio, sr=None)
             ss.append(s); fss.append(fs);
         self.data_param = pd.DataFrame({'id_XC':id_XC , 'no_syllable': no_syllables, 'id': id, 'name':name, 
                                         "coef_path":self.MG_coef, "param_path":self.MG_par, "audio_path":audios,
-                                        "s":ss, "fs":fss})
+                                        "s":ss, "fs":fss, "file_name":file_name})
         
         return self.data_param

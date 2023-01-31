@@ -193,8 +193,31 @@ def DownloadXenoCanto(data, XC_ROOTDIR="./examples/", XC_DIR="Audios/", filters=
     else:
         raise ValueError("No sounds were found with your specifications. Try again with other parameters.")
 
+#%%
+def BifurcationODE(f1, f2):
+        #st = 'x, y, alpha, beta, gamma'
+        #exec("st=sym.symbols('x y alpha beta gamma')")
+        beta_bif = np.linspace(-2.5, 1/3, 1000)  # mu2:beta,  mu1:alpha
+        xs, ys, alpha, beta, gamma = sym.symbols('x y alpha beta gamma')
+        # ---------------- Labia EDO's Bifurcation -----------------------
+        f1 = eval(f1)#ys
+        f2 = eval(f2)#(-alpha-beta*xs-xs**3+xs**2)*gamma**2 -(xs+1)*gamma*xs*ys
+        x01 = sym.solveset(f1, ys)+sym.solveset(f1, xs) # find root f1
+        f2_x01 = f2.subs(ys,x01.args[0])                # f2(root f1)
+        f  = sym.solveset(f2_x01, alpha)                # root f2 at root f1, alpha=f(x,beta)
+        g  = alpha                                      # g(x) = alpha, above
+        df = f.args[0].diff(xs)                         # f'(x)
+        dg = g.diff(xs)                                 # g'(x)
+        roots_bif = sym.solveset(df-dg, xs)             # bifurcation roots sets (xmin, xmas)
+        mu1_curves = [] 
+        for ff in roots_bif.args:                       # roots as arguments (expr)
+            x_root = np.array([float(ff.subs(beta, mu2)) for mu2 in beta_bif], dtype=float)    # root evaluatings beta
+            mu1    = np.array([f.subs([(beta,beta_bif[i]),(xs,x_root[i])]).args[0] for i in range(len(beta_bif))], dtype=float)
+            mu1_curves.append(mu1)
+        f1 = sym.lambdify([xs, ys, alpha, beta, gamma], f1)
+        f2 = sym.lambdify([xs, ys, alpha, beta, gamma], f2)
 
-
+        return beta_bif, mu1_curves, f1, f2
 
 # def Enve(self, out, fs, Nt):
 #     time = np.linspace(0, len(out)/fs, len(out))

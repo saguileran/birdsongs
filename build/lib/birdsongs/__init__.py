@@ -14,7 +14,8 @@ from .util import (
                     Print, 
                     smoothstep,
                     DownloadXenoCanto,
-                    grab_audio
+                    grab_audio,
+                    BifurcationODE
                   )
 
 __all__ = [ 
@@ -32,5 +33,6 @@ __all__ = [
             'Print', 
             'smoothstep',
             'DownloadXenoCanto',
-            'grab_audio'
+            'grab_audio',
+            'BifurcationODE'
           ]

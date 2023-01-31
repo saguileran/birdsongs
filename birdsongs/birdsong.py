@@ -21,8 +21,8 @@ class BirdSong(Syllable, object):
         self.file_name =  str(self.paths.sound_files[self.no_file])[len(str(self.paths.audios))+1:]
         
         if len(sfs)==0:
-            s, fs = sound.load(self.file_path)
-            #s, fs = librosa.load(self.file_name)
+            #s, fs = sound.load(self.file_path)
+            s, fs = librosa.load(self.file_path, sr=None)
             s = librosa.to_mono(s)
             self.id = "birdsong"
         else:

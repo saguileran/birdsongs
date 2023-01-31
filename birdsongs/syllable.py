@@ -18,31 +18,21 @@ class Syllable(object):
         self.__dict__.update(state)
         # restore the progress from the progress integer
         #self.progress = make_progress(self.progress_int)
-    
+
     #%%
     def __init__(self, birdsong=None, t0=0, Nt=200, llambda=1.5, NN=0, overlap=0.5, flim=(1.5e3,2e4), 
-                n_mels=4, umbral_FF=1, tlim=[], sfs=[], no_syllable=0, ide="syllable", file_name="syllable", paths=None):
+                n_mels=4, umbral_FF=1, tlim=[], sfs=[], no_syllable=0, ide="syllable", 
+                file_name="syllable", paths=None, f1f2=None):
         ## The bifurcation can be cahge modifying the self.f2 and self.f1 functions
         ## ------------- Bogdanov–Takens bifurcation ------------------
-        self.beta_bif = np.linspace(-2.5, 1/3, 1000)  # mu2:beta,  mu1:alpha
-        xs, ys, alpha, beta, gamma = sym.symbols('x y alpha beta gamma')
-        # ---------------- Labia EDO's Bifurcation -----------------------
-        self.f1 = ys
-        self.f2 = (-alpha-beta*xs-xs**3+xs**2)*gamma**2 -(xs+1)*gamma*xs*ys
-        x01 = sym.solveset(self.f1, ys)+sym.solveset(self.f1, xs)  # find root f1
-        f2_x01 = self.f2.subs(ys,x01.args[0])                     # f2(root f1)
-        f  = sym.solveset(f2_x01, alpha)                         # root f2 at root f1, alpha=f(x,beta)
-        g  = alpha                                               # g(x) = alpha, above
-        df = f.args[0].diff(xs)                                   # f'(x)
-        dg = g.diff(xs)                                           # g'(x)
-        roots_bif = sym.solveset(df-dg, xs)                       # bifurcation roots sets (xmin, xmas)
-        self.mu1_curves = [] 
-        for ff in roots_bif.args:                                       # roots as arguments (expr)
-            x_root = np.array([float(ff.subs(beta, mu2)) for mu2 in self.beta_bif], dtype=float)    # root evaluatings beta
-            mu1    = np.array([f.subs([(beta,self.beta_bif[i]),(xs,x_root[i])]).args[0] for i in range(len(self.beta_bif))], dtype=float)
-            self.mu1_curves.append(mu1)
-        self.f1 = sym.lambdify([xs, ys, alpha, beta, gamma], self.f1)
-        self.f2 = sym.lambdify([xs, ys, alpha, beta, gamma], self.f2)
+        if f1f2 is None:
+            f1 = "ys"
+            f2 = "(-alpha-beta*xs-xs**3+xs**2)*gamma**2 -(xs+1)*gamma*xs*ys"
+        beta_bif, mu1_curves, f1, f2 = BifurcationODE(f1, f2)
+        self.beta_bif = beta_bif
+        self.mu1_curves = mu1_curves
+        self.f1 = f1
+        self.f2 = f2
         ## -------------------------------------------------------------------------------------
         self.p = lmfit.Parameters()
         # add params:   (NAME   VALUE    VARY    MIN  MAX  EXPR BRUTE_STEP)
@@ -71,6 +61,7 @@ class Syllable(object):
             self.paths      = self.birdsong.paths
             self.file_name  = self.birdsong.file_name
             self.umbral     = self.birdsong.umbral
+            self.t0_bs       = self.birdsong.t0
             s = self.birdsong.s; 
             NN = self.birdsong.NN
         elif len(sfs)!=0:           
@@ -82,31 +73,26 @@ class Syllable(object):
             self.umbral     = 0.05
             self.paths      = paths
         
-        
         # ------ define syllable by time interval [tini, tend] --------
-        if len(tlim)==0 and t0!=0: 
+        if len(tlim)==0: 
             self.s  = sound.normalize(s, max_amp=1.0)
             self.t0 = t0
-        elif len(tlim)==0 and t0==0: 
-            self.t0 = t0
-            self.s  = sound.normalize(s, max_amp=1.0)
         elif len(tlim)!=0:
             self.s  = sound.normalize(s[int(tlim[0]*self.fs):int(tlim[1]*self.fs)], max_amp=1.0)
             self.t0 = tlim[0]
-            self.tlim = tlim
-        
+            #self.tlim = tlim
+
         self.time_s   = np.linspace(0, len(self.s)/self.fs, len(self.s))
         self.envelope = Enve(self.s, self.fs, self.Nt)
         self.T        = self.s.size/self.fs
         self.time0    = np.linspace(0, len(self.s)/self.fs, len(self.s))
-        
+        self.t_interval = np.array([self.time_s[0],self.time_s[-1]])+self.t0#_bs
+
         if NN==0:
             if self.s.size < self.fs/5: # a decimal of a second (0.2 s)
-                self.id          = "chunck"
-                self.NN          = 128
+                self.id = "chunck"; self.NN = 128;
             else:
-                self.id          = "syllable"
-                self.NN          = 1024
+                self.id = "syllable"; self.NN = 1024;
         else: self.NN=NN
         if ide!="": self.id = ide
         self.no_syllable = no_syllable
@@ -201,9 +187,6 @@ class Syllable(object):
 #         self.time   = self.time[df_filtered["FF"].index]
 #         self.FF = self.FF[df_filtered["FF"].index]
 
-        
-        
-        
         self.timeFF = np.linspace(0,self.time[-1],self.FF.size)
         self.FF_fun = interp1d(self.timeFF, self.FF)
         self.SCI    = self.f_msf / self.FF_fun(self.time)
@@ -225,6 +208,8 @@ class Syllable(object):
             self.beta  = b[0] + b[1]*(1e-4*y) + b[2]*(1e-4*y)**2   
         elif "chunck" in self.id: 
             self.beta = np.dot(b, t_par);
+
+        return self.alpha, self.beta
             
     #%%
     ##  ------------------------- BIRDS -------------------------
@@ -281,26 +266,16 @@ class Syllable(object):
         # ------------------------------------------------------------
         self.Vs = np.array(self.Vs)
         # define solution (synthetic syllable) as a Syllable object 
-        synth = Syllable(Nt=self.Nt, llambda=self.llambda, NN=self.NN, overlap=0.5, 
-                         flim=self.flim, sfs=[out, self.fs], umbral_FF=self.umbral_FF)
+        synth = Syllable(Nt=self.Nt, llambda=self.llambda, NN=self.NN, overlap=0.5, file_name=self.file_name, 
+                         paths=self.paths, flim=self.flim, sfs=[out, self.fs], umbral_FF=self.umbral_FF)
         
-        synth.id          = self.id+"-synth"
-        synth.Vs          = self.Vs
-        synth.alpha       = self.alpha
-        synth.beta        = self.beta
-        
-        # ------------ export p values and alpha-beta arrays ------------
-        df_MotorGestures = pd.DataFrame(data={"time":self.time_s, "alpha":self.alpha, "beta":self.beta})
-        df_MotorGestures_coef = pd.DataFrame(data=np.concatenate((list(self.p.valuesdict().values()),self.tlim, [self.NN, int(self.umbral_FF)])), 
-                                             index=np.concatenate((list(self.p.valuesdict().keys()), ["t_ini", "t_end", "NN", "umbral_FF"])), 
-                                             columns=["value"])
-        name  = self.file_name[:-4] + "-"+str(self.id)+"-"+str(self.no_syllable) 
-        df_MotorGestures.to_csv(self.paths.MG_param / name / "-MG.csv", index=True)
-        df_MotorGestures_coef.to_csv(self.paths.MG_param / name / "-MG-coef.csv", index=True)
+        synth.id    = self.id+"-synth"
+        synth.Vs    = self.Vs
+        synth.alpha = self.alpha
+        synth.beta  = self.beta
 
         synth.timesVs = np.linspace(0, len(self.s)/self.fs, len(self.s)*ovfs)
-        
-        delattr(self,"alpha"); delattr(self,"beta")
+        #delattr(self,"alpha"); delattr(self,"beta")
         
         return synth
 
@@ -364,19 +339,32 @@ class Syllable(object):
 
     #%%    
     def Solve(self, p, orde=2):
-        self.p = p;  # define parameteres to optimize
-        self.ord = orde; 
-        
+        self.p = p;  self.ord = orde; 
         if self.s.size < 2*self.fs/100: self.id = "chunck"
         else:                           self.id = "syllable"
-                
+
         self.AlphaBeta()             # define alpha and beta parameters
         synth = self.MotorGestures(self.alpha, self.beta, self.p["gm"].value) # solve the problem and define the synthetic syllable
         synth = self.SynthScores(synth, orde=orde) # compute differences and score variables
         synth.paths = self.paths
-        synth.file_name = self.file_name[:-4]# + "-synth    "
+        #synth.t0_bs = self.t0_bs
+        synth.t_interval = self.t_interval
+        synth.no_syllable = self.no_syllable
+        synth.file_name = self.file_name[:-4]# + "-synth"
         return synth
     
+    #%%
+    def ExportMotorGestures(self):
+        # ------------ export p values and alpha-beta arrays ------------
+        df_MotorGestures = pd.DataFrame(data={"time":self.time_s, "alpha":self.alpha, "beta":self.beta})
+        df_MotorGestures_coef = pd.DataFrame(data=np.concatenate((list(self.p.valuesdict().values()),self.t_interval, [self.NN, int(self.umbral_FF)])), 
+                                            index=np.concatenate((list(self.p.valuesdict().keys()), ["t_ini", "t_end", "NN", "umbral_FF"])), 
+                                            columns=["value"])
+        name  = self.file_name[:-4] + "-"+str(self.id)+"-"+str(self.no_syllable)+"-MG.csv"
+        name1  = self.file_name[:-4] + "-"+str(self.id)+"-"+str(self.no_syllable)+"-MG-coef.csv"
+        df_MotorGestures.to_csv(self.paths.MG_param / name, index=True)
+        df_MotorGestures_coef.to_csv(self.paths.MG_param / name1, index=True)
+
     #%%
     def SolveAB(self, alpha, beta, gamma, orde=2):
         self.alpha = alpha; self.beta  = beta;
@@ -445,16 +433,14 @@ class Syllable(object):
         #synth.correlation /= synth.correlation.max()
         synth.SKL         /= synth.SKL.max()
         synth.Df          /= synth.Df.max()
-        
+
         synth.scoreCorrelation = Norm(synth.correlation, ord=self.ord)/synth.correlation.size
         synth.scoreSKL         = Norm(synth.SKL, ord=self.ord)/synth.SKL.size
         synth.scoreDF          = Norm(synth.Df, ord=self.ord)/synth.Df.size
-        
-        
+
         synth.residualCorrelation = synth.scoreFF-np.mean(synth.correlation+synth.Df +synth.scoreSKL)
-        
         synth.SCIFF = synth.scoreSCI + synth.scoreFF
-        
+
         return synth
 
     #%%
@@ -465,3 +451,5 @@ class Syllable(object):
         self.p["b0"].set(value=p_array[3])
         self.p["b1"].set(value=p_array[4])
         self.p["b2"].set(value=p_array[5])
+        if len(p_array)>6: 
+            self.p["gm"].set(value=p_array[6])

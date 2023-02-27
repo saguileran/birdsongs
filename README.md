@@ -140,6 +140,12 @@ Install the birdsong package
 python .\setup.py install
 ```
 
+or using pip
+
+```bat
+pip install -e .
+```
+
 That's all! 
    
 <!---

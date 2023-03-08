@@ -70,16 +70,16 @@ class BirdSong(Syllable, object):
         self.FF     = yin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=self.NN, 
                           win_length=self.win_length, hop_length=self.hop_length, trough_threshold=self.umbral_FF, center=self.center, pad_mode='constant')
         
-        if len(syll_times)==0:
-            self.syllables = self.Syllables(method=split_method)
-        else:
-            indexes = np.int64(self.fs*np.array(syll_times))
-            indexes = [np.arange(ind[0],ind[1],1) for ind in indexes]
+        # if len(syll_times)==0:
+        #     self.syllables = self.Syllables(method=split_method)
+        # else:
+        #     indexes = np.int64(self.fs*np.array(syll_times))
+        #     indexes = [np.arange(ind[0],ind[1],1) for ind in indexes]
             
-            self.syllables = [x for x in indexes if len(x) > 2*self.NN]
+        #     self.syllables = [x for x in indexes if len(x) > 2*self.NN]
         
-        self.no_syllables = len(self.syllables)
-        print('The son has {} syllables'.format(self.no_syllables))
+        # self.no_syllables = len(self.syllables)
+        # print('The son has {} syllables'.format(self.no_syllables))
     
     #%%
     def Syllables(self, method="freq"):

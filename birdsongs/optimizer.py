@@ -3,8 +3,6 @@ from .birdsong import *
 from .util import *
 
 class Optimizer(Syllable, object):
-    
-
     def __init__(self, obj, method_kwargs):
         self.obj    = obj
         self.obj0   = obj
@@ -87,15 +85,15 @@ class Optimizer(Syllable, object):
         end0   = time.time()
         print(r"$a_0*$"+"={0:.4f}, t={1:.4f} min".format(self.obj.p["a0"].value, (end0-start0)/60))
         # ---------------- a1--------------------
-        start1 = time.time()
-        self.obj.p["a1"].set(vary=True)
+        # start1 = time.time()
+        # self.obj.p["a1"].set(vary=True)
         
-        mi1    = lmfit.minimize(self.residualCorrelation, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
-        self.obj.p["a1"].set(vary=False, value=mi1.params["a1"].value)
-        end1   = time.time()
+        # mi1    = lmfit.minimize(self.residualCorrelation, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
+        # self.obj.p["a1"].set(vary=False, value=mi1.params["a1"].value)
+        # end1   = time.time()
         
-        print(r"$a_1*$"+"={0:.4f}, t={1:.4f} min".format(self.obj.p["a1"].value, (end1-start1)/60))
-        #return self.obj.p["b0"].value, self.obj.p["b1"].value #end0-start0, end1-start1
+        # print(r"$a_1*$"+"={0:.4f}, t={1:.4f} min".format(self.obj.p["a1"].value, (end1-start1)/60))
+        # #return self.obj.p["b0"].value, self.obj.p["b1"].value #end0-start0, end1-start1
         obj = self.obj
         
     def OptimalGamma(self, obj):

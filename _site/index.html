@@ -1,0 +1,633 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>BirdSongs</title>
+<meta name="description" content="A python package to analyze, visualize and generate synthetic birdsongs.">
+
+
+  <meta name="author" content="Sebastian Aguilera Novoa">
+  
+
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="BirdSongs">
+<meta property="og:title" content="BirdSongs">
+<meta property="og:url" content="http://localhost:4000/">
+
+
+  <meta property="og:description" content="A python package to analyze, visualize and generate synthetic birdsongs.">
+
+
+
+
+
+  <meta name="twitter:site" content="@saguileran">
+  <meta name="twitter:title" content="BirdSongs">
+  <meta name="twitter:description" content="A python package to analyze, visualize and generate synthetic birdsongs.">
+  <meta name="twitter:url" content="http://localhost:4000/">
+
+  
+    <meta name="twitter:card" content="summary">
+    
+  
+
+  
+
+
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="http://localhost:4000/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Sebastian Aguilera Novoa",
+      "url": "http://localhost:4000/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://saguileran.github.io/birdsongs/assets/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://saguileran.github.io/birdsongs/assets/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://saguileran.github.io/birdsongs/assets/img/favicon-16x16.png">
+<link rel="manifest" href="https://saguileran.github.io/birdsongs/assets/img/site.webmanifest">
+<link rel="shortcut icon" href="https://saguileran.github.io/birdsongs/assets/img/favicon.ico">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="msapplication-config" content="https://saguileran.github.io/birdsongs/assets/img/browserconfig.xml">
+<meta name="theme-color" content="#ffffff">
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/img/logo.png" alt="BirdSongs"></a>
+        
+        <a class="site-title" href="/">
+          BirdSongs
+          <span class="site-subtitle">A python package to analyze, visualize and generate synthetic birdsongs.</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/use/">Use</a>
+            </li><li class="masthead__menu-item">
+              <a href="/results/">Results</a>
+            </li><li class="masthead__menu-item">
+              <a href="/">Home</a>
+            </li><li class="masthead__menu-item">
+              <a href="https://github.com/saguileran/birdsongs">GitHub</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
+
+  
+    <div class="author__avatar">
+      <a href="http://localhost:4000/">
+        <img src="/assets/img/bio-photo.jpg" alt="Sebastian Aguilera Novoa" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="http://localhost:4000/" itemprop="url">Sebastian Aguilera Novoa</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p>A physicist interested in sound waves simulations, computer science, signal processing, and science teaching.</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name" class="p-locality">Bogotá, CO</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://saguileran.github.io/" rel="nofollow noopener noreferrer me" itemprop="sameAs"><i class="fas fa-fw fa-link" aria-hidden="true"></i><span class="label">Website</span></a></li>
+          
+        
+          
+            <li><a href="https://twitter.com/saguileran" rel="nofollow noopener noreferrer me" itemprop="sameAs"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+            <li><a href="https://github.com/saguileran" rel="nofollow noopener noreferrer me" itemprop="sameAs"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+            <li><a href="https://instagram.com/saguileran" rel="nofollow noopener noreferrer me" itemprop="sameAs"><i class="fab fa-fw fa-instagram" aria-hidden="true"></i><span class="label">Instagram</span></a></li>
+          
+        
+      
+
+      
+
+      
+        <li>
+          <a href="mailto:saguileran@unal.edu.co" rel="me" class="u-email">
+            <meta itemprop="email" content="saguileran@unal.edu.co" />
+            <i class="fas fa-fw fa-envelope-square" aria-hidden="true"></i><span class="label">Email</span>
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    
+    
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          
+          
+
+
+          
+          <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>BirdSongs</title>
+<meta name="description" content="A python package to analyze, visualize and generate synthetic birdsongs.">
+
+
+  <meta name="author" content="Sebastian Aguilera Novoa">
+  
+
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="BirdSongs">
+<meta property="og:title" content="BirdSongs">
+<meta property="og:url" content="http://localhost:4000/">
+
+
+  <meta property="og:description" content="A python package to analyze, visualize and generate synthetic birdsongs.">
+
+
+
+
+
+  <meta name="twitter:site" content="@saguileran">
+  <meta name="twitter:title" content="BirdSongs">
+  <meta name="twitter:description" content="A python package to analyze, visualize and generate synthetic birdsongs.">
+  <meta name="twitter:url" content="http://localhost:4000/">
+
+  
+    <meta name="twitter:card" content="summary">
+    
+  
+
+  
+
+
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="http://localhost:4000/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Sebastian Aguilera Novoa",
+      "url": "http://localhost:4000/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+          <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://saguileran.github.io/birdsongs/assets/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://saguileran.github.io/birdsongs/assets/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://saguileran.github.io/birdsongs/assets/img/favicon-16x16.png">
+<link rel="manifest" href="https://saguileran.github.io/birdsongs/assets/img/site.webmanifest">
+<link rel="shortcut icon" href="https://saguileran.github.io/birdsongs/assets/img/favicon.ico">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="msapplication-config" content="https://saguileran.github.io/birdsongs/assets/img/browserconfig.xml">
+<meta name="theme-color" content="#ffffff">
+
+        </header>
+      
+
+      <section class="page__content e-content" itemprop="text">
+        
+        <h1 id="BirdSongs">BirdSongs</h1>
+<p>A python package to analyze, visualize and generate synthetic birdsongs.</p>
+
+
+<div id="toc_container">
+    <p class="toc_title">Table of Contents</p>
+    <ul class="toc_list">
+      <li><a href="#Overview">Overview</a>
+      <!--
+      <ul>
+        <li><a href="#First_Sub_Point_2">1.2 First Sub Point 2</a></li>
+      </ul> -->
+    </li>
+    <li><a href="#Objective">Objective</a></li>
+    <li><a href="#Physical_Model">Physical Model</a></li>
+    <li><a href="#Implementation">Implementation</a></li>
+    <li><a href="#POO">Programming Object Oriented (POO)</a></li>
+    <li><a href="#Conclusions">Conclusions</a></li>
+    <li><a href="#References">References</a></li>
+    <ul>
+        <li><a href="#literature">Literature</a></li>
+        <li><a href="#software">Software</a></li>
+        <li><a href="#audios-dataset">Audios Dataset</a></li>
+      </ul>
+    </ul>
+</div>
+
+
+<h2 id="Overview">Overview</h2>
+
+Study and pakcing of the physical model of the motor gestures of birdsongss. This model explains the physics of birdsongs by modeling the organs involved in sound production in birds (syrinx, trachea, glottis, Oro-Oesophageal Cavity (OEC), and beak) with oridary differential equations (EDOs). In this work, a Python package is developed to analyze, visualize and generate synthetic birdsongs using the motor gestures model and recorded samples of birdsongs. To automate the model, the problem is formulated as an minimization problem with two control parameters (air sac pressure of the bird’s bronchi and labial tension) and solved using numerical methods, signal processing tools, and numerical optimization. The package is tested by generating comparable birdsongs, solves the minimization problem using recorded samples of birdsongs and comparing the fundamental frequency (denoted as FF, F0, or also called pitch) and spectral conent index (SCI) of both birdsongs.
+
+<br><br>
+
+The dissertation document is made with latex, it is located on github at <a href="https://github.com/saguileran/birdsongs/">github.com/saguileran/birdsongs/</a> in the dissertation branch. You can download and compile it using tex software (texmaker).
+
+<br><br>
+<div class="row">
+  <div class="column">
+    <a target="_blank" href="https://github.com/saguileran/birdsongs/blob/dissertation/dissertation.pdf"><img src="assets/img/cover.jpg" alt="Dissertation document." width="300" height="400" class="centerImage"></a>
+  </div>
+  <div class="column">
+    <a target="_blank" href="https://github.com/saguileran/birdsongs/blob/dissertation/dissertation.pdf"><img src="assets/img/under-cover.png" alt="Dissertation document." width="300" height="400" class="centerImage"></a>
+  </div>
+</div>
+
+
+
+<h2 id="Objective">Objective</h2>
+
+Design, development, and evaluation of a computational-physical model to generating synthetic bird songs from recorded samples.
+
+<h2 id="Physical_Model">Physical Model</h2>
+
+Schematic implementation of the physical model <b>motor gestures of birdsongs:</b> syrinx, trachea, glottis, OEC, and beak.
+
+<img src="assets/img/model.png" alt="Model" width="700" height="400" class="centerImage">
+
+<h2 id="Implementation">Implementation</h2>
+
+Using the previous objects defined, the optimization problem is solved by following the next diagram
+
+<img src="assets/img/methodology.png" alt="Methodology" width="700" height="400" class="centerImage">
+
+
+<h2 id="POO">Programming Object Oriented (POO)</h2>
+
+Taking advantege of POO the repetition of long codes is avoid. Using this programming paradigm, the execution and implementation of the model is fast and easy. Five objects ared created to solve the optimization problem and analyze the synthetic syllables:
+
+<ul>
+    <li><b>Syllable:</b> define a object from audio syllable with its tempo and spectral features</li>
+    <li><b>Optimizer:</b> define a object to optimize function from method and syllables </li>
+    <li><b>BirdSong:</b> define a object to read and split an audio song in syllables</li>
+    <li><b>Ploter:</b> define a object to plot real and synthec syllables or songs</li>
+    <li><b>Paths:</b> define a object to organize folders location</li>
+</ul>
+
+<p>In order to understand the diagram methodology, the following icons will be used.</p>
+
+
+<img src="assets/img/objects.png" alt="POO" width="500" height="400" class="centerImage">
+
+<h2 id="Conclusions">Conclusions</h2>
+
+<ul>
+    <li>The SCI score gives comparable results to finding the optimal pressure parameters coefficients, however it is not always sufficient since the noise can be interpreted as harmonics or spectral content. An improvement is to refine the objective function that find these parametric coefficients</li>
+    <li>The model successfully simulated several syllables of Zonotrichia capensis with different sound quality. The best sounds to generate are the longer, simpler and clear syllables which were simulated with high accuracy. The thrilled syllables can be well-generated using chuncks, small parts of syllables, but it requires tuning the pitch threshold.</li>
+    <li>The most problematic and difficult syllables are the noisy and with high spectral content audios, in which strong harmonics are present making the pitch computing hard or even impossible to compute correctly. Although for some audios is sufficient to change the pitch threshold detector, it does not work for all of them.</li>
+</ul>
+
+<hr style="width:100%;text-align:left;margin-left:0">
+
+
+<h1 id="References">References</h1>
+<h2 id="literature">Literature</h2>
+<div class="csl-entry">[1] Amador, A., Perl, Y. S., Mindlin, G. B., &#38; Margoliash, D. (2013). Elemental gesture dynamics are encoded by song premotor cortical neurons. <i>Nature 2013 495:7439</i>, <i>495</i>(7439), 59–64. <a href="https://doi.org/10.1038/nature11967">https://doi.org/10.1038/nature11967</a></div>
+
+<h2 id="software">Software</h2>
+
+<div class="csl-entry">[2] Newville, M., Stensitzki, T., Allen, D. B., &#38; Ingargiola, A. (2014). <i>LMFIT: Non-Linear Least-Square Minimization and Curve-Fitting for Python</i>. <a href="https://doi.org/10.5281/ZENODO.11813">https://doi.org/10.5281/ZENODO.11813</a></div>
+<br>
+
+<div class="csl-entry">[3] Ulloa, J. S., Haupert, S., Latorre, J. F., Aubin, T., &#38; Sueur, J. (2021). scikit-maad: An open-source and modular toolbox for quantitative soundscape analysis in Python. <i>Methods in Ecology and Evolution</i>, <i>12</i>(12), 2334–2340. <a href="https://doi.org/10.1111/2041-210X.13711">https://doi.org/10.1111/2041-210X.13711 Dataset </a> </div>
+<br>
+
+<div class="csl-entry">[4] McFee, B., Raffel, C., Liang, D., Ellis, D. P., McVicar, M., Battenberg, E., &amp; Nieto, O. &#38; (2015). librosa: Audio and music signal analysis in python. <i>  In Proceedings of the 14th python in science conference </i>, <i>12</i>(12), (Vol. 8). <a href="https://librosa.org/doc/latest/index.html">Librosa</a> </div>
+
+<h2 id="audios-dataset">Audios Dataset</h2>
+<div class="csl-entry">[5] Xeno-canto Foundation and Naturalis Biodiversity Center &#38; (2005). <a href="https://xeno-canto.org/">xeno-canto:</a>     <i> Sharing bird sounds from around the world.</i> <i>  <a href="https://xeno-canto.org/set/8103">Dissertation Audios Dataset </a> </i></div>
+<br>
+
+<div class="csl-entry">[6] Ther Cornell Lab of Ornithology &#38; (2005). Macaulay Library - ebird <i>, <a href="https://ebird.org/">ebird.com</a> </div>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+
+      </footer>
+
+      
+
+      
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';" role="search">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+
+    
+      
+        
+          <li><a href="mailto:saguileran@unal.edu.co" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-envelope-square" aria-hidden="true"></i> Email</a></li>
+        
+      
+        
+          <li><a href="https://twitter.com/saguileran" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+        
+      
+        
+          <li><a href="https://github.com/saguileran" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+        
+          <li><a href="https://instagram.com/saguileran" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-instagram" aria-hidden="true"></i> Instagram</a></li>
+        
+      
+    
+
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2023 Sebastian Aguilera Novoa. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+  
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+  
+    <script src="/assets/js/clipboardrougev2.js"></script>
+  
+
+
+
+  </body>
+</html>

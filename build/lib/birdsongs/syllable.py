@@ -10,14 +10,14 @@ class Syllable(object):
         fs = sampling rate
         t0 = initial time of the syllable
     """ 
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        #del state[''] # remove the unpicklable progress attribute
-        return state
-    def __setstate__(self, state):
-        self.__dict__.update(state)
-        # restore the progress from the progress integer
-        #self.progress = make_progress(self.progress_int)
+    # def __getstate__(self):
+    #     state = self.__dict__.copy()
+    #     #del state[''] # remove the unpicklable progress attribute
+    #     return state
+    # def __setstate__(self, state):
+    #     self.__dict__.update(state)
+    #     # restore the progress from the progress integer
+    #     #self.progress = make_progress(self.progress_int)
 
     #%%
     def __init__(self, birdsong=None, t0=0, Nt=100, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4), 
@@ -61,8 +61,10 @@ class Syllable(object):
             self.no_file    = self.birdsong.no_file
             self.paths      = self.birdsong.paths
             self.file_name  = self.birdsong.file_name
+            self.state      = self.birdsong.state
+            self.country    = self.birdsong.country
             self.umbral     = self.birdsong.umbral
-            self.t0_bs       = self.birdsong.t0
+            self.t0_bs      = self.birdsong.t0
             s = self.birdsong.s; 
             NN = self.birdsong.NN
         elif len(sfs)!=0:           
@@ -188,6 +190,7 @@ class Syllable(object):
 #         self.timeFF   = self.time[df_filtered["FF"].index]
 #         self.FF = self.FF[df_filtered["FF"].index]
 
+        #self.timeFF = np.linspace(0,self.times[0][-1]+0.1,self.FF.size)
         self.timeFF = np.linspace(0,self.time[-1],self.FF.size)
         self.FF_fun = interp1d(self.timeFF, self.FF)
         self.SCI    = self.f_msf / self.FF_fun(self.time)
@@ -273,7 +276,7 @@ class Syllable(object):
         synth.Vs    = self.Vs
         synth.alpha = self.alpha
         synth.beta  = self.beta
-
+        
         synth.timesVs = np.linspace(0, len(self.s)/self.fs, len(self.s)*ovfs)
         #delattr(self,"alpha"); delattr(self,"beta")
 
@@ -297,6 +300,9 @@ class Syllable(object):
         synth.t_interval = self.t_interval
         synth.no_syllable = self.no_syllable
         synth.file_name = self.file_name[:-4]# + "-synth"
+
+        synth.state   = self.state
+        synth.country = self.country
         synth.type = self.type
         synth.id = self.id
 
@@ -306,8 +312,8 @@ class Syllable(object):
     def ExportMotorGestures(self):
         # ------------ export p values and alpha-beta arrays ------------
         #df_MotorGestures = pd.DataFrame(data={"time":self.time_s, "alpha":self.alpha, "beta":self.beta})
-        df_MotorGestures_coef = pd.DataFrame(data=np.concatenate((list(self.p.valuesdict().values()),self.t_interval, [self.NN, self.umbral_FF, self.type])), 
-                                            index=np.concatenate((list(self.p.valuesdict().keys()), ["t_ini", "t_end", "NN", "umbral_FF", "type"])), 
+        df_MotorGestures_coef = pd.DataFrame(data=np.concatenate((list(self.p.valuesdict().values()),self.t_interval, [self.NN, self.umbral_FF, self.type, self.country, self.state])), 
+                                            index=np.concatenate((list(self.p.valuesdict().keys()), ["t_ini", "t_end", "NN", "umbral_FF", "type", 'country', 'state'])), 
                                             columns=["value"])
         #name  = self.file_name[:-4] + "-"+str(self.id)+"-"+str(self.no_syllable)+"-MG.csv"
         name  = self.file_name[:-4] + "-"+str(self.id)+"-"+str(self.no_syllable)+"-MG.csv"
@@ -335,13 +341,24 @@ class Syllable(object):
         deltaMel    = np.abs(synth.FF_coef-self.FF_coef)
         deltaMfccs  = np.abs(synth.mfccs-self.mfccs)
         
-        synth.deltaFmsf     = np.abs(synth.f_msf-self.f_msf)
-        synth.deltaSCI      = np.abs(synth.SCI-self.SCI)
-        synth.deltaEnv      = np.abs(synth.envelope-self.envelope)
-        synth.deltaFF       = 1e-3*np.abs(synth.FF-self.FF)#/np.max(deltaFF)
-        synth.deltaRMS      = np.abs(synth.rms-self.rms)
-        synth.deltaCentroid = 1e-3*np.abs(synth.centroid-self.centroid)
-        synth.deltaF_msf    = 1e-3*np.abs(synth.f_msf-self.f_msf)
+        # synth.deltaFmsf     = np.abs(synth.f_msf-self.f_msf)
+        # synth.deltaSCI      = np.abs(synth.SCI-self.SCI)
+        # synth.deltaEnv      = np.abs(synth.envelope-self.envelope)
+        # synth.deltaFF       = 1e-3*np.abs(synth.FF-self.FF)#/np.max(deltaFF)
+        # synth.deltaRMS      = np.abs(synth.rms-self.rms)
+        # synth.deltaCentroid = 1e-3*np.abs(synth.centroid-self.centroid)
+        # synth.deltaF_msf    = 1e-3*np.abs(synth.f_msf-self.f_msf)
+        # synth.deltaSxx      = deltaSxx/np.max(deltaSxx)
+        # synth.deltaMel      = deltaMel/np.max(deltaMel)
+        # synth.deltaMfccs    = deltaMfccs/np.max(deltaMfccs)
+
+        synth.deltaFmsf     = np.abs(synth.f_msf-self.f_msf)/self.f_msf
+        synth.deltaSCI      = np.abs(synth.SCI-self.SCI)/self.SCI
+        synth.deltaEnv      = np.abs(synth.envelope-self.envelope)/self.envelope
+        synth.deltaFF       = np.abs(synth.FF-self.FF)/self.FF
+        synth.deltaRMS      = np.abs(synth.rms-self.rms)/self.rms
+        synth.deltaCentroid = np.abs(synth.centroid-self.centroid)/self.centroid
+        synth.deltaF_msf    = np.abs(synth.f_msf-self.f_msf)/self.f_msf
         synth.deltaSxx      = deltaSxx/np.max(deltaSxx)
         synth.deltaMel      = deltaMel/np.max(deltaMel)
         synth.deltaMfccs    = deltaMfccs/np.max(deltaMfccs)

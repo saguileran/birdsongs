@@ -10,16 +10,25 @@ class BirdSong(Syllable, object):
         no_file = number of the file to analyze
         umbral = threshold to detect a syllable, less than one
     """
-    def __init__(self, paths, no_file, sfs=[], umbral=0.05, llambda=1., NN=1024, overlap=0.5, center=False,
+    def __init__(self, paths, file_id, sfs=[], umbral=0.05, llambda=1., NN=1024, overlap=0.5, center=False,  #no_file,
                 umbral_FF=1.5, flim=(1.5e3,2e4),  tlim=[], split_method="freq", Nt=500, syll_times=[]):
-        self.no_file = no_file
+        
         self.paths   = paths
         self.llambda = llambda
         self.flim    = flim
         self.center  = center
-        self.file_path = self.paths.sound_files[self.no_file]
-        self.file_name =  str(self.paths.sound_files[self.no_file])[len(str(self.paths.audios))+1:]
         
+        # if file_id is None:
+        #     self.no_file = no_file
+        #     self.file_path = self.paths.sound_files[self.no_file]
+        #     self.file_name =  str(self.paths.sound_files[self.no_file])[len(str(self.paths.audios))+1:]
+        # else:
+        self.file_path = [file for file in paths.sound_files if file_id in file][0]
+        self.no_file = self.paths.AudioFiles()[self.paths.AudioFiles()['ML Catalog Number'] == int(file_id)].index[0]
+        self.country = self.paths.AudioFiles()[self.paths.AudioFiles()['ML Catalog Number'] == int(file_id)]["Country"].iloc[0]
+        self.state = self.paths.AudioFiles()[self.paths.AudioFiles()['ML Catalog Number'] == int(file_id)]["State"].iloc[0]
+        self.file_name = self.file_path[len(str(self.paths.audios))+1:]
+
         if len(sfs)==0:
             #s, fs = sound.load(self.file_path)
             s, fs = librosa.load(self.file_path, sr=None)
@@ -129,6 +138,9 @@ class BirdSong(Syllable, object):
         self.syllable      = Syllable(self, tlim=(self.time_syllable[0], self.time_syllable[-1]), flim=self.flim, NN=NN, file_name=self.file_name+"synth")
             
         self.syllable.no_syllable  = self.no_syllable
+        self.syllable.file_name    = self.file_name
+        self.syllable.state        = self.state
+        self.syllable.country      = self.country
         self.syllable.no_file      = self.no_file
         self.syllable.paths        = self.paths
         self.syllable.id           = "syllable"
@@ -164,7 +176,7 @@ class BirdSong(Syllable, object):
     # ------------- solver for some parameters -----------------
     def WholeSong(self, method_kwargs, plot=False, syll_max=0):
         self.OptGamma = self.AllGammas(method_kwargs)
-        self.p["gamma"].set(value=opt_gamma)
+        self.p["gamma"].set(value=np.mean(self.OptGamma))
         if syll_max==0: syll_max=self.syllables.size+1
         for i in range(1,syll_max): # maxi+1):#
             syllable = self.Syllable(i)

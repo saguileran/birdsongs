@@ -9,12 +9,12 @@ from os.path import relpath
 #%%
 class Paths(object):
     #%%
-    def __init__(self, root_path=None, audios_path=None, bird_name=None):
+    def __init__(self, root_path=None, audios_path=None, bird_name=None, results="results"):
         if root_path==None: self.root = Path("../examples/")
         else:               self.root = Path(root_path)
         
         self.auxdata  = self.root / 'auxiliar_data'
-        self.results  = self.root / 'results'
+        self.results  = self.root / results
         self.MG_param = self.results / "MotorGestures-parameters"
         self.images   = self.results / "Images"
         self.examples = self.results / 'Audios'  # write audios folder
@@ -58,8 +58,8 @@ class Paths(object):
         data = pd.read_csv(self.audios/'spreadsheet.csv', encoding_errors='ignore')
         data.dropna(axis = 0, how = 'all', inplace = True)
         self.data = data.convert_dtypes() #.dtypes  
-        if len(self.data)<30: 
-            self.data["label"] = list(string.ascii_uppercase)[:len(self.data)]
+        #if len(self.data)<30: 
+        self.data["label"] = np.arange(len(self.data)) #list(string.ascii_uppercase)[:len(self.data)]
         
         self.no_files    = len(self.sound_files)
             
@@ -97,20 +97,22 @@ class Paths(object):
             
             return df#, coef#, motor_gesture
         else:                               # if syllables is None
-            coefs, type, out, tlim, NN, umbral_FF = [], [], [], [], [], []
+            coefs, type, out, tlim, NN, umbral_FF, country, state = [], [], [], [], [], [], [], []
             for i in df.index:
-                coef = pd.read_csv(self.data_param.iloc[i]["coef_path"], index_col="Unnamed: 0")
+                coef = pd.read_csv(self.data_param.iloc[i]["coef_path"], index_col="Unnamed: 0", engine='python')#, encoding = "utf-8") #cp1252
                 tlim.append([float(coef.iloc[7].value), float(coef.iloc[8].value)])
                 NN.append(int(coef.iloc[9].value))
                 umbral_FF.append(float(coef.iloc[10].value))
                 type.append(coef.iloc[11].value)
+                country.append(coef.iloc[12].value)
+                state.append(coef.iloc[13].value)
                 coefs.append(coef.iloc[:7].astype('float64'))
             tlim = np.array(tlim)
             
             df = pd.DataFrame({'id_XC':df['id_XC'], 'no_syllable':df['no_syllable'],
             'id':df['id'], 'name':df['name'], 'coef_path':df['coef_path'], 'param_path':df['param_path'],
             'audio_path':df['audio_path'], 's':df['s'], 'fs':df['fs'], 'file_name':df['file_name'],
-            't_ini':tlim[:,0], 't_end':tlim[:,1], 'NN':NN, 'umbral_FF':umbral_FF, 'coef':coefs, 'type':type},
+            't_ini':tlim[:,0], 't_end':tlim[:,1], 'NN':NN, 'umbral_FF':umbral_FF, 'coef':coefs, 'type':type, 'country':country, 'state':state},
             index=df.index)
             
             out = [df.iloc[i] for i in range(len(df.index))]

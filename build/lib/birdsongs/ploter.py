@@ -105,7 +105,7 @@ class Ploter(object):
         else:              syllable_on=0
         if "birdsong" in obj.id:            
             fig, ax = plt.subplots(2+int(syllable_on), 1, figsize=(self.figsize[0], self.figsize[1]*(2+int(syllable_on))),constrained_layout=True)
-            fig.subplots_adjust(hspace=0.4, wspace=0.4)
+            fig.subplots_adjust(hspace=0.6, wspace=0.4)
             
             img = librosa.display.specshow(obj.Sxx_dB, x_axis="s", y_axis="linear", sr=obj.fs,
                          hop_length=obj.hop_length, ax=ax[0], cmap=self.cmap)
@@ -140,7 +140,7 @@ class Ploter(object):
                 img = librosa.display.specshow(syllable.Sxx_dB, x_axis="s", y_axis="linear", sr=syllable.fs,
                          hop_length=syllable.hop_length, ax=ax[2], cmap=self.cmap)
                 
-                ax[2].plot(syllable.time, syllable.FF, 'b+', label='Syllable', ms=15)
+                ax[2].plot(syllable.time+syllable.t0, syllable.FF, 'b+', label='Syllable', ms=15)
                 ax[2].set_ylim(obj.flim); 
                 ax[2].set_xlim((syllable.time[0], syllable.time[-1]));
                 ax[2].legend(loc='upper right', title="FF")
@@ -155,7 +155,7 @@ class Ploter(object):
 
             fig.suptitle("Audio Sound Wave and Spectrogram", fontsize=18) # 'Audio:\n{}'.format(obj.file_name[:-4])
             if SelectTime_on==True:  self.klicker = Klicker(fig, ax[0])
-            fig.tight_layout()
+            #fig.tight_layout()
             plt.show()
             
         
@@ -165,7 +165,7 @@ class Ploter(object):
             fig.subplots_adjust(hspace=0.8, wspace=0.4)
 
             img = librosa.display.specshow(obj.Sxx_dB, x_axis="s", y_axis="linear", sr=obj.fs,
-                         hop_length=obj.hop_length, ax=ax[0])
+                                           hop_length=obj.hop_length, ax=ax[0])
             #fig.colorbar(imgx|, ax=ax[0], format="%+2.f dB")
             ax[0].yaxis.set_major_formatter(ticks)
             
@@ -192,7 +192,7 @@ class Ploter(object):
 
             #fig.suptitle('id: {}, NoFile: {}, NoSyllable: {}'.format(obj.id, obj.no_file, obj.no_syllable), fontsize=16)
             fig.suptitle('Sound Wave and Spectrogram - {}-{}'.format(obj.id, obj.no_syllable), fontsize=16)
-            fig.tight_layout()
+            #fig.tight_layout()
             plt.show()
 
             path_save = obj.paths.images / "{}-{}-{}.png".format(obj.file_name[:-4], obj.id, obj.no_syllable)
@@ -250,11 +250,14 @@ class Ploter(object):
         return fig, ax
 
     #%%
-    def Result(self, obj, obj_synth, cmp="afmhot_r"):
+    def Result(self, obj, obj_synth, cmp="afmhot_r", figsize=None, ylim=None):
         plt.close()
         #if not("synth" in obj.id) and "synth" in obj_synth.id:
         ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*1e-3))
-        fig = plt.figure(constrained_layout=False, figsize=(5*self.figsize[0], 4*self.figsize[1]))
+        if figsize is None:
+              fig = plt.figure(constrained_layout=False, figsize=(5*self.figsize[0], 4*self.figsize[1]))
+        else: fig = plt.figure(constrained_layout=False, figsize=figsize)
+
         gs  = fig.add_gridspec(nrows=4, ncols=5, wspace=0.15, hspace=0.5, width_ratios=[1,1,1,1.,1.], left=0.05, right=0.98,)
         vmin, vmax = obj.Sxx_dB.min(), obj.Sxx_dB.max()
         # ----- FF ---------------
@@ -264,11 +267,14 @@ class Ploter(object):
                         hop_length=obj.hop_length, ax=ax1, cmap=self.cmap)
         fig.colorbar(img, ax=ax1, format="%+2.f dB")
         
+        #ax1.plot(obj.time,       obj.rms,       'rv-', label=r'$F_{rms}$ real', ms=9)
+        #ax1.plot(obj_synth.time, obj_synth.rms, 'p-', color="darkred", label=r'$F_{rms}$ synth', ms=7)
+        
         ax1.plot(obj.time,       obj.f_msf,       'D-', color="skyblue", label=r'$FF_{msf}$ real',ms=12)
         ax1.plot(obj_synth.time, obj_synth.f_msf, 'X-', color="lightgreen",label=r'$FF_{msf}$ synt', ms=12)
 
-        ax1.plot(obj_synth.time, obj_synth.centroid, 'p-', color="olive",  label=r'$F_{cent}$ synth', ms=12)
         ax1.plot(obj.time,       obj.centroid,       '+-', color="yellow", label=r'$F_{cent}$ real', ms=12)
+        ax1.plot(obj_synth.time, obj_synth.centroid, 'p-', color="olive",  label=r'$F_{cent}$ synth', ms=12)
         
         ax1.plot(obj.time,        obj.FF,       'b*-', label=r'FF real',ms=25)
         ax1.plot(obj_synth.time,  obj_synth.FF, 'go-', label=r'FF synt', ms=12)
@@ -280,20 +286,24 @@ class Ploter(object):
         ax1.set_title('Spectrogram - Fundamental Frequency (FF)')
         
         ax2 = fig.add_subplot(gs[0:2, 3:])
-        ax2.plot(obj_synth.time,  obj_synth.deltaFF ,      "*-", color="k",  ms=12, lw=3, label=r' $||ΔFF||_{}$={:.4f},'.format(obj_synth.ord, obj_synth.scoreFF)+"\n"+'    mean={:.4f}'.format(obj_synth.deltaFF_mean)); 
-        ax2.plot(obj_synth.time, obj_synth.deltaRMS,      "-p", color="r",  label=r' $|| ΔF_{{ rms }}||_{}$={:.4f},'.format(obj_synth.ord,  obj_synth.scoreRMS)+"\n"+'      mean={:.4f}'.format(obj_synth.scoreRMS_mean)); 
-        ax2.plot(obj.time,       obj_synth.deltaCentroid,  "-o", color="y", label=r'$ || \Delta F_{{ centroid }}||_{}$={:.4f},'.format(obj_synth.ord, obj_synth.scoreCentroid, obj_synth.scoreCentroid_mean)+"\n"+'          mean={:.4f}'.format(obj_synth.scoreCentroid_mean)); 
-        ax2.plot(obj.time,       obj_synth.deltaF_msf,     "D-", color="purple", label=r'$ || \Delta F_{{ msf }}||_{}$={:.4f},'.format(obj_synth.ord, obj_synth.scoreF_msf)+"\n"+'     mean={:.4f}'.format(obj_synth.scoreF_msf_mean)); 
+        ax2.plot(obj_synth.time, 100*obj_synth.deltaFF ,      "*-", color="k",  ms=12, lw=3, label=r' $||ΔFF||_{}$={:.4f},'.format(obj_synth.ord, obj_synth.scoreFF)+"\n"+'    mean={:.4f}'.format(obj_synth.deltaFF_mean)); 
+        #ax2.plot(obj_synth.time, obj_synth.deltaRMS,      "-p", color="r",  label=r' $|| ΔF_{{ rms }}||_{}$={:.4f},'.format(obj_synth.ord,  obj_synth.scoreRMS)+"\n"+'      mean={:.4f}'.format(obj_synth.scoreRMS_mean)); 
+        ax2.plot(obj.time,       100*obj_synth.deltaCentroid,  "-o", color="y", label=r'$ || \Delta F_{{ centroid }}||_{}$={:.4f},'.format(obj_synth.ord, obj_synth.scoreCentroid, obj_synth.scoreCentroid_mean)+"\n"+'          mean={:.4f}'.format(obj_synth.scoreCentroid_mean)); 
+        ax2.plot(obj.time,       100*obj_synth.deltaF_msf,     "D-", color="purple", label=r'$ || \Delta F_{{ msf }}||_{}$={:.4f},'.format(obj_synth.ord, obj_synth.scoreF_msf)+"\n"+'     mean={:.4f}'.format(obj_synth.scoreF_msf_mean)); 
 
 
-        ax2.plot(obj_synth.time, obj_synth.rms*1e-3, 'p-', color="darkred", label=r'$F_{rms}$ synth', ms=7)
-        ax2.plot(obj.time,       obj.rms*1e-3,       'rv-', label=r'$F_{rms}$ real', ms=9)
+        #ax2.plot(obj_synth.time, obj_synth.rms*1e-3, 'p-', color="darkred", label=r'$F_{rms}$ synth', ms=7)
+        #ax2.plot(obj.time,       obj.rms*1e-3,       'rv-', label=r'$F_{rms}$ real', ms=9)
 
-        ax2.set_xlabel('time (s)'); ax2.set_ylabel('f (kHz)'); 
+        #ax2.plot(obj_synth.time, obj_synth.rms, 'p-', color="darkred", label=r'$F_{rms}$ synth', ms=7)
+        #ax2.plot(obj.time,       obj.rms,       'rv-', label=r'$F_{rms}$ real', ms=9)
+
+        ax2.set_xlabel('time (s)'); ax2.set_ylabel('relative error (%)'); #'f (kHz)'); 
         ax2.legend(title="Feature", bbox_to_anchor=(1.03, 1), borderpad=0.6, labelspacing=0.7,)
         ax2.set_title('Fundamental Frequency Error (ΔFF)'); 
-        if obj_synth.deltaFF.max() > 1.2: ax2.set_ylim((-0.5,10))
-        else:                            ax2.set_ylim((-0.1,1))
+        if ylim is not None: ax2.set_ylim(ylim)
+        #if obj_synth.deltaFF.max() > 1.2: ax2.set_ylim((-0.5,10))
+        #else:                            ax2.set_ylim((-0.1,1))
 
         # ------------------ spectrogams ----------------------------
         ax3 = fig.add_subplot(gs[2, 0])

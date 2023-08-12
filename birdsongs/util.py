@@ -35,6 +35,7 @@ from IPython.display import display, Math
 from librosa import yin, pyin, feature, display, onset, times_like, stft, fft_frequencies
 import librosa 
 from maad import *
+import birdsongs as bs
 
 from IPython.display import Audio # reproduce audio 
 
@@ -226,3 +227,43 @@ def BifurcationODE(f1, f2):
 #     t_env[-1] = time[-1] 
 #     fun_s = interp1d(t_env, out_env)
 #     return fun_s(time)
+
+#%%
+def DefineWholeSyllable(paths, info): 
+  index = 0
+  sfs = [info.iloc[index]["s"], info.iloc[index]["fs"]] # [s, fs]
+  NN = int(info.iloc[index]["NN"])
+  file_name = info.iloc[index]["file_name"]
+  umbral_FF = float(info.iloc[index]["umbral_FF"])
+
+  syllable = bs.Syllable(sfs=sfs, paths=paths, tlim=[], NN=NN, file_name=file_name,
+                     umbral_FF=umbral_FF, ide="birdsong")
+  return syllable
+
+#%%
+def DefineSyllable(paths, info, index): 
+  sfs = [info.iloc[index]["s"], info.iloc[index]["fs"]] # [s, fs]
+  time_interval = [float(info.iloc[index]["t_ini"]), float(info.iloc[index]["t_end"])]
+  NN = int(info.iloc[index]["NN"])
+  file_name = info.iloc[index]["file_name"]
+  umbral_FF = float(info.iloc[index]["umbral_FF"])
+  type = info.iloc[index]["type"]
+  no_syllable = info.iloc[index]["no_syllable"]
+  state = info.iloc[index]["state"]
+  country = info.iloc[index]["country"]
+
+  coef = list(info.iloc[index]["coef"].iloc[:6].value)
+  syllable = bs.Syllable(sfs=sfs, paths=paths, tlim=time_interval, NN=NN, file_name=file_name,
+                         umbral_FF=umbral_FF, ide="syllable", type=type, no_syllable=no_syllable)
+  syllable.Set(coef)
+  syllable.state = state
+  syllable.country = country
+
+  synth_syllable = syllable.Solve(syllable.p)
+
+  bw = np.max(synth_syllable.FF)-np.min(synth_syllable.FF)
+  rate = synth_syllable.timeFF[-1]
+  bw_rate = {'file_name':synth_syllable.file_name, 'type':synth_syllable.type, 'no_syllable':synth_syllable.no_syllable,
+             'bw':bw, "lenght":rate, 'rate':1/rate}
+
+  return syllable, synth_syllable, bw_rate

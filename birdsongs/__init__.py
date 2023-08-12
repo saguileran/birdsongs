@@ -15,7 +15,9 @@ from .util import (
                     smoothstep,
                     DownloadXenoCanto,
                     grab_audio,
-                    BifurcationODE
+                    BifurcationODE,
+                    DefineSyllable,
+                    DefineWholeSyllable
                   )
 
 __all__ = [ 
@@ -36,5 +38,7 @@ __all__ = [
             'smoothstep',
             'DownloadXenoCanto',
             'grab_audio',
-            'BifurcationODE'
+            'BifurcationODE',
+            "DefineSyllable",
+            "DefineWholeSyllable"
           ]

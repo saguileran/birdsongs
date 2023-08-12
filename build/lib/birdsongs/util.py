@@ -35,6 +35,7 @@ from IPython.display import display, Math
 from librosa import yin, pyin, feature, display, onset, times_like, stft, fft_frequencies
 import librosa 
 from maad import *
+import birdsongs as bs
 
 from IPython.display import Audio # reproduce audio 
 
@@ -195,20 +196,22 @@ def DownloadXenoCanto(data, XC_ROOTDIR="./examples/", XC_DIR="Audios/", filters=
 
 #%%
 def BifurcationODE(f1, f2):
+        #st = 'x, y, alpha, beta, gamma'
+        #exec("st=sym.symbols('x y alpha beta gamma')")
         beta_bif = np.linspace(-2.5, 1/3, 1000)  # mu2:beta,  mu1:alpha
         xs, ys, alpha, beta, gamma = sym.symbols('x y alpha beta gamma')
         # ---------------- Labia EDO's Bifurcation -----------------------
         f1 = eval(f1)#ys
         f2 = eval(f2)#(-alpha-beta*xs-xs**3+xs**2)*gamma**2 -(xs+1)*gamma*xs*ys
-        x01 = sym.solveset(f1, ys)+sym.solveset(f1, xs)  # find root f1
-        f2_x01 = f2.subs(ys,x01.args[0])                     # f2(root f1)
-        f  = sym.solveset(f2_x01, alpha)                         # root f2 at root f1, alpha=f(x,beta)
-        g  = alpha                                               # g(x) = alpha, above
-        df = f.args[0].diff(xs)                                   # f'(x)
-        dg = g.diff(xs)                                           # g'(x)
-        roots_bif = sym.solveset(df-dg, xs)                       # bifurcation roots sets (xmin, xmas)
+        x01 = sym.solveset(f1, ys)+sym.solveset(f1, xs) # find root f1
+        f2_x01 = f2.subs(ys,x01.args[0])                # f2(root f1)
+        f  = sym.solveset(f2_x01, alpha)                # root f2 at root f1, alpha=f(x,beta)
+        g  = alpha                                      # g(x) = alpha, above
+        df = f.args[0].diff(xs)                         # f'(x)
+        dg = g.diff(xs)                                 # g'(x)
+        roots_bif = sym.solveset(df-dg, xs)             # bifurcation roots sets (xmin, xmas)
         mu1_curves = [] 
-        for ff in roots_bif.args:                                       # roots as arguments (expr)
+        for ff in roots_bif.args:                       # roots as arguments (expr)
             x_root = np.array([float(ff.subs(beta, mu2)) for mu2 in beta_bif], dtype=float)    # root evaluatings beta
             mu1    = np.array([f.subs([(beta,beta_bif[i]),(xs,x_root[i])]).args[0] for i in range(len(beta_bif))], dtype=float)
             mu1_curves.append(mu1)
@@ -224,3 +227,43 @@ def BifurcationODE(f1, f2):
 #     t_env[-1] = time[-1] 
 #     fun_s = interp1d(t_env, out_env)
 #     return fun_s(time)
+
+#%%
+def DefineWholeSyllable(paths, info): 
+  index = 0
+  sfs = [info.iloc[index]["s"], info.iloc[index]["fs"]] # [s, fs]
+  NN = int(info.iloc[index]["NN"])
+  file_name = info.iloc[index]["file_name"]
+  umbral_FF = float(info.iloc[index]["umbral_FF"])
+
+  syllable = bs.Syllable(sfs=sfs, paths=paths, tlim=[], NN=NN, file_name=file_name,
+                     umbral_FF=umbral_FF, ide="birdsong")
+  return syllable
+
+#%%
+def DefineSyllable(paths, info, index): 
+  sfs = [info.iloc[index]["s"], info.iloc[index]["fs"]] # [s, fs]
+  time_interval = [float(info.iloc[index]["t_ini"]), float(info.iloc[index]["t_end"])]
+  NN = int(info.iloc[index]["NN"])
+  file_name = info.iloc[index]["file_name"]
+  umbral_FF = float(info.iloc[index]["umbral_FF"])
+  type = info.iloc[index]["type"]
+  no_syllable = info.iloc[index]["no_syllable"]
+  state = info.iloc[index]["state"]
+  country = info.iloc[index]["country"]
+
+  coef = list(info.iloc[index]["coef"].iloc[:6].value)
+  syllable = bs.Syllable(sfs=sfs, paths=paths, tlim=time_interval, NN=NN, file_name=file_name,
+                         umbral_FF=umbral_FF, ide="syllable", type=type, no_syllable=no_syllable)
+  syllable.Set(coef)
+  syllable.state = state
+  syllable.country = country
+
+  synth_syllable = syllable.Solve(syllable.p)
+
+  bw = np.max(synth_syllable.FF)-np.min(synth_syllable.FF)
+  rate = synth_syllable.timeFF[-1]
+  bw_rate = {'file_name':synth_syllable.file_name, 'type':synth_syllable.type, 'no_syllable':synth_syllable.no_syllable,
+             'bw':bw, "lenght":rate, 'rate':1/rate}
+
+  return syllable, synth_syllable, bw_rate

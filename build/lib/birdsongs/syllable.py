@@ -58,7 +58,7 @@ class Syllable(object):
             self.birdsong   = birdsong
             self.fs         = self.birdsong.fs
             self.center     = self.birdsong.center
-            self.no_file    = self.birdsong.no_file
+            #self.no_file    = self.birdsong.no_file
             self.paths      = self.birdsong.paths
             self.file_name  = self.birdsong.file_name
             self.state      = self.birdsong.state
@@ -71,7 +71,7 @@ class Syllable(object):
             s, fs           = sfs
             self.fs         = fs
             self.center     = False
-            self.no_file    = 0
+            #self.no_file    = 0
             self.file_name  = file_name
             self.umbral     = 0.05
             self.paths      = paths

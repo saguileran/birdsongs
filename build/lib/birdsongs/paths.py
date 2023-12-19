@@ -13,7 +13,7 @@ class Paths(object):
         if root_path==None: self.root = Path("../examples/")
         else:               self.root = Path(root_path)
         
-        self.auxdata  = self.root / 'auxiliar_data'
+        self.auxdata  = self.root / 'auxiliar_data' #auxiliar_data
         self.results  = self.root / results
         self.MG_param = self.results / "MotorGestures-parameters"
         self.images   = self.results / "Images"

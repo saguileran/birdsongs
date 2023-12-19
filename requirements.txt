@@ -13,5 +13,6 @@ scikit_learn
 scikit_maad
 setuptools
 ipython
-pygobject
+#pygobject
 ffmpeg
+ipympl

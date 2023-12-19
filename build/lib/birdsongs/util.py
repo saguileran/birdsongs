@@ -35,6 +35,7 @@ from IPython.display import display, Math
 from librosa import yin, pyin, feature, display, onset, times_like, stft, fft_frequencies
 import librosa 
 from maad import *
+from maad import sound
 import birdsongs as bs
 
 from IPython.display import Audio # reproduce audio 

@@ -21,8 +21,8 @@ class Syllable(object):
 
     #%%
     def __init__(self, birdsong=None, t0=0, Nt=100, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4), 
-                n_mels=4, umbral_FF=1, tlim=[], sfs=[], no_syllable=0, ide="syllable", 
-                file_name="syllable", paths=None, f1f2=None, type=""):
+                 n_mels=4, umbral_FF=1, tlim=[], sfs=[], no_syllable=0, ide="syllable", 
+                 file_name="syllable", paths=None, f1f2=None, type=""):
         ## The bifurcation can be cahge modifying the self.f2 and self.f1 functions
         ## ------------- Bogdanov–Takens bifurcation ------------------
         if f1f2 is None:
@@ -33,6 +33,10 @@ class Syllable(object):
         self.mu1_curves = mu1_curves
         self.f1 = f1
         self.f2 = f2
+        ## Defining motor gestures model constants, measure by Gabo Mindlin 
+        self.BirdData = {"C":343, "L":0.025, "r":0.65, "Ch":1.43E-10,
+                          "MG":20, "MB":1E4, "RB":5E6, "Rh":24E3}
+                           # c, L, r, c, L1, L2, r2, rd 
         ## -------------------------------------------------------------------------------------
         self.p = lmfit.Parameters()
         # add params:   (NAME   VALUE    VARY    MIN  MAX  EXPR BRUTE_STEP)
@@ -58,20 +62,20 @@ class Syllable(object):
             self.birdsong   = birdsong
             self.fs         = self.birdsong.fs
             self.center     = self.birdsong.center
-            #self.no_file    = self.birdsong.no_file
             self.paths      = self.birdsong.paths
             self.file_name  = self.birdsong.file_name
             self.state      = self.birdsong.state
             self.country    = self.birdsong.country
             self.umbral     = self.birdsong.umbral
             self.t0_bs      = self.birdsong.t0
-            s = self.birdsong.s; 
-            NN = self.birdsong.NN
+            self.s          = self.birdsong.s
+            self.NN         = self.birdsong.NN
+            self.flim       = self.birdsong.flim
+            self.tlim       = self.birdsong.tlim
         elif len(sfs)!=0:           
             s, fs           = sfs
             self.fs         = fs
             self.center     = False
-            #self.no_file    = 0
             self.file_name  = file_name
             self.umbral     = 0.05
             self.paths      = paths
@@ -223,8 +227,10 @@ class Syllable(object):
         # initial vector ODEs (v0), it is not too relevant
         v = 1e-4*np.array([1e2, 1e1, 1, 1, 1, 1]);  self.Vs = [v];
         # ------------- BIRD PARAMETERS -----------
-        BirdData = pd.read_csv(self.paths.auxdata/'ZonotrichiaData.csv')
-        c, L, r, Ch, MG, MB, RB, Rh = BirdData['value'] # c, L, r, c, L1, L2, r2, rd 
+        #BirdData = pd.read_csv(self.paths.auxdata/'ZonotrichiaData.csv')
+        c, L, r, Ch = self.BirdData['C'], self.BirdData['L'], self.BirdData['r'], self.BirdData['Ch']
+        MG, MB, RB, Rh  = self.BirdData['MG'], self.BirdData['MB'], self.BirdData['RB'], self.BirdData['Rh']
+        #c, L, r, Ch, , Rh = BirdData['c'] # c, L, r, c, L1, L2, r2, rd 
         # - Trachea:
         #           r: reflection coeficient    [adimensionelss]
         #           L: trachea length           [m]

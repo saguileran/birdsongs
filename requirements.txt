@@ -16,3 +16,4 @@ ipython
 #pygobject
 ffmpeg
 ipympl
+geopandas

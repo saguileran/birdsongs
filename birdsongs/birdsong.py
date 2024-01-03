@@ -24,7 +24,8 @@ class BirdSong(Syllable, object):
         #     self.file_name =  str(self.paths.sound_files[self.no_file])[len(str(self.paths.audios))+1:]
         # else:
         self.file_path = [file for file in paths.sound_files if file_id in str(file)][0]
-        self.file_name = str(self.file_path).split("/")[-1]#self.file_path[len(str(self.paths.audios))+1:]
+        self.file_name = os.path.basename(os.path.normpath(self.file_path))
+        #str(self.file_path).split("/")[-1]#self.file_path[len(str(self.paths.audios))+1:]
         if type(dict) is list:
             self.country = dict[0]
             self.state   = dict[1]

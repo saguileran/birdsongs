@@ -68,10 +68,12 @@ class Syllable(object):
             self.country    = self.birdsong.country
             self.umbral     = self.birdsong.umbral
             self.t0_bs      = self.birdsong.t0
-            self.s          = self.birdsong.s
+            #self.s          = self.birdsong.s
             self.NN         = self.birdsong.NN
             self.flim       = self.birdsong.flim
-            self.tlim       = self.birdsong.tlim
+            #self.tlim       = self.birdsong.tlim
+            s          = self.birdsong.s
+            
         elif len(sfs)!=0:           
             s, fs           = sfs
             self.fs         = fs
@@ -290,7 +292,7 @@ class Syllable(object):
 
     #%%    
     def WriteAudio(self):
-        name = '{}/{}-{}-{}.wav'.format(self.paths.examples, self.file_name, self.id, self.no_syllable)
+        name = '{}/{}-{}-{}.wav'.format(self.paths.examples, self.file_name[:-4], self.id, self.no_syllable)
         WriteAudio(name, fs=self.fs, s=self.s)
 
     #%%    
@@ -305,7 +307,7 @@ class Syllable(object):
         synth.paths = self.paths
         synth.t_interval = self.t_interval
         synth.no_syllable = self.no_syllable
-        synth.file_name = self.file_name[:-4]# + "-synth"
+        synth.file_name = self.file_name[:-4] + "-synth"
 
         synth.state   = self.state
         synth.country = self.country

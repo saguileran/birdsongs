@@ -6,9 +6,6 @@ class BirdSong(Syllable, object):
     """
     Store a song and its properties in a class 
     INPUT:
-        pahts = paths object with all the folder paths requiered
-        no_file = number of the file to analyze
-        umbral = threshold to detect a syllable, less than one
     """
     def __init__(self, paths, file_id, sfs=[], umbral=0.05, llambda=1., NN=1024, overlap=0.5, center=False,  #no_file,
                 umbral_FF=1.5, flim=(1.5e3,2e4),  tlim=[], split_method="freq", Nt=500, syll_times=[], dict=["",""]):
@@ -18,14 +15,9 @@ class BirdSong(Syllable, object):
         self.flim    = flim
         self.center  = center
         
-        # if file_id is None:
-        #     self.no_file = no_file
-        #     self.file_path = self.paths.sound_files[self.no_file]
-        #     self.file_name =  str(self.paths.sound_files[self.no_file])[len(str(self.paths.audios))+1:]
-        # else:
         self.file_path = [file for file in paths.sound_files if file_id in str(file)][0]
         self.file_name = os.path.basename(os.path.normpath(self.file_path))
-        #str(self.file_path).split("/")[-1]#self.file_path[len(str(self.paths.audios))+1:]
+        
         if type(dict) is list:
             self.country = dict[0]
             self.state   = dict[1]
@@ -33,12 +25,8 @@ class BirdSong(Syllable, object):
             self.no_file = self.paths.AudioFiles()[self.paths.AudioFiles()['ML Catalog Number'] == int(file_id)].index[0]
             self.country = self.paths.AudioFiles()[self.paths.AudioFiles()['ML Catalog Number'] == int(file_id)]["Country"].iloc[0]
             self.state = self.paths.AudioFiles()[self.paths.AudioFiles()['ML Catalog Number'] == int(file_id)]["State"].iloc[0]
-        # else:
-        #     self.country = dict[0]
-        #     self.state   = dict[1]
-
+        
         if len(sfs)==0:
-            #s, fs = sound.load(self.file_path)
             s, fs = librosa.load(self.file_path, sr=None)
             s = librosa.to_mono(s)
             self.id = "birdsong"

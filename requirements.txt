@@ -13,7 +13,6 @@ scikit_learn
 scikit_maad
 setuptools
 ipython
-#pygobject
 ffmpeg
 ipympl
 geopandas

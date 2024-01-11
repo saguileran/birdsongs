@@ -102,7 +102,7 @@ class Syllable(object):
                 self.id = "chunck"; self.NN = 128;
             else:
                 self.id = "syllable"; self.NN = 1024;
-        else: self.NN=NN
+        elif NN!=0 and birdsong==None: self.NN=NN
         if ide!="": self.id = ide
         self.no_syllable = no_syllable
         self.win_length  = self.NN

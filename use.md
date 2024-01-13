@@ -1,6 +1,6 @@
 ---
 permalink: /use/
-layout: single
+layout: splash
 search: true
 author_profile: **false**
 title: "Use"

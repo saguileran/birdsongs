@@ -1,11 +1,11 @@
 # main links
 main:
+  - title: "Home"
+    url: /
   - title: "Use"
     url: /use/
   - title: "Results"
     url: /results/
-  - title: "Home"
-    url: /
   - title: "GitHub"
     url: https://github.com/saguileran/birdsongs
     # - title: "Sample Collections"

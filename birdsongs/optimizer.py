@@ -40,24 +40,35 @@ class Optimizer(Syllable, object):
     # ---------------- OPTIMAL PARAMETERS ------------------------------
     def OptimalBs(self, obj):
         self.obj = obj
-        if "syllable" in self.obj.id:
-            # ---------------- b0 and b2 --------------------
-            start02 = time.time()
-            self.obj.p["b0"].set(vary=True);  obj.p["b2"].set(vary=True);
-            mi02    = lmfit.minimize(self.residualFF, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
-            self.obj.p["b0"].set(vary=False, value=mi02.params["b0"].value)
-            self.obj.p["b2"].set(vary=False, value=mi02.params["b2"].value)
-            end02   = time.time()
-            print(r"$b_0*$"+"={:.4f},\nb_2*={:.4f}, t={:.4f} min".format(self.obj.p["b0"].value, self.obj.p["b2"].value, (end02-start02)/60))
-        elif "chunck" in self.obj.id:
-            # ---------------- b0--------------------
-            start0 = time.time()
-            self.obj.p["b0"].set(vary=True)
-            mi0    = lmfit.minimize(self.residualFF, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
-            self.obj.p["b0"].set(vary=False, value=mi0.params["b0"].value)
-            end0   = time.time()
-            print(r"$b_0*$"+"={0:.4f}, t={1:.4f} min".format(self.obj.p["b0"].value, (end0-start0)/60))
+        # ---------------- b0 and b2 --------------------
+        start02 = time.time()
+        self.obj.p["b0"].set(vary=True);  obj.p["b2"].set(vary=True);
+        mi02    = lmfit.minimize(self.residualFF, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
+        self.obj.p["b0"].set(vary=False, value=mi02.params["b0"].value)
+        self.obj.p["b2"].set(vary=False, value=mi02.params["b2"].value)
+        end02   = time.time()
+        print(r"$b_0*$"+"={:.4f},\nb_2*={:.4f}, t={:.4f} min".format(self.obj.p["b0"].value, self.obj.p["b2"].value, (end02-start02)/60))
         # ---------------- b1--------------------
+        start1 = time.time()
+        self.obj.p["b1"].set(vary=True)
+        mi1    = lmfit.minimize(self.residualFF, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
+        self.obj.p["b1"].set(vary=False, value=mi1.params["b1"].value)
+        end1   = time.time()
+        print(r"$b_1*$"+"={0:.4f}, t={1:.4f} min".format(self.obj.p["b1"].value, (end1-start1)/60))
+        #return self.obj.p["b0"].value, self.obj.p["b1"].value #end0-start0, end1-start1
+        #return self.obj.p
+        obj = self.obj
+
+        # ---------------- OPTIMAL PARAMETERS chunck ------------------------------
+    def OptimalBs_chunck(self, obj):
+    
+        start0 = time.time()
+        self.obj.p["b0"].set(vary=True)
+        mi0    = lmfit.minimize(self.residualFF, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
+        self.obj.p["b0"].set(vary=False, value=mi0.params["b0"].value)
+        end0   = time.time()
+        print(r"$b_0*$"+"={0:.4f}, t={1:.4f} min".format(self.obj.p["b0"].value, (end0-start0)/60))
+    # ---------------- b1--------------------
         start1 = time.time()
         self.obj.p["b1"].set(vary=True)
         mi1    = lmfit.minimize(self.residualFF, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
@@ -70,9 +81,6 @@ class Optimizer(Syllable, object):
         
     def OptimalAs(self, obj):
         self.obj = obj
-        # ---------------- a0--------------------
-        start0 = time.time()
-        self.obj.p["a0"].set(vary=True)
         
         # def ResidualCo(c):
         #     print("pickling a C instance...")
@@ -80,6 +88,9 @@ class Optimizer(Syllable, object):
         # copyreg.pickle(Syllable, ResidualCo)
         
         
+        # ---------------- a0--------------------
+        start0 = time.time()
+        self.obj.p["a0"].set(vary=True)
         mi0    = lmfit.minimize(self.residualCorrelation, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
         self.obj.p["a0"].set(vary=False, value=mi0.params["a0"].value)
         end0   = time.time()

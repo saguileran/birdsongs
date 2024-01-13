@@ -10,17 +10,22 @@ author_profile: true
 <div id="toc_container">
     <p class="toc_title">Table of Contents</p>
     <ul class="toc_list">
-      <li><a href="#Overview">Overview</a>
+    <li><a href="#Objective">Objective</a></li>
+    <li><a href="#Overview">Overview</a>
       <!--
       <ul>
         <li><a href="#First_Sub_Point_2">1.2 First Sub Point 2</a></li>
       </ul> -->
     </li>
-    <li><a href="#Objective">Objective</a></li>
-    <li><a href="#Physical_Model">Physical Model</a></li>
-    <li><a href="#Implementation">Implementation</a></li>
-    <li><a href="#POO">Programming Object Oriented (POO)</a></li>
+    <li><a href="#Python_Implementation">Python Implementation</a>
+      <ul>
+        <li><a href="#Physical_Model">Physical Model</a></li>
+        <li><a href="#OOP">Object-Oriented Thinking (OOP)</a></li>
+        <li><a href="#Methodology">Methodology</a></li>
+      </ul> 
+    </li>
     <li><a href="#Conclusions">Conclusions</a></li>
+    <li><a href="#Aplications">Aplications</a></li>
     <li><a href="#References">References</a></li>
     <ul>
         <li><a href="#literature">Literature</a></li>
@@ -30,16 +35,26 @@ author_profile: true
     </ul>
 </div>
 
+<h2 id="Objective">Objective</h2>
+
+Design, development, and evaluation of a computational-physical model to generate synthetic birdsongs from recorded samples.
+
 
 <h2 id="Overview">Overview</h2>
 
-Study and pakcing of the physical model of the motor gestures of birdsongss. This model explains the physics of birdsongs by modeling the organs involved in sound production in birds (syrinx, trachea, glottis, Oro-Oesophageal Cavity (OEC), and beak) with oridary differential equations (EDOs). In this work, a Python package is developed to analyze, visualize and generate synthetic birdsongs using the motor gestures model and recorded samples of birdsongs. To automate the model, the problem is formulated as an minimization problem with two control parameters (air sac pressure of the bird’s bronchi and labial tension) and solved using numerical methods, signal processing tools, and numerical optimization. The package is tested by generating comparable birdsongs, solves the minimization problem using recorded samples of birdsongs and comparing the fundamental frequency (denoted as FF, F0, or also called pitch) and spectral conent index (SCI) of both birdsongs.
-
+<p>
+Study and Python implementation of the motor gestures for birdsongs model created by Prof. G Mindlin. This model explains the physics of birdsongs by modeling the organs involved in sound production in birds (syrinx, trachea, glottis, Oro-Oesophageal Cavity (OEC), and beak) using oridary differential equations (ODEs).
+<br><br>
+This work presents an automated model to generated comparable synthetic birdsongs, in spectro and time, using the motor gestures model and an audio recorded file (real birdsongs) as an input. The automatization is done by formulating a minimization problem with three control parameters: air sac pressure of the bird’s bronchi, labial tension of the syrinx walls, and a time scale constant. This optimization problem is solved using numerical methods, signal processing tools, and numerical optimization techniques. The objective function depends on the Fundamental Frequency (also called pitch and denoted as FF or F0) and the Spectral Conent Index (SCI) of both synthetic and real syllable
+<br><br>
+The package is tested and evaluated in three different Colombian bird species: Zonotrichia Capensis, Ocellated Tapaculo, and Mimus Gilvus; recorded samples download from Xeno-Canto and eBird audio libraries. The results give FF and SCI relative errors less than % and comparable spectral harmonics, in number and frequency, as you can see in section Results
 <br><br>
 
-The dissertation document is made with latex, it is located on github at <a href="https://github.com/saguileran/birdsongs/">github.com/saguileran/birdsongs/</a> in the dissertation branch. You can download and compile it using tex software (texmaker).
-
+The PDF dissertation document is write with latex and is stored on Github at <a href="https://github.com/saguileran/birdsongs/tree/dissertation">www.github.com/saguileran/birdsongs/tree/dissertation</a> in the dissertation branch. You can download and compile it using text software (Texmaker, Overleaf, TeXstudio).
+</p>
 <br><br>
+
+<!--
 <div class="row">
   <div class="column">
     <a target="_blank" href="https://github.com/saguileran/birdsongs/blob/dissertation/dissertation.pdf"><img src="assets/img/cover.jpg" alt="Dissertation document." width="300" height="400" class="centerImage"></a>
@@ -48,42 +63,65 @@ The dissertation document is made with latex, it is located on github at <a href
     <a target="_blank" href="https://github.com/saguileran/birdsongs/blob/dissertation/dissertation.pdf"><img src="assets/img/under-cover.png" alt="Dissertation document." width="300" height="400" class="centerImage"></a>
   </div>
 </div>
+-->
+
+<figure>
+  <div class="row">
+  <div class="column">
+    <img src="assets/img/cover.jpg" alt="Dissertation document." width="300" height="400" class="centerImage"/>
+  </div>
+  <div class="column">
+  <img src="assets/img/under-cover.png" alt="Dissertation document." width="300" height="400" class="centerImage"/>
+  </div>
+  <figcaption><b>Figure 1.</b> PDF document of the bachelor's thesis. </figcaption>
+</figure>
+
+<h2 id="Python_Implementation">Python Implementation</h2>
+
+<h3 id="Physical_Model">Physical Model</h3>
+
+<p>Schematic description of the physical <b>model motor gestures for birdsongs</b> with the organs involved in the sound production (syrinx, trachea, glotis, OEC, and beak) and their corresponding ODEs.</p>
+
+<center><figure>
+  <img src="assets/img/model.png" alt="Model" width="700" height="400">
+  <figcaption><b>Figure 2.</b> Diagram of the physical model motor gestures for birdsongs.</figcaption>
+</center></figure>
 
 
+<h3 id="OOP">Object-Oriented Thinking (OOP)</h3>
 
-<h2 id="Objective">Objective</h2>
-
-Design, development, and evaluation of a computational-physical model to generating synthetic bird songs from recorded samples.
-
-<h2 id="Physical_Model">Physical Model</h2>
-
-Schematic implementation of the physical model <b>motor gestures of birdsongs:</b> syrinx, trachea, glottis, OEC, and beak.
-
-<img src="assets/img/model.png" alt="Model" width="700" height="400" class="centerImage">
-
-<h2 id="Implementation">Implementation</h2>
-
-Using the previous objects defined, the optimization problem is solved by following the next diagram
-
-<img src="assets/img/methodology.png" alt="Methodology" width="700" height="400" class="centerImage">
-
-
-<h2 id="POO">Programming Object Oriented (POO)</h2>
-
-Taking advantege of POO the repetition of long codes is avoid. Using this programming paradigm, the execution and implementation of the model is fast and easy. Five objects ared created to solve the optimization problem and analyze the synthetic syllables:
+<p>By taking advantage of the Object-Oriented Programming (OOP) paradigm, long codes can be avoided. Furthermore, the execution and implementation of the model is fast and easy, making it possible to create and compare several syllables with a single line of code. To solve the optimization problem and to analyze and compare real and synthetic birdsongs, five objects are created:</p>
 
 <ul>
-    <li><b>Syllable:</b> define a object from audio syllable with its tempo and spectral features</li>
-    <li><b>Optimizer:</b> define a object to optimize function from method and syllables </li>
-    <li><b>BirdSong:</b> define a object to read and split an audio song in syllables</li>
-    <li><b>Ploter:</b> define a object to plot real and synthec syllables or songs</li>
-    <li><b>Paths:</b> define a object to organize folders location</li>
+    <li><b>BirdSong:</b> Read an audio using its file name and a path object, it computes the audio spectral and temporal features. It can also split the audio into syllables.</li>
+    <li><b>Syllable:</b> Create a birdsong syllable from a birdsong object using a time interval that can be selected in the plot or defined as a list. The spectral and temporal features of the syllable are automatically computed.</li>
+    <li><b>Optimizer:</b>  Create an optimizer that solves the minimization problem using the method entered (the default is brute force but can be changed to leastsq, bfgs, newton, etc; further information in lmfit) in a feasible region that can be modified.</li>
+    <li><b>Plot:</b> Visualize the birdsong and sylalble objects and their spectral and temporal features.</li>
+    <li><b>Paths:</b> Manage the package paths: audio files and results directories.</li>
 </ul>
 
-<p>In order to understand the diagram methodology, the following icons will be used.</p>
+<p>For each object an icon is defined as follows:</p>
 
+<center><figure>
+  <img src="assets/img/objects.png" alt="POO"  width="500" height="400">
+  <figcaption><b>Figure 1.</b> Objects implemented.</figcaption>
+</center></figure>
 
-<img src="assets/img/objects.png" alt="POO" width="500" height="400" class="centerImage">
+<p>This will facilitate the reading of the methodology diagram. Each icon is an object that deals with different tasks. The major advantage of this implementation is the possiblity to easily compare the features between syllables or chuncks (small part of a syllable) objects.</p>
+
+<h3 id="Methodology">Methodology</h3>
+
+<p>Using the above defined objects, the optimization problem is solved by following the next steps below:</p>
+
+<center><figure>
+  <img src="assets/img/methodology.png" alt="Methodology"  width="700" height="400">
+  <figcaption><b>Figure 3.</b> Diagram of the physical-computational model methodology.</figcaption>
+</center></figure>
+
+<p>Each step contains the icon of the object involved. The final output is a parameters object (data frame from lmfit library) with the optimal control parameters coefficients of the optimal motor gesture that best reproduce the real birdsong.</p>
+
+<hr style="width:100%;text-align:left;margin-left:0">
+
 
 <h2 id="Conclusions">Conclusions</h2>
 
@@ -93,7 +131,16 @@ Taking advantege of POO the repetition of long codes is avoid. Using this progra
     <li>The most problematic and difficult syllables are the noisy and with high spectral content audios, in which strong harmonics are present making the pitch computing hard or even impossible to compute correctly. Although for some audios is sufficient to change the pitch threshold detector, it does not work for all of them.</li>
 </ul>
 
-<hr style="width:100%;text-align:left;margin-left:0">
+
+<h2 id="Applications">Applications</h2>
+
+<p>Some of the applications of this model are:</p>
+
+<ul>
+    <li><b>Data augmentation:</b> use the model to create numerous synthetic syllables, it can be done by creating a syntetic birdsong and then varying its motor gestures parameters to get similar birdsongs.</li>
+    <li><b>Birdsongs descriptions:</b> characterize and compare birdsongs using the motor gestures parameters.</li>
+</ul>
+
 
 
 <h1 id="References">References</h1>

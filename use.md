@@ -2,20 +2,20 @@
 permalink: /use/
 layout: single
 search: true
-author_profile: false
+author_profile: **false**
 title: "Use"
 excerpt: "Installation and use of birdsongs."
 last_modified_at: 2023-01-05T11:59:26-04:00
 toc: true
 ---
 
-Here you can find a tutorial of how to download, install and use the `birdsongs` package.
+Here you will find a tutorial on how to download, install and use the `birdsongs` package.
 
 # Installation
 
 ## Requirments
 
-`birdsong` is implemented in python 3.8 and requires:
+`birdsong` is implemented in Python 3.8 but is also tested in Python 3.10 and 3.11. It requires the following packages:
 
 
 - librosa
@@ -39,19 +39,20 @@ Here you can find a tutorial of how to download, install and use the `birdsongs`
     
 ## Downloading
 
-In order to use birdsongs, clone the repository and enter to the folder repository
+To use birdsongs, clone the main branch of the repository and go to its root folder.
 
 ```bat
-git clone https://github.com/saguileran/birdsongs.git
-cd birdsongs
+git clone -b main --single-branch https://github.com/saguileran/birdsongs.git
+d birdsongs
 ```
-you can verify the current branch with the command `git branch -a`. You have to be in `main` branch, to change the branch use the command `git checkout main`.
 
-The next step is to install the required packages, any of the following commands lines will work
+You can clone the whole repository using the code git clone  `https://github.com/saguileran/birdsongs.git` but since it is very large only the main branch is enough. To change the branch use the command `git checkout`  follow of the branch name of interest.
+
+The next step is to install the required packages, any of the following commands lines will work:
 
 ```bat
 pip install -r ./requirements.txt
-# python -m pip install -r ./requirements.txt  # (equivalent)
+python -m pip install -r ./requirements.txt
 ```
 <!--
 You can now use the package in a python terminal opened at the birdsongs folder. 
@@ -59,61 +60,60 @@ You can now use the package in a python terminal opened at the birdsongs folder.
 To use the package from any folder install the repository, this can be done with any of the two following lines
 -->
 
-Install the birdsong package
+Now, install the birdsong package.
 
 ```bat
 python .\setup.py install
 ```
 
-That's all! 
-   
-<!---
-and then add to python 
-
+or using pip, any of the following command lines should work:
 ```bat
-pip install -e birdsongs
-python -m pip install -e birdsongs
+pip install -e .
+pip install .
 ```
--->
 
-Take a look at the tutorials notebooks for basic uses: physical model implementation, [motor-gestures.ipynb](./tutorials/motor-gestures.ipynb); define and generate a syllable from a recorded birdsong, [syllable.ipynb](./tutorials/syllable.ipynb); or to generate a whole birdsong, several syllables, [birdsong.ipynb](./tutorials/birdsong.ipynb),
+That's all. Now let's create a synthetic birdsong!
+
+Take a look at the tutorials notebooks for basic uses: physical model implementation, [motor-gestures.ipynb](https://github.com/saguileran/birdsongs/blob/main/tutorials/motor-gestures.ipynb); define and generate a syllable from a recorded birdsong, [syllable.ipynb](https://github.com/saguileran/birdsongs/blob/main/tutorials/syllable.ipynb); or to generate a whole birdsong, several syllables, [birdsong.ipynb](https://github.com/saguileran/birdsongs/blob/main/tutorials/birdsong.ipynb),
 
 # Use
 
-## Define
+## Define Objects
 
 Import the package as `bs` 
 
 ```python
 import birdsongs as bs
-```  
-  
-Define the ploter and paths objects, optionally you can specify the audio folder or enable to save figures 
-
-```python
-# audios = "path\to\audios"     # default examples/audios/
-# root = "path\to\audios"       # default ./
-# bird_name = "path\to\audios"  # default None
-
-ploter = bs.Ploter(save=True)  # images are save at ./examples/results/Images/
-paths  = bs.Paths()            # root, audios_path, bird_name
 ```
 
-Displays the audios found with the `paths.AudiosFiles()` function, if the folder has a *spreadsheet.csv* file this functions displays all the information about the files inside the folder.
-
-**BirdSong**
+### Path and Plotter
   
-Defining and plotting the wave sound and spectrogram of a birdsong object
+First, define the ploter and paths objects, optionally you can specify the audio folder or enable ploter to save figures
 
 ```python
-birdsong = bs.BirdSong(paths, no_file=0, NN=1024, umbral_FF=1.0,
+root    = "../examples/" # "path\\to\\repository\\' 
+audios  = 'audios'       # "path\\to\\audios\\'
+results = "results"      # "path\\to\\results\\'
+
+paths  = bs.Paths(root, audios, results, catalog=False)      # root_path, audios_path, catalog
+ploter = bs.Ploter(save=True)   # to save figures save=True 
+```
+
+Displays the audios file names found with the paths.AudiosFiles(True) function, if the folder has a spreadsheet.csv file this function displays all the information about the files inside the folder otherwise it diplays the audio files names found.
+
+### BirdSong
+  
+Define and plot the wave sound and spectrogram of a birdsong object, for example the audio file "XC11293"
+
+```python
+birdsong = bs.BirdSong(paths, file_id="XC11293", NN=1024, umbral_FF=1., Nt=500,
                        #tlim=(t0,tend), flim=(f0,fmax) # other features
                       )
-ploter.Plot(birdsong, FF_on=False)  # plot the wave sound and spectrogram
-birdsong.Play()                     # in notebook useAudioPlay(birdsong)
+ploter.Plot(birdsong, FF_on=False)  # plot the wave sound and spectrogram without FF
+birdsong.Play()                     # listen to the birdsong
 ```
 
-**Syllables**
+### Syllables
   
 Define the syllables using time intervals of interest from the whole birdsong. You can choose the points with the `ploter.Plot()` function by changing the value of `SelectTime_on` to `True`
     
@@ -129,18 +129,19 @@ ploter.Plot(syllable, FF_on=True);
   
 ## Solve
   
-The last step consists in defining the optimizer object to generate the synthetic syllable (song), solving the optimization problem. For example, to generate the synthetic syllable (or birdsong) with the previously defined time intervals 
+Now let's define the optimizer object to generate the synthetic syllable, i.e., to solve the optimization problem. For example, to generate the synthetic syllable (or chunck) from the previously selected time interval.
 
 ```python
-brute_kwargs = {'method':'brute', 'Ns':11}          # optimization mehotd. Ns is the number of grid points
+brute_kwargs = {'method':'brute', 'Ns':11}          # optimization method,  Ns is the number of grid points
 optimizer    = bs.Optimizer(syllable, brute_kwargs) # optimizer object
-optimal_gm   = optimizer.OptimalGamma(syllable)     # find optimal gamma 
+optimal_gm   = optimizer.OptimalGamma(syllable)     # find optimal gamma (time scale constant) 
 
 optimizer.OptimalParams(syllable, Ns=11)            # find optimal parameters coefficients
-#syllable, synth_syllable = optimizer.SongByTimes(time_intervals)   # find optimal parameters over the time intervals
+#syllable, synth_syllable = optimizer.SongByTimes(time_intervals)   # find optimal parameters over several time intervals
 ```
     
-define the optimal synthetic syllable object with the values found above
+Then, define the synthetic syllable object with the optimal values found above.
+
 
 ```python
 synth_syllable = syllable.Solve(syllable.p)
@@ -148,7 +149,7 @@ synth_syllable = syllable.Solve(syllable.p)
 
 ## Visualize
   
-Visualize and write the optimal synthetic audio 
+Finally, visualize and write the optimal synthetic audio.
     
 ```python
 ploter.Plot(synth_syllable);                # sound wave and spectrogram of the synthetic syllable
@@ -162,17 +163,21 @@ birdsong.WriteAudio();  synth_syllable.WriteAudio(); # write both audios at ./ex
   
 ## Note  
   
-To generate a single synthetic syllable (chunck) you must have defined a birdsong (syllable), the process is as follows:
+To generate a single synthetic syllable (or chunck) you must have defined a birdsong (or syllable) and the process is as follows:
 
-1. Define a paths and ploter object.
-2. Use the previous path obeject to define a birdsong (syllable) object, it also requeries the file number (birdsong for a syllable). Here you can define the window FFT length and the umbral threshold to compute the pitch.
-3. Define an optimization object with a dictionary of the method name and its parameters.
-4. Find the optimal gamma (γ), for a single syllable or for a set of syllables defined from time intervals.
-5. Find the optimal labia parameters, the motor gesture curve: air-sac pressure (α) and labia tension (β).
-6. Generate the synthetic birdsong from the previous control parameters found.
-7. Plot and save all the syrinx, scoring, and result variables.
-8. Write the syllable audios defined both synthetic and real.
+1. Define a path object.
+2. Define a birdsong object using the above path object, it requeries the audio file id. You can also enter the length of the window FFT and the umbral (threshold) for computing the FF, between others.
+3. Select or define the time intervals of interest.
+4. Define an optimization object with a dictionary of the method name and its parameters.
+5. Find the optimal gammas for all the time intervals, or a single, and average them.
+6. Find and export the optimal labia parameters for each syllable, the motor gesture curve.
+7. Generate synthetic birdsong from the previous control parameters found.
+8. Visualize and save all the syrinx, scoring, and result variables.
+9. Save both synthetic and real syllable audios.
 
+The repository has some audio examples, in the ./examples/audios folder. You can download and store your own audios in the same folder or enter the audio folder path to the Paths object.
+
+The audios can be in WAV of MP3 format. If you prefer WAV format, we suggest use Audacity to convert the audios without any issue.
 <!--
 
 ```python
@@ -196,7 +201,7 @@ bird.WriteAudio();  synth_bird.WriteAudio() # write both objects, real and synth
 ```
 -->
     
-The repository has some audio examples, in [./examples/audios](https://github.com/saguileran/birdsongs/tree/main/examples/audios) folder. You can download and store your own audios in the same folder or enter the audio folder path to the Paths object, the package also has a function to download audios from Xeno-Canto: birdsong.util.DownloadXenoCanto().
+The repository has some audio examples in the folder [./examples/audios](https://github.com/saguileran/birdsongs/tree/main/examples/audios). You can download and store your own audios in the same folder or enter another audio folder path to the Paths object, the package also has a function to download audios from Xeno-Canto: birdsong.util.DownloadXenoCanto().
 
 The audios **must** be in WAV format or birdosngs will not import them, we suggest use [Audacity](https://www.audacityteam.org/) to convert the audios without any problem.
 

@@ -32,3 +32,5 @@ _site
 # chace
 .ipynb_checkpoints
 birdsongs/__pycache__
+
+examples/

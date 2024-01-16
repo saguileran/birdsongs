@@ -43,16 +43,15 @@ Design, development, and evaluation of a computational-physical model to generat
 <h2 id="Overview">Overview</h2>
 
 <p>
-Study and Python implementation of the motor gestures for birdsongs model created by Prof. G Mindlin. This model explains the physics of birdsongs by modeling the organs involved in sound production in birds (syrinx, trachea, glottis, Oro-Oesophageal Cavity (OEC), and beak) using oridary differential equations (ODEs).
+Study and Python implementation of the motor gestures for birdsongs model created by Prof. G Mindlin. This model explains the physics of birdsongs by modeling the organs involved in sound production in birds (syrinx, trachea, glottis, Oro-Oesophageal Cavity (OEC), and beak) using ordinary differential equations (ODEs).
 <br><br>
-This work presents an automated model to generated comparable synthetic birdsongs, in spectro and time, using the motor gestures model and an audio recorded file (real birdsongs) as an input. The automatization is done by formulating a minimization problem with three control parameters: air sac pressure of the bird’s bronchi, labial tension of the syrinx walls, and a time scale constant. This optimization problem is solved using numerical methods, signal processing tools, and numerical optimization techniques. The objective function depends on the Fundamental Frequency (also called pitch and denoted as FF or F0) and the Spectral Conent Index (SCI) of both synthetic and real syllable
+This work presents an automated model to generate comparable synthetic birdsongs, in spectro and time, using the motor gestures model and an audio-recorded file (real birdsongs) as input. The automatization is done by formulating a minimization problem with three control parameters: air sac pressure of the bird’s bronchi, labial tension of the syrinx walls, and a time scale constant. This optimization problem is solved using numerical methods, signal processing tools, and numerical optimization techniques. The objective function depends on the Fundamental Frequency (also called pitch and denoted as FF or F0) and the Spectral Conent Index (SCI) of both synthetic and real syllable
 <br><br>
-The package is tested and evaluated in three different Colombian bird species: Zonotrichia Capensis, Ocellated Tapaculo, and Mimus Gilvus; recorded samples download from Xeno-Canto and eBird audio libraries. The results give FF and SCI relative errors less than % and comparable spectral harmonics, in number and frequency, as you can see in section Results
+The package is tested and evaluated in three different Colombian bird species: Zonotrichia Capensis, Ocellated Tapaculo, and Mimus Gilvus; recorded samples are downloaded from Xeno-Canto and eBird audio libraries. The results give FF and SCI relative errors less than % and comparable spectral harmonics, in number and frequency, as you can see in section Results
 <br><br>
 
-The PDF dissertation document is write with latex and is stored on Github at <a href="https://github.com/saguileran/birdsongs/tree/dissertation">www.github.com/saguileran/birdsongs/tree/dissertation</a> in the dissertation branch. You can download and compile it using text software (Texmaker, Overleaf, TeXstudio).
+The PDF dissertation document is written with latex and is stored on Github at <a href="https://github.com/saguileran/birdsongs/tree/dissertation">www.github.com/saguileran/birdsongs/tree/dissertation</a> in the dissertation branch. You can download and compile it using text software (Texmaker, Overleaf, TeXstudio).
 </p>
-<br><br>
 
 <!--
 <div class="row">
@@ -83,7 +82,7 @@ The PDF dissertation document is write with latex and is stored on Github at <a 
 
 <h3 id="Physical_Model">Physical Model</h3>
 
-<p>Schematic description of the physical <b>model motor gestures for birdsongs</b> with the organs involved in the sound production (syrinx, trachea, glotis, OEC, and beak) and their corresponding ODEs.</p>
+<p>Schematic description of the physical <b>model motor gestures for birdsongs</b> with the organs involved in the sound production (syrinx, trachea, glottis, OEC, and beak) and their corresponding ODEs.</p>
 
 <center><figure>
   <img src="assets/img/model.png" alt="Model" width="700" height="400">
@@ -93,13 +92,13 @@ The PDF dissertation document is write with latex and is stored on Github at <a 
 
 <h3 id="OOP">Object-Oriented Thinking (OOP)</h3>
 
-<p>By taking advantage of the Object-Oriented Programming (OOP) paradigm, long codes can be avoided. Furthermore, the execution and implementation of the model is fast and easy, making it possible to create and compare several syllables with a single line of code. To solve the optimization problem and to analyze and compare real and synthetic birdsongs, five objects are created:</p>
+<p>By taking advantage of the Object-Oriented Programming (OOP) paradigm, long codes can be avoided. Furthermore, the execution and implementation of the model are fast and easy, making it possible to create and compare several syllables with a single line of code. To solve the optimization problem and to analyze and compare real and synthetic birdsongs, five objects are created:</p>
 
 <ul>
-    <li><b>BirdSong:</b> Read an audio using its file name and a path object, it computes the audio spectral and temporal features. It can also split the audio into syllables.</li>
+    <li><b>BirdSong:</b> Read audio using its file name and a path object, it computes the audio spectral and temporal features. It can also split the audio into syllables.</li>
     <li><b>Syllable:</b> Create a birdsong syllable from a birdsong object using a time interval that can be selected in the plot or defined as a list. The spectral and temporal features of the syllable are automatically computed.</li>
-    <li><b>Optimizer:</b>  Create an optimizer that solves the minimization problem using the method entered (the default is brute force but can be changed to leastsq, bfgs, newton, etc; further information in lmfit) in a feasible region that can be modified.</li>
-    <li><b>Plot:</b> Visualize the birdsong and sylalble objects and their spectral and temporal features.</li>
+    <li><b>Optimizer:</b>  Create an optimizer that solves the minimization problem using the method entered (the default is a brute force but can be changed to leastsq, bfgs, newton, etc; further information in lmfit) in a feasible region that can be modified.</li>
+    <li><b>Plot:</b> Visualize the birdsong and syllable objects and their spectral and temporal features.</li>
     <li><b>Paths:</b> Manage the package paths: audio files and results directories.</li>
 </ul>
 
@@ -110,11 +109,11 @@ The PDF dissertation document is write with latex and is stored on Github at <a 
   <figcaption><b>Figure 1.</b> Objects implemented.</figcaption>
 </center></figure>
 
-<p>This will facilitate the reading of the methodology diagram. Each icon is an object that deals with different tasks. The major advantage of this implementation is the possiblity to easily compare the features between syllables or chuncks (small part of a syllable) objects.</p>
+<p>This will facilitate the reading of the methodology diagram. Each icon is an object that deals with different tasks. The major advantage of this implementation is the possibility to easily compare the features between syllables or chuncks (small part of a syllable) objects.</p>
 
 <h3 id="Methodology">Methodology</h3>
 
-<p>Using the above defined objects, the optimization problem is solved by following the next steps below:</p>
+<p>Using the above-defined objects, the optimization problem is solved by following the next steps below:</p>
 
 <center><figure>
   <img src="assets/img/methodology.png" alt="Methodology"  width="700" height="400">
@@ -129,8 +128,8 @@ The PDF dissertation document is write with latex and is stored on Github at <a 
 <h2 id="Conclusions">Conclusions</h2>
 
 <ul>
-    <li>The SCI score gives comparable results to finding the optimal pressure parameters coefficients, however it is not always sufficient since the noise can be interpreted as harmonics or spectral content. An improvement is to refine the objective function that find these parametric coefficients</li>
-    <li>The model successfully simulated several syllables of Zonotrichia capensis with different sound quality. The best sounds to generate are the longer, simpler and clear syllables which were simulated with high accuracy. The thrilled syllables can be well-generated using chuncks, small parts of syllables, but it requires tuning the pitch threshold.</li>
+    <li>The SCI score gives comparable results to finding the optimal pressure parameters coefficients, however, it is not always sufficient since the noise can be interpreted as harmonics or spectral content. An improvement is to refine the objective function that finds these parametric coefficients</li>
+    <li>The model successfully simulated several syllables of Zonotrichia Capensis with different sound quality. The best sounds to generate are the longer, simpler, and clearer syllables which were simulated with high accuracy. The thrilled syllables can be well-generated using chunks, small parts of syllables, but it requires tuning the pitch threshold.</li>
     <li>The most problematic and difficult syllables are the noisy and with high spectral content audios, in which strong harmonics are present making the pitch computing hard or even impossible to compute correctly. Although for some audios is sufficient to change the pitch threshold detector, it does not work for all of them.</li>
 </ul>
 
@@ -140,8 +139,8 @@ The PDF dissertation document is write with latex and is stored on Github at <a 
 <p>Some of the applications of this model are:</p>
 
 <ul>
-    <li><b>Data augmentation:</b> use the model to create numerous synthetic syllables, it can be done by creating a syntetic birdsong and then varying its motor gestures parameters to get similar birdsongs.</li>
-    <li><b>Birdsongs descriptions:</b> characterize and compare birdsongs using the motor gestures parameters.</li>
+    <li><b>Data augmentation:</b> Use the model to create numerous synthetic syllables, it can be done by creating a synthetic birdsong and then varying its motor gesture parameters to get similar birdsongs.</li>
+    <li><b>Birdsongs descriptions:</b> Characterize and compare birdsongs using the motor gestures parameters.</li>
 </ul>
 
 
@@ -158,7 +157,7 @@ The PDF dissertation document is write with latex and is stored on Github at <a 
 <div class="csl-entry">[3] Ulloa, J. S., Haupert, S., Latorre, J. F., Aubin, T., &#38; Sueur, J. (2021). scikit-maad: An open-source and modular toolbox for quantitative soundscape analysis in Python. <i>Methods in Ecology and Evolution</i>, <i>12</i>(12), 2334–2340. <a href="https://doi.org/10.1111/2041-210X.13711">https://doi.org/10.1111/2041-210X.13711 Dataset </a> </div>
 <br>
 
-<div class="csl-entry">[4] McFee, B., Raffel, C., Liang, D., Ellis, D. P., McVicar, M., Battenberg, E., &amp; Nieto, O. &#38; (2015). librosa: Audio and music signal analysis in python. <i>  In Proceedings of the 14th python in science conference </i>, <i>12</i>(12), (Vol. 8). <a href="https://librosa.org/doc/latest/index.html">Librosa</a> </div>
+<div class="csl-entry">[4] McFee, B., Raffel, C., Liang, D., Ellis, D. P., McVicar, M., Battenberg, E., &amp; Nieto, O. &#38; (2015). librosa: Audio and music signal analysis in Python. <i>  In Proceedings of the 14th python in science conference </i>, <i>12</i>(12), (Vol. 8). <a href="https://librosa.org/doc/latest/index.html">Librosa</a> </div>
 
 <h2 id="audios-dataset">Audios Dataset</h2>
 <div class="csl-entry">[5] Xeno-canto Foundation and Naturalis Biodiversity Center &#38; (2005). <a href="https://xeno-canto.org/">xeno-canto:</a>     <i> Sharing bird sounds from around the world.</i> <i>  <a href="https://xeno-canto.org/set/8103">Dissertation Audios Dataset </a> </i></div>

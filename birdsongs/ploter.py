@@ -140,7 +140,7 @@ class Ploter(object):
                 img = librosa.display.specshow(syllable.Sxx_dB, x_axis="s", y_axis="linear", sr=syllable.fs,
                          hop_length=syllable.hop_length, ax=ax[2], cmap=self.cmap)
                 
-                ax[2].plot(syllable.time+syllable.t0, syllable.FF, 'b+', label='Syllable', ms=15)
+                ax[2].plot(syllable.time, syllable.FF, 'b+', label='Syllable', ms=15)
                 ax[2].set_ylim(obj.flim); 
                 ax[2].set_xlim((syllable.time[0], syllable.time[-1]));
                 ax[2].legend(loc='upper right', title="FF")
@@ -270,11 +270,11 @@ class Ploter(object):
         #ax1.plot(obj.time,       obj.rms,       'rv-', label=r'$F_{rms}$ real', ms=9)
         #ax1.plot(obj_synth.time, obj_synth.rms, 'p-', color="darkred", label=r'$F_{rms}$ synth', ms=7)
         
-        ax1.plot(obj.time,       obj.f_msf,       'D-', color="skyblue", label=r'$FF_{msf}$ real',ms=12)
-        ax1.plot(obj_synth.time, obj_synth.f_msf, 'X-', color="lightgreen",label=r'$FF_{msf}$ synt', ms=12)
+        #ax1.plot(obj.time,       obj.f_msf,       'D-', color="skyblue", label=r'$FF_{msf}$ real',ms=12)
+        #ax1.plot(obj_synth.time, obj_synth.f_msf, 'X-', color="lightgreen",label=r'$FF_{msf}$ synt', ms=12)
 
-        ax1.plot(obj.time,       obj.centroid,       '+-', color="yellow", label=r'$F_{cent}$ real', ms=12)
-        ax1.plot(obj_synth.time, obj_synth.centroid, 'p-', color="olive",  label=r'$F_{cent}$ synth', ms=12)
+        #ax1.plot(obj.time,       obj.centroid,       '+-', color="yellow", label=r'$F_{cent}$ real', ms=12)
+        #ax1.plot(obj_synth.time, obj_synth.centroid, 'p-', color="olive",  label=r'$F_{cent}$ synth', ms=12)
         
         ax1.plot(obj.time,        obj.FF,       'b*-', label=r'FF real',ms=25)
         ax1.plot(obj_synth.time,  obj_synth.FF, 'go-', label=r'FF synt', ms=12)
@@ -320,7 +320,7 @@ class Ploter(object):
 
         ax4 = fig.add_subplot(gs[3, 0])
         img = librosa.display.specshow(obj_synth.Sxx_dB, x_axis="s", y_axis="linear", sr=obj_synth.fs,
-                        hop_length=obj_synth.hop_length, ax=ax4, cmap=self.cmap)
+                                       hop_length=obj_synth.hop_length, ax=ax4, cmap=self.cmap)
         fig.colorbar(img, ax=ax4, format="%+2.f dB")
         #ax4.plot(obj_synth.time, obj_synth.FF, 'go-', label='synthetic', ms=6)
         ax4.set_xlim((obj.time[0], obj.time[-1])); ax4.set_ylim(obj.flim);

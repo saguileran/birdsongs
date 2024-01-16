@@ -28,7 +28,13 @@ class Optimizer(Syllable, object):
         syllable_synth = self.obj.Solve(p)
         return syllable_synth.residualCorrelation
         # return syllable_synth.scoreFF -np.mean(syllable_synth.correlation+syllable_synth.Df+syllable_synth.scoreSKL)
-
+    
+    def residualFF_shift(self, p): 
+        syllable_synth = self.obj.Solve(p)
+        delta = Norm(syllable_synth.FF - self.obj.FF - p["f0"],
+                     ord=self.obj.ord)/syllable_synth.FF.size
+        return delta
+        #return syllable_synth.residualCorrelation
     # making peackeable
     #def residualCorrelation_p(p): return Optimizer, (p.a,)
     # print("pickling a C instance...")
@@ -106,7 +112,7 @@ class Optimizer(Syllable, object):
         # print(r"$a_1*$"+"={0:.4f}, t={1:.4f} min".format(self.obj.p["a1"].value, (end1-start1)/60))
         # #return self.obj.p["b0"].value, self.obj.p["b1"].value #end0-start0, end1-start1
         obj = self.obj
-        
+    
     def OptimalGamma(self, obj):
         self.obj = obj
         start = time.time()
@@ -119,6 +125,20 @@ class Optimizer(Syllable, object):
         obj = self.obj
         return mi.params["gm"].value
     
+    def OptimalF0(self, obj, Ns=21):
+        self.obj = obj; self.kwargs["Ns"] = Ns;
+        # ---------------- f0, FF shift --------------------
+        start02 = time.time()
+        self.obj.p["f0"].set(vary=True);
+        mi02    = lmfit.minimize(self.residualFF_shift, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
+        self.obj.p["f0"].set(vary=False, value=mi02.params["f0"].value)
+        end02   = time.time()
+        print(r"$f_0*$"+"={:.4f},\nt={:.4f} min".format(self.obj.p["f0"].value, (end02-start02)/60))
+        
+        #self.obj.FF -= self.obj.p["f0"].value
+        obj = self.obj
+        return self.obj.p["f0"].value
+
 #     def OptimalParams1(self, NsGamma=51, NsPar=21):
 #         obj_synth = self.obj.Solve(self.obj.p)     #
         
@@ -148,7 +168,7 @@ class Optimizer(Syllable, object):
                             ('b0', -0.1, True,   -1,  0.5,  None, None),#0.03),  
                             ('b1',   1,  True,  0.2,     2,  None, None),#0.04), 
                             ('b2',   0., True,    0,    2,  None, None), 
-                            ('gm',   gm, True,  1e4,  1e5, None, 2000))
+                            ('gm',   gm, True,  1e4,  1e5,  None, 2000))
         mi    = lmfit.minimize(self.residualFFandSCI, self.obj.p, nan_policy='omit', method=self.method, **self.kwargs) 
         self.obj.p["a0"].set(vary=False, value=mi.params["a0"].value)
         self.obj.p["a1"].set(vary=False, value=mi.params["a1"].value)
@@ -297,32 +317,32 @@ class Optimizer(Syllable, object):
         
         return self.bird, self.synth_bird
         
-    def SmoothAB(self, times, smooth=3, fraction=5):
-        times   = np.array(times)
-        indexes = np.int64(times*self.obj.fs)
-        self.alphas_smooth = np.copy(self.alphas)
-        self.betas_smooth  = np.copy(self.betas)
+    # def SmoothAB(self, times, smooth=3, fraction=5):
+    #     times   = np.array(times)
+    #     indexes = np.int64(times*self.obj.fs)
+    #     self.alphas_smooth = np.copy(self.alphas)
+    #     self.betas_smooth  = np.copy(self.betas)
         
-        for i in range(times.shape[0]):
-            index_0, index_end = indexes[i,0], int(indexes[i,1])-1
+    #     for i in range(times.shape[0]):
+    #         index_0, index_end = indexes[i,0], int(indexes[i,1])-1
             
-            NoSamples = (index_end-index_0)//fraction  # syllable samples length fraction
-            x = self.synth_bird_t
-            yleft  = smoothstep(x, x_min=x[int(index_0-NoSamples/2)], x_max=x[index_0], N=smooth)
-            yright = smoothstep(x, x_min=x[index_end], x_max=x[int(index_end+NoSamples/2)], N=smooth)
+    #         NoSamples = (index_end-index_0)//fraction  # syllable samples length fraction
+    #         x = self.synth_bird_t
+    #         yleft  = smoothstep(x, x_min=x[int(index_0-NoSamples/2)], x_max=x[index_0], N=smooth)
+    #         yright = smoothstep(x, x_min=x[index_end], x_max=x[int(index_end+NoSamples/2)], N=smooth)
             
-            self.synth_bird_s[int(index_0-NoSamples/2):index_0]      = self.synth_bird_s[index_0]*yleft[int(index_0-NoSamples/2):index_0]
-            self.synth_bird_s[index_end:int(index_end+NoSamples/2)] = self.synth_bird_s[index_end]*yright[index_end:int(index_end+NoSamples/2)][::-1]
+    #         self.synth_bird_s[int(index_0-NoSamples/2):index_0]      = self.synth_bird_s[index_0]*yleft[int(index_0-NoSamples/2):index_0]
+    #         self.synth_bird_s[index_end:int(index_end+NoSamples/2)] = self.synth_bird_s[index_end]*yright[index_end:int(index_end+NoSamples/2)][::-1]
             
-            # self.alphas_smooth[int(index_0-NoSamples/2):index_0]     = self.alphas[index_0]*yleft[int(index_0-NoSamples/2):index_0]
-            # self.betas_smooth[int(index_0-NoSamples/2):index_0]      = self.betas[index_0]*yleft[int(index_0-NoSamples/2):index_0]
-            # self.alphas_smooth[index_end:int(index_end+NoSamples/2)] = self.alphas[index_end]*yright[index_end:int(index_end+NoSamples/2)][::-1]
-            # self.betas_smooth[index_end:int(index_end+NoSamples/2)]  = self.betas[index_end]*yright[index_end:int(index_end+NoSamples/2)][::-1]
-            # ----------------------------------------------
+    #         # self.alphas_smooth[int(index_0-NoSamples/2):index_0]     = self.alphas[index_0]*yleft[int(index_0-NoSamples/2):index_0]
+    #         # self.betas_smooth[int(index_0-NoSamples/2):index_0]      = self.betas[index_0]*yleft[int(index_0-NoSamples/2):index_0]
+    #         # self.alphas_smooth[index_end:int(index_end+NoSamples/2)] = self.alphas[index_end]*yright[index_end:int(index_end+NoSamples/2)][::-1]
+    #         # self.betas_smooth[index_end:int(index_end+NoSamples/2)]  = self.betas[index_end]*yright[index_end:int(index_end+NoSamples/2)][::-1]
+    #         # ----------------------------------------------
         
-        # self.synth_bird.alphas_smooth = self.alphas_smooth
-        # self.synth_bird.betas_smooth  = self.betas_smooth
+    #     # self.synth_bird.alphas_smooth = self.alphas_smooth
+    #     # self.synth_bird.betas_smooth  = self.betas_smooth
         
-        # self.synth_bird_s = self.synth_bird_s
+    #     # self.synth_bird_s = self.synth_bird_s
         
-        return self.synth_bird_s
+    #     return self.synth_bird_s

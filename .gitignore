@@ -3,3 +3,5 @@ __pycache__
 .vscode
 examples/results_old/
 tutorials/birdsongs_develop.ipynb
+.vscode/
+_site/

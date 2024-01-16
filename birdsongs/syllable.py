@@ -22,7 +22,7 @@ class Syllable(object):
     #%%
     def __init__(self, birdsong=None, t0=0, Nt=100, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4), 
                  n_mels=4, umbral_FF=1, tlim=[], sfs=[], no_syllable=0, ide="syllable", 
-                 file_name="syllable", paths=None, f1f2=None, type=""):
+                 file_name="syllable", paths=None, f1f2=None, type="", BirdData=None):
         ## The bifurcation can be cahge modifying the self.f2 and self.f1 functions
         ## ------------- Bogdanov–Takens bifurcation ------------------
         if f1f2 is None:
@@ -35,18 +35,22 @@ class Syllable(object):
         self.f2 = f2
         ## Defining motor gestures model constants, measure by Gabo Mindlin 
         self.BirdData = {"C":343, "L":0.025, "r":0.65, "Ch":1.43E-10,
-                          "MG":20, "MB":1E4, "RB":5E6, "Rh":24E3}
+                         "MG":20, "MB":1E4, "RB":5E6, "Rh":24E3}
+        if BirdData is not None: 
+            for k in BirdData.keys():  self.BirdData[k] = BirdData[k]
+            
                            # c, L, r, c, L1, L2, r2, rd 
         ## -------------------------------------------------------------------------------------
         self.p = lmfit.Parameters()
-        # add params:   (NAME   VALUE    VARY    MIN  MAX  EXPR BRUTE_STEP)
+        # add params:   (NAME  VALUE  VARY   MIN  MAX  EXPR BRUTE_STEP)
         self.p.add_many(('a0', 0.11, False, 0.01, 0.25, None, None), 
                         ('a1',   0., False,   -2,    2, None, None), #0.05
                         ('a2',   0., False,    0,    2, None, None),
                         ('b0', -0.1, False,   -1,  0.5, None, None),  
                         ('b1',    1, False,    0,    2, None, None), 
                         ('b2',   0., False,    0,    2, None, None), 
-                        ('gm',  4e4, False,  1e4,  1e5, None, None))
+                        ('gm',  4e4, False,  1e4,  1e5, None, None),
+                        ('f0',    0, False, -1e3,  1e3, None, None))
         # -------------------------------------------------------------------        
         self.n_mfcc     = 8
         self.Nt         = Nt
@@ -296,7 +300,7 @@ class Syllable(object):
         WriteAudio(name, fs=self.fs, s=self.s)
 
     #%%    
-    def Solve(self, p, orde=2):
+    def Solve(self, p, orde=2, BirdData=None):
         self.p = p;  self.ord = orde; 
         if self.s.size < 2*self.fs/100: self.id = "chunck"
         else:                           self.id = "syllable"
@@ -308,11 +312,16 @@ class Syllable(object):
         synth.t_interval = self.t_interval
         synth.no_syllable = self.no_syllable
         synth.file_name = self.file_name[:-4] + "-synth"
+        synth.FF -= self.p["f0"].value
 
         synth.state   = self.state
         synth.country = self.country
         synth.type = self.type
         synth.id = self.id
+        synth.BirdData = self.BirdData
+
+        if BirdData is not None: 
+            for k in BirdData.keys():  synth.BirdData[k] = BirdData[k]
 
         return synth
     

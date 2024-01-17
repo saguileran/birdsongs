@@ -11,22 +11,6 @@ Keywords: numerical-optimization,bioacustics,syrinx,signal processing
 Requires-Python: >=3.5
 Description-Content-Type: text/markdown
 License-File: LICENSE
-Requires-Dist: librosa>0.9
-Requires-Dist: lmfit
-Requires-Dist: scipy
-Requires-Dist: sympy
-Requires-Dist: numpy<1.24
-Requires-Dist: pandas>1.5
-Requires-Dist: matplotlib
-Requires-Dist: playsound
-Requires-Dist: PeakUtils
-Requires-Dist: mpl_pan_zoom
-Requires-Dist: mpl_point_clicker
-Requires-Dist: scikit_learn
-Requires-Dist: scikit_maad
-Requires-Dist: setuptools
-Requires-Dist: ipython
-Requires-Dist: ffmpeg
 
 <a href="https://github.com/saguileran/birdsongs/"><img src="./assets/img/logo.png" width="500"></a>
 

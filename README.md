@@ -212,7 +212,7 @@ Displays the audios file names found with the `paths.AudiosFiles(True)` function
 
 ### Birdsong
   
-Define and plot the wave sound and spectrogram of a the *XC11293* sample.
+Define and plot the wave sound and spectrogram of the sample *XC11293*. You can use both mp3 and wav files but in Windows maybe you can get errors from `librosa.load`. 
 
 ```python
 birdsong = bs.BirdSong(paths, file_id="XC11293", NN=1024, umbral_FF=1., Nt=500,
@@ -344,7 +344,7 @@ The PDF document of the bachelor thesis, <a href="https://github.com/saguileran/
 
 
 <figure><center>
-  <img src="https://raw.githubusercontent.com/saguileran/birdsongs/gh-pages/assets/img/cover.jpg" width="250" height="350"> <img src="https://raw.githubusercontent.com/saguileran/birdsongs/gh-pages/assets/img/under-cover.png" width="250" height="350">
+  <img src="https://raw.githubusercontent.com/saguileran/birdsongs/gh-pages/assets/img/cover.jpg" width="250" height="350"><img src="https://raw.githubusercontent.com/saguileran/birdsongs/gh-pages/assets/img/under-cover.png" width="250" height="350">
   <figcaption><b>Figure 6.</b> Bachelor's thesis PDF document.</figcaption>
 </figure></center>
 

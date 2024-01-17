@@ -2,6 +2,7 @@ import os, string
 import pandas as pd
 from pathlib import Path
 from maad import sound
+import requests
 from librosa import load
 import numpy as np
 from os.path import relpath
@@ -147,3 +148,17 @@ class Paths(object):
         if self.catalog: return self.data
         else:            return [name for name in self.files_names]
         
+    #%%
+    def CalculateAltitude(self):
+        altitude = []
+        for i in range(1):#len(paths.data)):
+            long, lat = paths.data["Longitude"][i], paths.data["Latitude"][i]
+            if type(long)==np.float64 and type(lat)==np.float64:
+                query = ('https://api.open-elevation.com/api/v1/lookup'
+                        f'?locations={lat},{long}')
+                r = requests.get(query).json()
+                elevation = r["results"][0]["elevation"]
+                altitude.append(elevation)
+            else:
+                altitude.append("NA")
+        return altitude

@@ -20,7 +20,7 @@ class Syllable(object):
     #     #self.progress = make_progress(self.progress_int)
 
     #%%
-    def __init__(self, birdsong=None, t0=0, Nt=100, llambda=1.5, NN=512, overlap=0.5, flim=(1.5e3,2e4), 
+    def __init__(self, birdsong=None, t0=0, Nt=100, llambda=1.5, NN=None, overlap=0.5, flim=(1.5e3,2e4), 
                  n_mels=4, umbral_FF=1, tlim=[], sfs=[], no_syllable=0, ide="syllable", 
                  file_name="syllable", paths=None, f1f2=None, type="", BirdData=None):
         ## The bifurcation can be cahge modifying the self.f2 and self.f1 functions
@@ -36,10 +36,10 @@ class Syllable(object):
         ## Defining motor gestures model constants, measure by Gabo Mindlin 
         self.BirdData = {"C":343, "L":0.025, "r":0.65, "Ch":1.43E-10,
                          "MG":20, "MB":1E4, "RB":5E6, "Rh":24E3}
+                                   # c, L, r, c, L1, L2, r2, rd 
         if BirdData is not None: 
             for k in BirdData.keys():  self.BirdData[k] = BirdData[k]
             
-                           # c, L, r, c, L1, L2, r2, rd 
         ## -------------------------------------------------------------------------------------
         self.p = lmfit.Parameters()
         # add params:   (NAME  VALUE  VARY   MIN  MAX  EXPR BRUTE_STEP)
@@ -52,14 +52,14 @@ class Syllable(object):
                         ('gm',  4e4, False,  1e4,  1e5, None, None),
                         ('f0',    0, False, -1e3,  1e3, None, None))
         # -------------------------------------------------------------------        
-        self.n_mfcc     = 8
-        self.Nt         = Nt
-        
-        self.n_mels     = n_mels
-        self.flim       = flim
-        self.llambda    = llambda
-        self.umbral_FF  = umbral_FF
-        self.type       = type
+        self.n_mfcc      = 8
+        self.Nt          = Nt
+        self.n_mels      = n_mels
+        self.flim        = flim
+        self.llambda     = llambda
+        self.umbral_FF   = umbral_FF
+        self.type        = type
+        self.no_syllable = no_syllable
         
         # define a syllable by entering the amplitude array (out)
         if birdsong!=None: 
@@ -77,6 +77,10 @@ class Syllable(object):
             self.flim       = self.birdsong.flim
             #self.tlim       = self.birdsong.tlim
             s          = self.birdsong.s
+            # self.win_length = self.birdsong.win_length
+            # self.hop_length = self.birdsong.hop_length
+            # self.no_overlap = self.birdsong.no_overlap
+            #self.umbral_FF  = umbral_FF
             
         elif len(sfs)!=0:           
             s, fs           = sfs
@@ -101,17 +105,26 @@ class Syllable(object):
         self.time0    = np.linspace(0, len(self.s)/self.fs, len(self.s))
         self.t_interval = np.array([self.time_s[0],self.time_s[-1]])+self.t0#_bs
 
-        if NN==0:
-            if self.s.size < self.fs/5: # a decimal of a second (0.2 s)
-                self.id = "chunck"; self.NN = 128;
-            else:
-                self.id = "syllable"; self.NN = 1024;
-        elif NN!=0 and birdsong==None: self.NN=NN
+        # if NN==0:
+        #     if self.s.size < self.fs/5: # a decimal of a second (0.2 s)
+        #         self.id = "chunck"; self.NN = 128;
+        #     else:
+        #         self.id = "syllable"; self.NN = 1024;
+        # elif NN!=0 and birdsong==None: self.NN=NN
+        if birdsong is None and NN is None: self.NN = 512
+        elif birdsong is not None and NN is not None: self.NN = NN
+        elif birdsong is None and NN is not None: self.NN = NN
+            
         if ide!="": self.id = ide
-        self.no_syllable = no_syllable
-        self.win_length  = self.NN
-        self.hop_length  = self.NN//4
-        self.no_overlap  = int(overlap*self.NN)        
+        
+        self.win_length = self.NN//2
+        self.hop_length = self.NN//4
+        self.no_overlap = int(overlap*self.NN)
+        
+
+        # self.win_length  = self.NN
+        # self.hop_length  = self.NN//4
+        # self.no_overlap  = int(overlap*self.NN)
         
         # -------------------------------------------------------------------
         # ------------- ACOUSTIC FEATURES -----------------------------------

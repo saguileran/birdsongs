@@ -98,14 +98,15 @@ class Ploter(object):
         #else:  print("This is not a synthetic object, there is not motor gestures variables asociated to it.")
             
     #%%
-    def Plot(self, obj, syllable=None, chunck=None, FF_on=False, SelectTime_on=False): 
+    def Plot(self, obj, syllable=None, chunck=None, FF_on=False, SelectTime_on=False, xlim=None): 
         ticks = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(x*1e-3))
         plt.close()
-        if syllable!=None: syllable_on=1
-        else:              syllable_on=0
+        if syllable!=None: syllable_on, ratios = 1, [2,1,1]
+        else:              syllable_on, ratios = 0, [2,1]
         if "birdsong" in obj.id:            
-            fig, ax = plt.subplots(2+int(syllable_on), 1, figsize=(self.figsize[0], self.figsize[1]*(2+int(syllable_on))),constrained_layout=True)
-            fig.subplots_adjust(hspace=0.6, wspace=0.4)
+            fig, ax = plt.subplots(2+int(syllable_on), 1, gridspec_kw={'height_ratios': ratios},
+                                   figsize=(self.figsize[0], self.figsize[1]*(2+int(syllable_on))), constrained_layout=True)
+            fig.subplots_adjust(hspace=0.6, wspace=0.2)
             
             img = librosa.display.specshow(obj.Sxx_dB, x_axis="s", y_axis="linear", sr=obj.fs,
                          hop_length=obj.hop_length, ax=ax[0], cmap=self.cmap)
@@ -116,18 +117,20 @@ class Ploter(object):
             # for i in range(len(obj.syllables)):  
             #     ax[0].plot([obj.time[obj.syllables[i][0]], obj.time[obj.syllables[i][-1]]], [0, 0], 'white', lw=5)
             #     ax[0].text((obj.time[obj.syllables[i][-1]]-obj.time[obj.syllables[i][0]])/2, 0.5, str(i))
-            ax[0].set_ylim(obj.flim); ax[0].set_xlim(min(obj.time), max(obj.time));
-            ax[0].set_title("Song Spectrum"); 
+            ax[0].set_ylim(obj.flim)
+            if xlim is not None: ax[0].set_xlim(xlim)
+            else:                ax[0].set_xlim(min(obj.time), max(obj.time))
+            ax[0].set_title("Spectrum"); 
             ax[0].yaxis.set_major_formatter(ticks)
-            ax[0].set_ylabel('f (kHz)'); #ax[0].set_xlabel('t (s)'); 
+            ax[0].set_ylabel('Frequency (kHz)'); ax[0].set_xlabel(''); 
 
 
             ax[1].plot(obj.time_s, obj.s,'k', label='audio')
             ax[1].plot(obj.time_s, np.ones(obj.time_s.size)*obj.umbral, '--', label='umbral')
             ax[1].plot(obj.time_s, obj.envelope, label='envelope')
-            ax[1].legend(bbox_to_anchor=(1.01, 0.98))#loc=1, title='Data') loc='upper right',
-            ax[1].set_title("Song Sound Wave")
-            ax[1].set_xlabel('time (s)'); ax[1].set_ylabel('Amplitud normalaized');
+            ax[1].legend(bbox_to_anchor=(1.01, 0.65))#loc=1, ) loc='upper right', , title='Data'
+            ax[1].set_title("Waveform")
+            ax[1].set_xlabel('Time (s)'); ax[1].set_ylabel('Amplitude (a.u)');
             ax[1].sharex(ax[0])
 
             if chunck!=None:
@@ -142,9 +145,11 @@ class Ploter(object):
                 
                 ax[2].plot(syllable.time, syllable.FF, 'b+', label='Syllable', ms=15)
                 ax[2].set_ylim(obj.flim); 
-                ax[2].set_xlim((syllable.time[0], syllable.time[-1]));
+                if xlim is not None: ax[2].set_xlim(xlim)
+                else:                ax[2].set_xlim((syllable.time[0], syllable.time[-1]))
+            
                 ax[2].legend(loc='upper right', title="FF")
-                ax[2].set_xlabel('t (s)'); ax[2].set_ylabel('f (khz)')
+                ax[2].set_xlabel('Time (s)'); ax[2].set_ylabel('f (khz)')
                 ax[2].set_title('Single Syllable Spectrum, No {}'.format(syllable.no_syllable))
                 ax[2].yaxis.set_major_formatter(ticks)
                 
@@ -153,7 +158,7 @@ class Ploter(object):
                 path_save = obj.paths.images / "{}-{}-AllSongAndSyllable.png".format(obj.file_name[:-4], syllable.no_syllable)
             else: path_save = obj.paths.images / "{}-AllSongAndSyllable.png".format(obj.file_name[:-4])
 
-            fig.suptitle("Audio Sound Wave and Spectrogram", fontsize=18) # 'Audio:\n{}'.format(obj.file_name[:-4])
+            fig.suptitle("Audio Sample: "+obj.file_name, fontsize=18) # 'Audio:\n{}'.format(obj.file_name[:-4])
             if SelectTime_on==True:  self.klicker = Klicker(fig, ax[0])
             #fig.tight_layout()
             plt.show()
@@ -161,8 +166,9 @@ class Ploter(object):
         
             if self.save: fig.savefig(path_save, transparent=True, bbox_inches='tight')
         else:  # syllable ------------------------------------------------
-            fig, ax = plt.subplots(2, 1, figsize=(self.figsize[0], self.figsize[1]*(2+int(syllable_on))), constrained_layout=True)
-            fig.subplots_adjust(hspace=0.8, wspace=0.4)
+            fig, ax = plt.subplots(2, 1, gridspec_kw={'height_ratios': [2, 1]}, constrained_layout=True,
+                                   figsize=(self.figsize[0], self.figsize[1]*(2+int(syllable_on))))
+            fig.subplots_adjust(hspace=0.8, wspace=0.2)
 
             img = librosa.display.specshow(obj.Sxx_dB, x_axis="s", y_axis="linear", sr=obj.fs,
                                            hop_length=obj.hop_length, ax=ax[0])
@@ -180,22 +186,22 @@ class Ploter(object):
             
             ax[0].set_ylim(obj.flim); ax[0].set_xlim(min(obj.time), max(obj.time));
             ax[0].set_title("Spectrum"); 
-            ax[0].set_ylabel('f (kHz)'); #ax[0].set_xlabel('t (s)'); 
+            ax[0].set_ylabel('Frequency (kHz)'); ax[0].set_xlabel(''); 
 
 
             ax[1].plot(obj.time_s, obj.s,'k', label='audio')
             ax[1].plot(obj.time_s, obj.envelope, label='envelope')
-            ax[1].legend(bbox_to_anchor=(1.01, 0.98))#loc='upper right')#loc=1, title='Data')
-            ax[1].set_title("Sound Wave")
-            ax[1].set_xlabel('t (s)'); ax[1].set_ylabel('Amplitud normalaized');
+            ax[1].legend(bbox_to_anchor=(1.01, 0.65))#loc='upper right')#loc=1, title='Data')
+            ax[1].set_title("Waveform")
+            ax[1].set_xlabel('Time (s)'); ax[1].set_ylabel('Amplitude (a.u)');
             ax[1].sharex(ax[0])
 
-            #fig.suptitle('id: {}, NoFile: {}, NoSyllable: {}'.format(obj.id, obj.no_file, obj.no_syllable), fontsize=16)
-            fig.suptitle('Sound Wave and Spectrogram - {}-{}'.format(obj.id, obj.no_syllable), fontsize=16)
+            fig.suptitle("Audio Sample: {} - Id: {} - No. {}".format(obj.file_name, obj.id, obj.no_syllable), fontsize=18) # 'Audio:\n{}'.format(obj.file_name[:-4])
+            #fig.suptitle('Sound Wave and Spectrogram - {}-{}'.format(obj.id, obj.no_syllable), fontsize=16)
             #fig.tight_layout()
             plt.show()
 
-            path_save = obj.paths.images / "{}-{}-{}.png".format(obj.file_name[:-4], obj.id, obj.no_syllable)
+            path_save = obj.paths.images / "{}-{}.png".format(obj.file_name[:-4], obj.type)
             
             if self.save: fig.savefig(path_save, transparent=True, bbox_inches='tight')
             return fig, ax
@@ -320,7 +326,7 @@ class Ploter(object):
 
         ax4 = fig.add_subplot(gs[3, 0])
         img = librosa.display.specshow(obj_synth.Sxx_dB, x_axis="s", y_axis="linear", sr=obj_synth.fs,
-                        hop_length=obj_synth.hop_length, ax=ax4, cmap=self.cmap)
+                                       hop_length=obj_synth.hop_length, ax=ax4, cmap=self.cmap)
         fig.colorbar(img, ax=ax4, format="%+2.f dB")
         #ax4.plot(obj_synth.time, obj_synth.FF, 'go-', label='synthetic', ms=6)
         ax4.set_xlim((obj.time[0], obj.time[-1])); ax4.set_ylim(obj.flim);

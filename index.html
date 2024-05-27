@@ -1,5 +1,5 @@
 ---
-layout: single
+layout: splash
 author_profile: true
 ---
 
@@ -37,20 +37,20 @@ author_profile: true
 
 <h2 id="Objective">Objective</h2>
 
-Design, development, and evaluation of a computational-physical model to generate synthetic birdsongs from recorded samples.
+Design, development, and evaluation of a computational-physical model for generating synthetic birdsongs from recorded samples.
 
 
 <h2 id="Overview">Overview</h2>
 
 <p>
-Study and Python implementation of the motor gestures for birdsongs model created by Prof. G Mindlin. This model explains the physics of birdsongs by modeling the organs involved in sound production in birds (syrinx, trachea, glottis, Oro-Oesophageal Cavity (OEC), and beak) using ordinary differential equations (ODEs).
+This study involves the Python implementation of the motor gestures for birdsong model developed by Professor G. Mindlin. This model explains the physics of birdsong by simulating the organs involved in sound production in birds, including the syrinx, trachea, glottis, oro-esophageal cavity (OEC), and beak, using ordinary differential equations (ODEs).
 <br><br>
-This work presents an automated model to generate comparable synthetic birdsongs, in spectro and time, using the motor gestures model and an audio-recorded file (real birdsongs) as input. The automatization is done by formulating a minimization problem with three control parameters: air sac pressure of the bird’s bronchi, labial tension of the syrinx walls, and a time scale constant. This optimization problem is solved using numerical methods, signal processing tools, and numerical optimization techniques. The objective function depends on the Fundamental Frequency (also called pitch and denoted as FF or F0) and the Spectral Conent Index (SCI) of both synthetic and real syllable
+This work presents an automated model for generating synthetic birdsongs that are comparable to real birdsongs in both spectrographic and temporal domains. The model uses the motor gestures approach and an audio recording of real birdsong as input. Automation is achieved by formulating a minimization problem with three control parameters: air sac pressure of the bird’s bronchi, labial tension of the syrinx walls, and a time scale constant. This optimization problem is solved using numerical methods, signal processing tools, and numerical optimization techniques. The objective function is based on the Fundamental Frequency (also called pitch, denoted as FF or F0) and the Spectral Content Index (SCI) of both the synthetic and real syllables.
 <br><br>
-The package is tested and evaluated in three different Colombian bird species: Zonotrichia Capensis, Ocellated Tapaculo, and Mimus Gilvus; recorded samples are downloaded from Xeno-Canto and eBird audio libraries. The results give FF and SCI relative errors less than % and comparable spectral harmonics, in number and frequency, as you can see in section Results
+The package is tested and evaluated on three different Colombian bird species: Zonotrichia capensis, Ocellated Tapaculo, and Mimus gilvus. Recorded samples are downloaded from Xeno-Canto and eBird audio libraries. The results show relative errors in FF and SCI of less than [specific percentage], with comparable spectral harmonics in both number and frequency, as detailed in the <a href="https://saguileran.github.io/birdsongs/results/">Results</a> section.
 <br><br>
 
-The PDF dissertation document is written with latex and is stored on Github at <a href="https://github.com/saguileran/birdsongs/tree/dissertation">www.github.com/saguileran/birdsongs/tree/dissertation</a> in the dissertation branch. You can download and compile it using text software (Texmaker, Overleaf, TeXstudio).
+The PDF dissertation document is written with latex and is stored on Github at <a href="https://github.com/saguileran/birdsongs/tree/dissertation">www.github.com/saguileran/birdsongs/tree/dissertation</a> at the dissertation branch.
 </p>
 
 <!--

@@ -43,7 +43,7 @@ To use birdsongs, clone the main branch of the repository and go to its root fol
 
 ```bat
 git clone -b main --single-branch https://github.com/saguileran/birdsongs.git
-d birdsongs
+cd birdsongs
 ```
 
 You can clone the whole repository using the code git clone  `https://github.com/saguileran/birdsongs.git` but since it is very large only the main branch is enough. To change the branch use the command `git checkout`  follow of the branch name of interest.
@@ -203,7 +203,8 @@ bird.WriteAudio();  synth_bird.WriteAudio() # write both objects, real and synth
     
 The repository has some audio examples in the folder [./examples/audios](https://github.com/saguileran/birdsongs/tree/main/examples/audios). You can download and store your own audios in the same folder or enter another audio folder path to the Paths object, the package also has a function to download audios from Xeno-Canto: birdsong.util.DownloadXenoCanto().
 
-The audios **must** be in WAV format or birdosngs will not import them, we suggest use [Audacity](https://www.audacityteam.org/) to convert the audios without any problem.
+>[!IMPORTANT]
+>The audios **must** be in WAV format or birdosngs will not import them, we suggest use [Audacity](https://www.audacityteam.org/) to convert the audios without any problem.
 
 ---
 

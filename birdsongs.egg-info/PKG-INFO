@@ -11,6 +11,22 @@ Keywords: numerical-optimization,bioacustics,syrinx,signal processing
 Requires-Python: >=3.5
 Description-Content-Type: text/markdown
 License-File: LICENSE
+Requires-Dist: librosa>0.9
+Requires-Dist: lmfit
+Requires-Dist: scipy
+Requires-Dist: sympy
+Requires-Dist: numpy<1.24
+Requires-Dist: pandas>1.5
+Requires-Dist: matplotlib
+Requires-Dist: playsound
+Requires-Dist: PeakUtils
+Requires-Dist: mpl_pan_zoom
+Requires-Dist: mpl_point_clicker
+Requires-Dist: scikit_learn
+Requires-Dist: scikit_maad
+Requires-Dist: setuptools
+Requires-Dist: ipython
+Requires-Dist: ffmpeg
 
 <a href="https://github.com/saguileran/birdsongs/"><img src="./assets/img/logo.png" width="500"></a>
 
@@ -55,15 +71,15 @@ A python package for analyzing, visualizing and generating synthetic birdsongs f
   
 # Objective
 
-Design, development, and evaluation of a computational-physical model to generate synthetic birdsongs from recorded samples.
+Design, development, and evaluation of a computational-physical model for generating synthetic birdsongs from recorded samples.
 
 # Overview
 
-Study and Python implementation of the **motor gestures for birdsongs** model created by Prof. [G Mindlin](https://scholar.google.com.ar/citations?user=gMzZPngAAAAJ&hl=en). This model explains the physics of birdsongs by modeling the organs involved in sound production in birds (syrinx, trachea, glottis, Oro-Oesophageal Cavity (OEC), and beak) using oridary differential equations (ODEs). 
+Study and Python implementation of the **motor gestures for birdsongs** model created by Prof. [G Mindlin](https://scholar.google.com.ar/citations?user=gMzZPngAAAAJ&hl=en). This model explains the physics of birdsong by simulating the organs involved in sound production in birds, including the syrinx, trachea, glottis, oro-esophageal cavity (OEC), and beak, using ordinary differential equations (ODEs).
 
-This work presents an automated model to generated comparable synthetic birdsongs, in spectro and time, using the motor gestures model and an audio recorded file (real birdsongs) as an input. The automatization is done by formulating a minimization problem with three control parameters: air sac pressure of the bird’s bronchi, labial tension of the syrinx walls, and a time scale constant. This optimization problem is solved using numerical methods, signal processing tools, and numerical optimization techniques. The objective function depends on the Fundamental Frequency (also called pitch and denoted as FF or F0) and the Spectral Conent Index (SCI) of both synthetic and real syllable
+This work presents an automated model for generating synthetic birdsongs that are comparable to real birdsong in both spectrographic and temporal aspects. The model utilizes motor gestures for birdsongs model and an audio recording of real birdsong as input. Automation is achieved by formulating a minimization problem with three control parameters: air sac pressure of the bird’s bronchi, labial tension of the syrinx walls, and a time scale constant. This optimization problem is solved using numerical methods, signal processing tools, and numerical optimization techniques. The objective function is based on the Fundamental Frequency (also called pitch, denoted as FF or F0) and the Spectral Content Index (SCI) of both synthetic and real syllables.
 
-The package is tested and evaluated in three different Colombian bird species: Zonotrichia Capensis, Ocellated Tapaculo, and Mimus Gilvus; recorded samples download from Xeno-Canto and eBird audio libraries. The results give FF and SCI relative errors less than  % and comparable spectral harmonics, in number and frequency, as you can see in section [Results](#results)
+The model is tested and evaluated on three different Colombian bird species: Zonotrichia capensis, Ocellated Tapaculo, and Mimus gilvus, using recorded samples downloaded from [Xeno-Canto](https://xeno-canto.org/) and [eBird](https://ebird.org/home) audio libraries. The results show relative errors in FF and SCI of less than 10%, with comparable spectral harmonics in terms of number and frequency, as detailed in the [Results](#results) section.
 
 
 # Repository Contents
@@ -90,14 +106,13 @@ Schematic description of the physical model **motor gestures for birdsongs** wit
 
 ## Object-Oriented Thinking
 
-By taking advantage of the Object-Oriented Programming (OOP) paradigm, long codes can be avoided. Furthermore, the execution and implementation of the model is fast and easy, making it possible to create and compare several syllables with a single line of code. 
-To solve the optimization problem and to analyze and compare real and synthetic birdsongs, five objects are created:
+By leveraging the Object-Oriented Programming (OOP) paradigm, the need for lengthy code is minimized. Additionally, the execution and implementation of the model are efficient and straightforward, allowing for the creation and comparison of several syllables with a single line of code. To solve the optimization problem and to analyze and compare real and synthetic birdsong, five objects are created:
 
-- **BirdSong**: Read an audio using its file name and a path object, it computes the audio spectral and temporal features. It can also split the audio into syllables.
+- **BirdSong**: Read an audio using its file name and a path sobject, it computes the audio spectral and temporal features. It can also split the audio into syllables (in process).
 - **Syllable**: Create a birdsong syllable from a birdsong object using a time interval that can be selected in the plot or defined as a list. The spectral and temporal features of the syllable are automatically computed. 
-- **Optimizer**: Create an optimizer that solves the minimization problem using the method entered (the default is brute force but can be changed to leastsq, bfgs, newton, etc; further information in [lmfit](https://lmfit.github.io/lmfit-py/fitting.html)) in a feasible region that can be modified. 
-- **Plot**: Visualize the birdsong and sylalble objects and their spectral and temporal features.
-- **Paths**: Manage the package paths: audio files and results directories.
+- **Optimizer**: Create an optimizer that solves the minimization problem using the method entered (the default is brute force but can be changed to leastsq, bfgs, newton, etc. The use of a different method to brute force need to add additional parameters. Further information in [lmfit](https://lmfit.github.io/lmfit-py/fitting.html)) in a feasible region that can be modified. 
+- **Plot**: Visualize the birdsong and sylalble objects and their spectral and temporal features. It also include a functionality to select points from the spectrum.
+- **Paths**: Manage the package paths, audio files and results directories.
 
 For each object an icon is defined as follows:
 
@@ -106,11 +121,12 @@ For each object an icon is defined as follows:
   <figcaption><b>Figure 2.</b> Objects implemented.</figcaption>
 </figure></center>
 
-This will facilitate the reading of the methodology diagram. Each icon is an object that deals with different tasks. The major advantage of this implementation is the possiblity to easily compare the features between syllables or chuncks (small part of a syllable) objects. 
+
+This approach simplifies the interpretation of the methodology diagram. Each icon represents an object that handles different tasks. The major advantage of this implementation is the ability to easily compare features between syllable or chunk (small part of a syllable) objects.
 
 ## Methodology
 
-Using the above defined objects, the optimization problem is solved by following the next steps below:
+Using the previous defined objects, the optimization problem is solved by following the next steps below:
 
 <!-- <p align="center"> <img src="./assets/img/methodology.png" width="600" alt="methodology"></p>
 -->
@@ -120,44 +136,24 @@ Using the above defined objects, the optimization problem is solved by following
 </figure></center>
 
 
-Each step contains the icon of the object involved. The final output is a parameters object (data frame from lmfit library) with the optimal control parameters coefficients of the optimal motor gesture that best reproduce the real birdsong.
+Each step includes the icon of the object involved. The final output is a parameters object (a data frame similar to the lmfit library parameters objects) containing the optimal control parameter coefficients for the motor gestures that best reproduce the real birdsong.
 
 # Installation
 
 ## Requirments
 
-`birdsong` is implemented in Python 3.8 but is also tested in Python 3.10 and 3.11. It requires the following packages:
-
-- librosa
-- lmfit
-- scipy
-- sympy
-- numpy
-- pandas
-- matplotlib
-- playsound
-- PeakUtils
-- mpl_pan_zoom
-- mpl_point_clicker
-- scikit_learn
-- scikit_maad
-- setuptools
-- ipython
-- pygobject
-- ffmpeg
-- ipympl
-
+`birdsong` is implemented in Python 3.8 but is also tested in Python 3.10 and 3.11. The required packages are listed in the file [requirements.txt](https://github.com/saguileran/birdsongs/blob/main/requirements.txt).
     
 ## Downloading
 
-To use **birdsongs**, clone the ```main``` branch of the repository and go to its root folder.
+To use **birdsongs**, clone the `main` branch of the repository and go to its root folder.
 
 ```bat
 git clone -b main --single-branch https://github.com/saguileran/birdsongs.git
 cd birdsongs
 ```
 You can clone the whole repository using the code
-```git clone https://github.com/saguileran/birdsongs.git``` but since it is very large only the main branch is enough. To change the branch use the command `git checkout ` follow of the branch name of interest.
+`git clone https://github.com/saguileran/birdsongs.git` but since it is very large only the main branch is enough. To change the branch use the command `git checkout ` follow of the branch name of interest.
 
 The next step is to install the required packages, any of the following commands lines will work:
 
@@ -201,8 +197,6 @@ Take a look at the tutorials notebooks for basic uses: physical model implementa
 
 ## Define Objects
 
-
-
 Import the birdonsg package as `bs` 
 
 ```python
@@ -226,47 +220,58 @@ Displays the audios file names found with the `paths.AudiosFiles(True)` function
 
 ### Birdsong
   
-Define and plot the wave sound and spectrogram of a the *XC11293* sample.
+Define and plot the wave sound and spectrogram of the sample *XC11293*. You can use both mp3 and wav files but in Windows maybe you can get errors from `librosa.load`. 
 
 ```python
-birdsong = bs.BirdSong(paths, file_id="XC11293", NN=1024, umbral_FF=1., Nt=500,
-                       #tlim=(t0,tend), flim=(f0,fmax) # other features
+birdsong = bs.BirdSong(paths, file_id="XC11293", NN=512, umbral_FF=1., Nt=500,
+                       tlim=(0,60), flim=(100,20e3) # other features
                       )
 ploter.Plot(birdsong, FF_on=False)  # plot the wave sound and spectrogram without FF
-birdsong.Play()                     # hear birdsong
+birdsong.Play()                     # listen the birdsong
 ```
 
-**Note:** The parameter *Nt* is related to the envelope of the waveform, for long audios large Nt while for short audios small Nt. 
+>[!NOTE]
+>The parameter *Nt* is related to the envelope of the waveform, for long audios large Nt while for short audios small Nt. 
 
 ### Syllable
   
-Define the syllable using a time interval of interest and the previous birdsong object. The syllable inherits the birdsong attributes (NN, flim, paths, etc). To select the time interval points from the plot change the `SelectTime_on` argument of the `ploter.Plot()` funtion to `True`.
+Define the syllable using a time interval of interest and the previous birdsong object. The syllable inherits the birdsong attributes (NN, flim, paths, etc). To select the two time interval points (start and end of the syllable) from the plot change the `SelectTime_on` argument of the `ploter.Plot()` funtion to `True`.
     
 ```python
 # selec time intervals from the birdsong plot, you can select a single pair
 ploter.Plot(birdsong, FF_on=False, SelectTime_on=True) # select 
+```
+
+Then, define a birdsong syllable with the time interval selected
+
+```python
 time_intervals = Positions(ploter.klicker)             # save
 print(time_intervals)                                  # display
 
 # define the syllable object
 syllable = bs.Syllable(birdsong, tlim=time_intervals[0], Nt=30, ide="syllable")
-ploter.Plot(syllable, FF_on=True);
+ploter.Plot(syllable, FF_on=True)
 ``` 
+
+>[!IMPORTANT]
+>The algorithm used to calculate the fundamental frequency does not perform well at the extremes of the syllable. To avoid issues, do not select the exact extremes; instead, choose a slightly shorter segment of the syllable.
   
 ## Solve
   
-Now let's define the optimizer object to generate the synthetic syllable, i.e., to solve the optimization problem. For example, to generate the synthetic syllable (or chunck) from the previously selected time interval.
+Now let's define the optimizer object to generate the synthetic syllable by solving the optimization problem. First, create the optimizer object by specifying the optimization method, its parameters, and the syllable of interest.
 
 ```python
 brute_kwargs = {'method':'brute', 'Ns':11}          # optimization method,  Ns is the number of grid points
 optimizer    = bs.Optimizer(syllable, brute_kwargs) # optimizer object
+```
+Then, execute the solver to find the optimal time scalar constant and the optimal motor gesture parameters (labial tension and air sac pressure vairables) 
+```python
 optimal_gm   = optimizer.OptimalGamma(syllable)     # find optimal gamma (time scale constant) 
-
 optimizer.OptimalParams(syllable, Ns=11)            # find optimal parameters coefficients
 #syllable, synth_syllable = optimizer.SongByTimes(time_intervals)   # find optimal parameters over several time intervals
 ```
     
-Then, define the synthetic syllable object with the optimal values found above.
+Finally, define the synthetic syllable object with the optimal values found above.
 
 ```python
 synth_syllable = syllable.Solve(syllable.p)
@@ -358,7 +363,7 @@ The PDF document of the bachelor thesis, <a href="https://github.com/saguileran/
 
 
 <figure><center>
-  <img src="https://raw.githubusercontent.com/saguileran/birdsongs/gh-pages/assets/img/cover.jpg" width="250" height="350"> <img src="https://raw.githubusercontent.com/saguileran/birdsongs/gh-pages/assets/img/under-cover.png" width="250" height="350">
+  <img src="https://raw.githubusercontent.com/saguileran/birdsongs/gh-pages/assets/img/cover.jpg" width="250" height="350"><img src="https://raw.githubusercontent.com/saguileran/birdsongs/gh-pages/assets/img/under-cover.png" width="250" height="350">
   <figcaption><b>Figure 6.</b> Bachelor's thesis PDF document.</figcaption>
 </figure></center>
 

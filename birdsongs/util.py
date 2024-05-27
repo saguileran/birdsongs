@@ -19,7 +19,7 @@ from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D 
 from matplotlib.gridspec import GridSpec
 
-from scipy import signal
+from scipy import signal, stats
 from scipy.interpolate import interp1d
 from scipy.optimize import root
 from scipy.signal import argrelextrema, butter, savgol_filter, find_peaks #hilbert
@@ -29,20 +29,30 @@ from sklearn.linear_model import LinearRegression
 from random import uniform
 from multiprocessing import Pool
 from IPython.display import display as Display
-from IPython.display import display, Math
+from IPython.display import Math, Latex
 
 
 from librosa import yin, pyin, feature, display, onset, times_like, stft, fft_frequencies
 import librosa 
-from maad import *
+from librosa.display import specshow as Specshow 
+#from maad import *
 from maad import sound
+import string
 import birdsongs as bs
+import plotly.express as px
+import plotly.graph_objs as go
+import plotly
+import geopandas
+from dash import Dash, dcc, html, Input, Output
+
 
 from IPython.display import Audio # reproduce audio 
 
 Pool() # crea pool to parallel programming for optimization
 #warnings.filterwarnings(action='once') # omite warnings spam
 
+#%%
+def PrintPretty(s): Display(Latex(s))
 #%%
 def rk4(f, v, dt):
     """
@@ -76,6 +86,19 @@ def Enve(out, fs, Nt):
 #%%
 def AudioPlay(obj):
     return Audio(data=obj.s, rate=obj.fs)
+
+#%%
+def Klicker_Multiple(fig, ax,
+                     labels=[r"$f_{max/min}$",r"$theme_{ini}$",r"$theme_{end}$",r"$trill_{ini}$",r"$trill_{end}$"],
+                     colors=["cyan","olivedrab","darkgreen","steelblue","royalblue"],
+                     markers=["p","*","*","o","o"]):
+    zoom_factory(ax)
+    pm = PanManager(fig, button=MouseButton.MIDDLE)
+    klicker = clicker(ax, labels, markers=markers,colors=colors, legend_bbox=(1.01, 0.98))
+
+    klicker._pm = pm
+    #ax.legend(title="Interval Points", bbox_to_anchor=(1.1, 1.05))
+    return klicker
 
 #%%
 def Klicker(fig, ax):
@@ -230,41 +253,37 @@ def BifurcationODE(f1, f2):
 #     return fun_s(time)
 
 #%%
-def DefineWholeSyllable(paths, info): 
-  index = 0
-  sfs = [info.iloc[index]["s"], info.iloc[index]["fs"]] # [s, fs]
-  NN = int(info.iloc[index]["NN"])
-  file_name = info.iloc[index]["file_name"]
-  umbral_FF = float(info.iloc[index]["umbral_FF"])
+def DefineWholeSyllable(paths, df, index, flim=(1e2,15e3)):
+    
+    file_id = df.iloc[index]["id_XC"]
+    NN = df.iloc[index]["NN"]
+    umbral_FF = df.iloc[index]["umbral_FF"]
+    birdsong = bs.BirdSong(paths, file_id=file_id, umbral_FF=umbral_FF, tlim=(0,60), Nt=1000, NN=NN, flim=flim)
 
-  syllable = bs.Syllable(sfs=sfs, paths=paths, tlim=[], NN=NN, file_name=file_name,
-                     umbral_FF=umbral_FF, ide="birdsong")
-  return syllable
+    return birdsong
+
 
 #%%
-def DefineSyllable(paths, info, index): 
-  sfs = [info.iloc[index]["s"], info.iloc[index]["fs"]] # [s, fs]
-  time_interval = [float(info.iloc[index]["t_ini"]), float(info.iloc[index]["t_end"])]
-  NN = int(info.iloc[index]["NN"])
-  file_name = info.iloc[index]["file_name"]
-  umbral_FF = float(info.iloc[index]["umbral_FF"])
-  type = info.iloc[index]["type"]
-  no_syllable = info.iloc[index]["no_syllable"]
-  state = info.iloc[index]["state"]
-  country = info.iloc[index]["country"]
+def DefineSyllable(paths, df, index, flim=(1e2,15e3)): 
+    
+    file_id = df.iloc[index]["id_XC"]
+    NN = df.iloc[index]["NN"]
+    umbral_FF = df.iloc[index]["umbral_FF"]
+    time_interval = df.iloc[index][["t_ini","t_end"]].values
+    type = df.iloc[index]["type"]
+    no_syllable = df.iloc[index]["no_syllable"]
+    coef = df.iloc[index][["coef"]].values[0]
+    
+    birdsong = bs.BirdSong(paths, file_id=file_id, umbral_FF=umbral_FF, tlim=(0,60), Nt=1000, NN=NN, flim=flim)
+    
+    syllable = bs.Syllable(birdsong=birdsong, tlim=time_interval, Nt=10, #NN=NN, #file_name=file_name,
+                            umbral_FF=umbral_FF, ide="syllable", type=type, no_syllable=no_syllable)
+    syllable.Set(coef)
+    synth_syllable = syllable.Solve(syllable.p)
 
-  coef = list(info.iloc[index]["coef"].iloc[:6].value)
-  syllable = bs.Syllable(sfs=sfs, paths=paths, tlim=time_interval, NN=NN, file_name=file_name,
-                         umbral_FF=umbral_FF, ide="syllable", type=type, no_syllable=no_syllable)
-  syllable.Set(coef)
-  syllable.state = state
-  syllable.country = country
+    bw = np.max(synth_syllable.FF)-np.min(synth_syllable.FF)
+    lenght = synth_syllable.timeFF[-1]
+    bw_rate = {'file_name':synth_syllable.file_name, 'type':synth_syllable.type, 'no_syllable':synth_syllable.no_syllable,
+                'bw':bw, "lenght":lenght, 'rate':1/lenght}
 
-  synth_syllable = syllable.Solve(syllable.p)
-
-  bw = np.max(synth_syllable.FF)-np.min(synth_syllable.FF)
-  rate = synth_syllable.timeFF[-1]
-  bw_rate = {'file_name':synth_syllable.file_name, 'type':synth_syllable.type, 'no_syllable':synth_syllable.no_syllable,
-             'bw':bw, "lenght":rate, 'rate':1/rate}
-
-  return syllable, synth_syllable, bw_rate
+    return syllable, synth_syllable, bw_rate

@@ -20,8 +20,8 @@ class Syllable(object):
     #     #self.progress = make_progress(self.progress_int)
 
     #%%
-    def __init__(self, birdsong=None, t0=0, Nt=100, llambda=1.5, NN=None, overlap=0.5, flim=(1.5e3,2e4), 
-                 n_mels=4, umbral_FF=1, tlim=[], sfs=[], no_syllable=0, ide="syllable", 
+    def __init__(self, birdsong=None, t0=0, Nt=100, llambda=1.5, NN=None, overlap=0.5, flim=(1.5e3,2e4), n_mfcc=8,
+                 n_mels=4, umbral_FF=1, tlim=[], sfs=[], no_syllable=0, ide="syllable", ff_method="yin", t0_bs=None,
                  file_name="syllable", paths=None, f1f2=None, type="", BirdData=None):
         ## The bifurcation can be cahge modifying the self.f2 and self.f1 functions
         ## ------------- Bogdanov–Takens bifurcation ------------------
@@ -52,7 +52,7 @@ class Syllable(object):
                         ('gm',  4e4, False,  1e4,  1e5, None, None),
                         ('f0',    0, False, -1e3,  1e3, None, None))
         # -------------------------------------------------------------------        
-        self.n_mfcc      = 8
+        self.n_mfcc      = n_mfcc
         self.Nt          = Nt
         self.n_mels      = n_mels
         self.flim        = flim
@@ -60,6 +60,7 @@ class Syllable(object):
         self.umbral_FF   = umbral_FF
         self.type        = type
         self.no_syllable = no_syllable
+        self.ff_method = ff_method
         
         # define a syllable by entering the amplitude array (out)
         if birdsong!=None: 
@@ -89,6 +90,7 @@ class Syllable(object):
             self.file_name  = file_name
             self.umbral     = 0.05
             self.paths      = paths
+        if t0_bs!=None: self.t0_bs = t0_bs
         
         # ------ define syllable by time interval [tini, tend] --------
         if len(tlim)==0: 
@@ -97,20 +99,13 @@ class Syllable(object):
         elif len(tlim)!=0:
             self.s  = sound.normalize(s[int(tlim[0]*self.fs):int(tlim[1]*self.fs)], max_amp=1.0)
             self.t0 = tlim[0]
-            #self.tlim = tlim
 
         self.time_s   = np.linspace(0, len(self.s)/self.fs, len(self.s))
         self.envelope = Enve(self.s, self.fs, self.Nt)
         self.T        = self.s.size/self.fs
         self.time0    = np.linspace(0, len(self.s)/self.fs, len(self.s))
-        self.t_interval = np.array([self.time_s[0],self.time_s[-1]])+self.t0#_bs
+        self.t_interval = np.array([self.time_s[0],self.time_s[-1]])+self.t0_bs
 
-        # if NN==0:
-        #     if self.s.size < self.fs/5: # a decimal of a second (0.2 s)
-        #         self.id = "chunck"; self.NN = 128;
-        #     else:
-        #         self.id = "syllable"; self.NN = 1024;
-        # elif NN!=0 and birdsong==None: self.NN=NN
         if birdsong is None and NN is None: self.NN = 512
         elif birdsong is not None and NN is not None: self.NN = NN
         elif birdsong is None and NN is not None: self.NN = NN
@@ -196,12 +191,26 @@ class Syllable(object):
         # # self.times_on = times_on
         
         # # ------------- "better method" --------------
-        # self.FF     = pyin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=self.NN, 
-        #                win_length=self.win_length, hop_length=self.hop_length, n_thresholds=100, beta_parameters=(2, 18), 
-        #                boltzmann_parameter=2, resolution=0.1, max_transition_rate=35.92, switch_prob=0.01, 
-        #                no_trough_prob=0.01, fill_na=0, center=self.center, pad_mode='constant')
-        self.FF     = yin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=self.NN, 
-                          win_length=self.NN//2, hop_length=self.NN//4, trough_threshold=self.umbral_FF, center=self.center, pad_mode='constant')
+        if ff_method=="pyin":
+            self.FF,_,_     = pyin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=self.NN, 
+                                   win_length=self.win_length, hop_length=self.hop_length, n_thresholds=100, beta_parameters=(2, 18), 
+                                   boltzmann_parameter=2, resolution=0.1, max_transition_rate=35.92, switch_prob=0.01, 
+                                   no_trough_prob=0.01, fill_na=0, center=self.center, pad_mode='constant')
+        elif ff_method=="yin":
+            self.FF = yin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=self.NN, 
+                          win_length=self.win_length, hop_length=self.hop_length, center=self.center,
+                          trough_threshold=self.umbral_FF, pad_mode='constant')
+        elif ff_method=="both":
+            self.FF2    = yin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=self.NN, 
+                              win_length=self.win_length, hop_length=self.hop_length, center=self.center,
+                              trough_threshold=self.umbral_FF, pad_mode='constant')
+            self.FF,_,_ = pyin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=self.NN, 
+                               win_length=self.win_length, hop_length=self.hop_length, n_thresholds=100, beta_parameters=(2, 18), 
+                               boltzmann_parameter=2, resolution=0.1, max_transition_rate=35.92, switch_prob=0.01, 
+                               no_trough_prob=0.01, fill_na=0, center=self.center, pad_mode='constant')
+        elif ff_method=="manual":
+            print("Not implemented yet.")
+            pass
         
 #         # # remove atypical data
 #         df = pd.DataFrame(data={"FF":self.FF, "time":self.time})
@@ -294,7 +303,7 @@ class Syllable(object):
         # ------------------------------------------------------------
         self.Vs = np.array(self.Vs)
         # define solution (synthetic syllable) as a Syllable object 
-        synth = Syllable(Nt=self.Nt, llambda=self.llambda, NN=self.NN, overlap=0.5, file_name=self.file_name, 
+        synth = Syllable(Nt=self.Nt, llambda=self.llambda, NN=self.NN, overlap=0.5, file_name=self.file_name, t0_bs=self.t0_bs+self.t0,
                          paths=self.paths, flim=self.flim, sfs=[out, self.fs], umbral_FF=self.umbral_FF)
         
         synth.id    = self.id
@@ -322,8 +331,10 @@ class Syllable(object):
         synth = self.MotorGestures(self.alpha, self.beta, self.p["gm"].value) # solve the problem and define the synthetic syllable
         synth = self.SynthScores(synth, orde=orde) # compute differences and score variables
         synth.paths = self.paths
-        synth.t_interval = self.t_interval
+        synth.p = self.p
+        #synth.t_interval = self.t_interval
         synth.no_syllable = self.no_syllable
+        synth.ff_method = self.ff_method
         synth.file_name = self.file_name[:-4] + "-synth"
         synth.FF -= self.p["f0"].value
 
@@ -342,7 +353,7 @@ class Syllable(object):
     def ExportMotorGestures(self):
         # ------------ export p values and alpha-beta arrays ------------
         #df_MotorGestures = pd.DataFrame(data={"time":self.time_s, "alpha":self.alpha, "beta":self.beta})
-        df_MotorGestures_coef = pd.DataFrame(data=np.concatenate((list(self.p.valuesdict().values()),self.t_interval, [self.NN, self.umbral_FF, self.type, self.country, self.state])), 
+        df_MotorGestures_coef = pd.DataFrame(data=np.concatenate((list(self.p.valuesdict().values()), self.t_interval, [self.NN, self.umbral_FF, self.type, self.country, self.state])), 
                                             index=np.concatenate((list(self.p.valuesdict().keys()), ["t_ini", "t_end", "NN", "umbral_FF", "type", 'country', 'state'])), 
                                             columns=["value"])
         #name  = self.file_name[:-4] + "-"+str(self.id)+"-"+str(self.no_syllable)+"-MG.csv"

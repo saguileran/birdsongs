@@ -63,14 +63,9 @@ class Paths(object):
             else: 
                 self.sound_files = []; self.files_names = []; 
         self.no_files  = len(self.sound_files)
-    #%%
-    # def AudioFiles(self, verbose=False):
-    #     if verbose: print("The folder has {} songs:".format(self.no_files))
-    #     return self.data
-    #     #[print(str(i)+"-"+str(self.files_names[i])) for i in range(self.no_files)];
 
     #%%
-    def ImportParameters(self, XC=None, no_file=None, no_syllable=None, name=None):
+    def ImportParameters1(self, XC=None, no_file=None, no_syllable=None, name=None):
 
         self.data_param = self.MG_Files()
 
@@ -118,7 +113,39 @@ class Paths(object):
             print("{} files were found.".format(len(df.index)))
             return out, df
         
+    #%%
+    def ImportParameters(self, no_syllable=None, country_filter=None):
 
+        df = self.MG_Files()
+                                    # if syllables is None
+        coefs, type, out, tlim, NN, umbral_FF, country, state = [], [], [], [], [], [], [], []
+        for i in df.index:
+            coef = pd.read_csv(self.data_param.iloc[i]["coef_path"], index_col="Unnamed: 0", engine='python').T#, encoding = "utf-8") #cp1252
+            tlim.append([float(coef["t_ini"].value), float(coef["t_end"].value)])
+            NN.append(int(coef["NN"].value))
+            umbral_FF.append(float(coef["umbral_FF"].value))
+            type.append(coef["type"].value)
+            country.append(coef["country"].value)
+            state.append(coef["state"].value)
+            coefs.append(coef[["a0","a1","a2","b0","b1","b2","gm"]].values[0]) # coef.iloc[:7].astype('float64')
+        tlim = np.array(tlim)
+        
+        df = pd.DataFrame({'id_XC':df['id_XC'], 'no_syllable':df['no_syllable'],
+        'id':df['id'], 'name':df['name'], 'coef_path':df['coef_path'],
+        # 'param_path':df['param_path'], 's':df['s'], 'fs':df['fs'],
+        'audio_path':df['audio_path'], 'file_name':df['file_name'],
+        't_ini':tlim[:,0], 't_end':tlim[:,1], 'NN':NN, 'umbral_FF':umbral_FF, 'coef':coefs, 'type':type, 'country':country, 'state':state},
+        index=df.index)
+        
+        self.df = df.reset_index(drop=True, inplace=False)
+        print("{} files were found.".format(len(self.df.index)))
+        
+        if country_filter is not None: 
+            self.df = self.df[self.df["country"]==country_filter]
+        if no_syllable is not None: 
+            self.df = self.df[self.df["no_syllable"]==str(no_syllable)]
+        
+        return self.df
     #%% 
     def MG_Files(self): 
         self.MG_coef = list(self.MG_param.glob("*MG.csv"))
@@ -130,14 +157,15 @@ class Paths(object):
         name = [x[1]+"-"+x[2] for x in MG_coef_splited]
         audios = [list(self.audios.glob(id+"*"))[0]  for id  in id_XC]
         file_name = [relpath(audio, self.audios) for audio in audios]
-        ss, fss = [], []
+        # ss, fss = [], []
         
-        for audio in audios:
-            s, fs = load(audio, sr=None)
-            ss.append(s); fss.append(fs);
+        # for audio in audios:
+        #     s, fs = load(audio, sr=None)
+        #     ss.append(s); fss.append(fs);
+            
         self.data_param = pd.DataFrame({'id_XC':id_XC , 'no_syllable': no_syllables, 'id': id, 'name':name, 
-                                        "coef_path":self.MG_coef, "param_path":self.MG_coef, "audio_path":audios,
-                                        "s":ss, "fs":fss, "file_name":file_name})
+                                        "coef_path":self.MG_coef, "audio_path":audios, "file_name":file_name})
+                                                #"coef_path":self.MG_coef, "s":ss, "fs":fss, 
 
         return self.data_param
 
@@ -152,7 +180,7 @@ class Paths(object):
     def CalculateAltitude(self):
         altitude = []
         for i in range(1):#len(paths.data)):
-            long, lat = paths.data["Longitude"][i], paths.data["Latitude"][i]
+            long, lat = self.data["Longitude"][i], self.data["Latitude"][i]
             if type(long)==np.float64 and type(lat)==np.float64:
                 query = ('https://api.open-elevation.com/api/v1/lookup'
                         f'?locations={lat},{long}')

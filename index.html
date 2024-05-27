@@ -1,6 +1,7 @@
 ---
-layout: splash
+layout: home
 author_profile: true
+toc=true
 ---
 
 <h1 id="BirdSongs">BirdSongs</h1>
@@ -82,7 +83,8 @@ The PDF dissertation document is written with latex and is stored on Github at <
 
 <h3 id="Physical_Model">Physical Model</h3>
 
-<p>Schematic description of the physical <b>model motor gestures for birdsongs</b> with the organs involved in the sound production (syrinx, trachea, glottis, OEC, and beak) and their corresponding ODEs.</p>
+
+<p>A schematic description of the <b>motor gestures model for birdsongs</b>, illustrating the organs involved in sound production (syrinx, trachea, glottis, OEC, and beak) along with their corresponding ordinary differential equations (ODEs).</p>
 
 <center><figure>
   <img src="assets/img/model.png" alt="Model" width="700" height="400">
@@ -92,7 +94,7 @@ The PDF dissertation document is written with latex and is stored on Github at <
 
 <h3 id="OOP">Object-Oriented Thinking (OOP)</h3>
 
-<p>By taking advantage of the Object-Oriented Programming (OOP) paradigm, long codes can be avoided. Furthermore, the execution and implementation of the model are fast and easy, making it possible to create and compare several syllables with a single line of code. To solve the optimization problem and to analyze and compare real and synthetic birdsongs, five objects are created:</p>
+<p>By leveraging the Object-Oriented Programming (OOP) paradigm, lengthy code can be avoided. Additionally, the execution and implementation of the model are efficient and straightforward, allowing for the creation and comparison of several syllables with a single line of code. To solve the optimization problem and to analyze and compare real and synthetic birdsong, five objects are created:</p>
 
 <ul>
     <li><b>BirdSong:</b> Read audio using its file name and a path object, it computes the audio spectral and temporal features. It can also split the audio into syllables.</li>

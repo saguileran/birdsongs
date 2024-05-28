@@ -56,7 +56,7 @@ python setup.py install
 python -m pip install .
 ```
 
-or using pip (not suggested)
+or using pip (not recomended)
 ```bat
 pip install -e .
 pip install .

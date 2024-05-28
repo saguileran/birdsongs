@@ -54,7 +54,6 @@ Now, install the birdsong package using any one of the following lines
 ```bat
 python setup.py install
 python -m pip install .
-
 ```
 
 or using pip (not suggested)

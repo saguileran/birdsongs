@@ -1,9 +1,9 @@
-librosa>0.9
+librosa
 lmfit
 scipy
 sympy
-numpy<1.24
-pandas>1.5
+numpy
+pandas
 matplotlib
 playsound
 PeakUtils

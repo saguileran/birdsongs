@@ -8,15 +8,15 @@ Author-email: saguileran@unal.edu.co
 Maintainer: Sebastian Aguilera Novoa
 License: GPL-3.0
 Keywords: numerical-optimization,bioacustics,syrinx,signal processing
-Requires-Python: >=3.5
+Requires-Python: >=3.8
 Description-Content-Type: text/markdown
 License-File: LICENSE
-Requires-Dist: librosa>0.9
+Requires-Dist: librosa
 Requires-Dist: lmfit
 Requires-Dist: scipy
 Requires-Dist: sympy
-Requires-Dist: numpy<1.24
-Requires-Dist: pandas>1.5
+Requires-Dist: numpy
+Requires-Dist: pandas
 Requires-Dist: matplotlib
 Requires-Dist: playsound
 Requires-Dist: PeakUtils

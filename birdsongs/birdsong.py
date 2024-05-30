@@ -7,7 +7,7 @@ class BirdSong(Syllable, object):
     Store a song and its properties in a class 
     INPUT:
     """
-    def __init__(self, paths, file_id, sfs=[], umbral=0.05, llambda=1., NN=1024, overlap=0.5, center=False,  #no_file,
+    def __init__(self, paths, file_id, sfs=[], umbral=0.05, llambda=1., NN=1024, overlap=0.5, center=False,  t0_bs=0,#no_file,
                  umbral_FF=1.05, flim=(1.5e3,2e4),  tlim=[], split_method="freq", Nt=500, syll_times=[], dict=["",""]):
         
         self.paths   = paths
@@ -18,6 +18,7 @@ class BirdSong(Syllable, object):
         self.file_path = [file for file in paths.sound_files if file_id in str(file)][0]
         self.file_name = os.path.basename(os.path.normpath(self.file_path))
         
+        self.t0_bs = t0_bs
         if self.paths.catalog!=True:
             self.country = dict[0]
             self.state   = dict[1]

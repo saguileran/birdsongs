@@ -17,3 +17,4 @@ ffmpeg
 ipympl
 geopandas
 pygobject
+plotly

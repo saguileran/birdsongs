@@ -115,8 +115,8 @@ class Ploter(object):
     def Plot(self, obj, syllable=None, chunck=None, FF_on=False, SelectTime_on=False, xlim=None, figsize=None, save=None): 
         ticks = ticker.FuncFormatter(lambda x, pos: '{:g}'.format(x*1e-3))
         ticks_x = ticker.FuncFormatter(lambda x, pos: '{:.2f}'.format(x+obj.t0+obj.t0_bs))
+        
         if figsize is None: figsize=(8*self.figsize[0]//5, self.figsize[1]*5/3)
-                
         if xlim is not None: xlim = (xlim[0]-obj.t0, xlim[1]-obj.t0)
         else:                xlim = (obj.time[0], obj.time[-1])
 

@@ -53,6 +53,7 @@ pip install playsound@git+https://github.com/taconi/playsound
 ```
 
 In other case just execute `pip install playsound`.
+
 <!--
 You can now use the package in a Python terminal opened in the birdsongs folder. 
 

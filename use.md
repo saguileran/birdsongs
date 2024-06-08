@@ -15,17 +15,21 @@ Here you will find a tutorial on how to download, install, and use the `birdsong
 
 ## Requirments
 
-`birdsong` is implemented in Python 3.8 but it works for any latest Python version. The package requirements can be found at [requirements.txt](https://github.com/saguileran/birdsongs/blob/main/requirements.txt)
+`birdsong` is implemented in Python 3.8 but it works for any latest Python version. The package requirements can be found at [requirements.txt](https://github.com/saguileran/birdsongs/blob/main/requirements.txt).
+
+If you are using a version of Python higher than 3.10, to listening the audios you must execute `pip install playsound@git+https://github.com/taconi/playsound` in other case just execute `pip install playsound`.
 
 ## Setup Python Environment
 
-It is always a good practice to create a new environment to play with new packages. To do it, use the following command lines:
+If you are using Anaconda, it is always a good practice to create a new environment to test new packages. For that, use the following command lines:
 
 ```bash
 conda create -n birdsongs python=3.12
 conda activate birdsong
 ```
-When you finished using the birdsongs package just enter `conda deactivate` to disable the birdsongs environment.
+When you finished using the birdsongs package just enter `conda deactivate` to disable the birdsongs environment. 
+
+This can be also done in vsc using Python environments.
     
 ## Downloading
 

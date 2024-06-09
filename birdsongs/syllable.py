@@ -60,7 +60,7 @@ class Syllable(object):
         self.umbral_FF   = umbral_FF
         self.type        = type
         self.no_syllable = no_syllable
-        self.ff_method = ff_method
+        self.ff_method   = ff_method
         
         # define a syllable by entering the amplitude array (out)
         if birdsong!=None: 
@@ -191,16 +191,16 @@ class Syllable(object):
         # # self.times_on = times_on
         
         # # ------------- "better method" --------------
-        if ff_method=="pyin":
+        if self.ff_method=="pyin":
             self.FF,_,_     = pyin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=self.NN, 
                                    win_length=self.win_length, hop_length=self.hop_length, n_thresholds=100, beta_parameters=(2, 18), 
                                    boltzmann_parameter=2, resolution=0.1, max_transition_rate=35.92, switch_prob=0.01, 
                                    no_trough_prob=0.01, fill_na=0, center=self.center, pad_mode='constant')
-        elif ff_method=="yin":
+        elif self.ff_method=="yin":
             self.FF = yin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=self.NN, 
                           win_length=self.win_length, hop_length=self.hop_length, center=self.center,
                           trough_threshold=self.umbral_FF, pad_mode='constant')
-        elif ff_method=="both":
+        elif self.ff_method=="both":
             self.FF2    = yin(self.s, fmin=self.flim[0], fmax=self.flim[1], sr=self.fs, frame_length=self.NN, 
                               win_length=self.win_length, hop_length=self.hop_length, center=self.center,
                               trough_threshold=self.umbral_FF, pad_mode='constant')
@@ -208,7 +208,7 @@ class Syllable(object):
                                win_length=self.win_length, hop_length=self.hop_length, n_thresholds=100, beta_parameters=(2, 18), 
                                boltzmann_parameter=2, resolution=0.1, max_transition_rate=35.92, switch_prob=0.01, 
                                no_trough_prob=0.01, fill_na=0, center=self.center, pad_mode='constant')
-        elif ff_method=="manual":
+        elif self.ff_method=="manual":
             print("Not implemented yet.")
             pass
         

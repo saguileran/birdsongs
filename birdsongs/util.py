@@ -42,7 +42,7 @@ import birdsongs as bs
 import plotly.express as px
 import plotly.graph_objs as go
 import plotly
-import geopandas
+#import geopandas
 #from dash import Dash, dcc, html, Input, Output
 
 

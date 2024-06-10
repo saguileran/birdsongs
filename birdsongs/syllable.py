@@ -76,6 +76,7 @@ class Syllable(object):
             #self.s          = self.birdsong.s
             self.NN         = self.birdsong.NN
             self.flim       = self.birdsong.flim
+            self.ff_method   = self.birdsong.ff_method
             #self.tlim       = self.birdsong.tlim
             s          = self.birdsong.s
             # self.win_length = self.birdsong.win_length
